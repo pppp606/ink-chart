@@ -39,7 +39,7 @@ export type BarChartValueDisplay = 'right' | 'inside' | 'none';
 /**
  * Available bar characters for rendering
  */
-export type BarChartCharacter = '█' | '▓' | '▒' | '░';
+export type BarChartCharacter = '▆' | '█' | '▓' | '▒' | '░';
 
 /**
  * Props for the BarChart component
@@ -80,7 +80,8 @@ export interface BarChartProps {
   
   /** 
    * Character to use for drawing bars
-   * - '█': Full block (default, solid appearance)
+   * - '▆': Lower block (default, with visual spacing)
+   * - '█': Full block (solid appearance)
    * - '▓': Dark shade
    * - '▒': Medium shade
    * - '░': Light shade
@@ -218,7 +219,7 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
     sort = 'none',
     showValue = 'none',
     format = (value: number) => value.toString(),
-    barChar = '█',
+    barChar = '▆',
     width = 'auto'
   } = props;
 
@@ -268,10 +269,7 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
                    renderAutoWidthRow(item, ratio, showValue, format, barChar);
   });
 
-  // Join with spacing, avoiding trailing separator
-  const content = rows.length > 1 ? rows.slice(0, -1).join('\n▇\n') + '\n▇\n' + rows[rows.length - 1] : rows[0] || '';
-  
   return (
-    <Text>{content}</Text>
+    <Text>{rows.join('\n')}</Text>
   );
 }
