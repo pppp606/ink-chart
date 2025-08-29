@@ -145,7 +145,7 @@ function renderFixedWidthRow(
     const labelPart = displayLabel.padEnd(layout.labelWidth);
     const barPart = bar.padEnd(layout.barWidth); // Ensure consistent width for bar area
     const valuePart = format(value).padStart(layout.valueWidth - 1); // -1 for space separator
-    return labelPart + ' ' + barPart + valuePart;  // Added space between label and bar
+    return labelPart + ' ' + barPart + ' ' + valuePart;  // Added space between label-bar and bar-value
   } else {
     return displayLabel.padEnd(layout.labelWidth) + ' ' + bar;  // Added space between label and bar
   }
