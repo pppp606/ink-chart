@@ -28,8 +28,24 @@ module.exports = {
   },
   rules: {
     'react/react-in-jsx-scope': 'off',
+    'react/prop-types': 'off', // Using TypeScript for prop validation
     '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
   },
+  overrides: [
+    {
+      files: ['**/__tests__/**/*', '**/*.test.*', '**/*.spec.*'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+      },
+    },
+    {
+      files: ['dist/**/*'],
+      rules: {
+        '@typescript-eslint/no-explicit-any': 'off',
+        'react/prop-types': 'off',
+      },
+    },
+  ],
 };

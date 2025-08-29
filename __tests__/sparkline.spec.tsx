@@ -1,4 +1,11 @@
 import React from 'react';
+
+// Mock Ink components for testing
+jest.mock('ink', () => ({
+  Text: ({ children }: { children: React.ReactNode }) => children,
+  Box: ({ children }: { children: React.ReactNode }) => children,
+}));
+
 import { Sparkline } from '../src/components/Sparkline.js';
 
 describe('Sparkline Component', () => {
@@ -10,7 +17,8 @@ describe('Sparkline Component', () => {
     it('should return a React element or null', () => {
       const data = [1, 2, 3, 4, 5];
       const result = Sparkline({ data });
-      expect(result).toBeNull(); // Currently returns null in stub
+      expect(result).toBeDefined(); // Should return a React element
+      expect(result?.type).toBeDefined();
     });
 
     it('should accept required data prop', () => {
@@ -100,10 +108,16 @@ describe('Sparkline Component', () => {
       const autoResult = Sparkline({ data, yDomain: 'auto' });
       const fixedResult = Sparkline({ data, yDomain: [0, 100] });
       
-      // These should fail because yDomain handling needs implementation
       expect(autoResult).not.toBeNull();
       expect(fixedResult).not.toBeNull();
-      expect(autoResult).not.toEqual(fixedResult);
+      
+      // Compare the props.children content instead of object references
+      const autoContent = (autoResult as any)?.props?.children;
+      const fixedContent = (fixedResult as any)?.props?.children;
+      
+      expect(autoContent).toBeDefined();
+      expect(fixedContent).toBeDefined();
+      expect(autoContent).not.toEqual(fixedContent);
     });
 
     it('should handle threshold highlighting', () => {
