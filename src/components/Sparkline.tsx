@@ -2,6 +2,7 @@ import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
 import { red } from '../core/ansi.js';
+import { useAutoWidth } from '../core/useAutoWidth.js';
 
 /**
  * Props for the Sparkline component
@@ -194,15 +195,19 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
     caption
   } = props;
 
+  // Use auto-width hook when width is set to 'auto'
+  const autoWidth = useAutoWidth();
+  const effectiveWidth = width === 'auto' ? autoWidth.width : width;
+
   // Handle empty or invalid data
   if (!data || data.length === 0) {
     return null;
   }
 
   // Validate width parameter
-  if (typeof width === 'number' && (width <= 0 || !Number.isInteger(width))) {
-    console.warn('Sparkline: width must be a positive integer, falling back to auto');
-    // Continue with auto width behavior
+  if (typeof effectiveWidth === 'number' && (effectiveWidth <= 0 || !Number.isInteger(effectiveWidth))) {
+    console.warn('Sparkline: width must be a positive integer, falling back to data length');
+    // Fall back to data length for invalid width
   }
 
   // Filter out non-finite values and warn if found
@@ -224,8 +229,8 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
   let symbols = valuesToSymbols(processedData, mode, isPreNormalized);
 
   // Handle width specification
-  if (typeof width === 'number' && width > 0 && Number.isInteger(width)) {
-    symbols = scaleSymbolsToWidth(symbols, width);
+  if (typeof effectiveWidth === 'number' && effectiveWidth > 0 && Number.isInteger(effectiveWidth)) {
+    symbols = scaleSymbolsToWidth(symbols, effectiveWidth);
   }
 
   // Apply threshold highlighting if specified
