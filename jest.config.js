@@ -17,6 +17,9 @@ export default {
       },
     ],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(ink-testing-library|ink)/)'
+  ],
   testMatch: ['**/__tests__/**/*.(test|spec).(ts|tsx)'],
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
