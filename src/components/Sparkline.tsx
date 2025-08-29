@@ -16,9 +16,10 @@ export interface SparklineProps {
   /** 
    * Width of the sparkline in characters. 
    * - 'auto': Uses the length of the data array
+   * - 'max': Uses full terminal width with margin
    * - number: Fixed width, data will be interpolated to fit
    */
-  width?: 'auto' | number;
+  width?: 'auto' | 'max' | number;
   
   /** 
    * Height of the sparkline (future use, currently unused) 
@@ -60,7 +61,7 @@ export interface SparklineProps {
  * 
  * @example
  * ```tsx
- * // Basic usage with auto-scaling
+ * // Basic usage with auto width (uses data length)
  * <Sparkline data={[1, 3, 2, 5, 4]} />
  * 
  * // Fixed width with threshold highlighting
@@ -71,10 +72,10 @@ export interface SparklineProps {
  *   caption="Sales Trend"
  * />
  * 
- * // Fixed domain for consistent scaling
+ * // Full terminal width
  * <Sparkline 
  *   data={[20, 30, 40]} 
- *   yDomain={[0, 100]}
+ *   width="max"
  *   mode="braille"
  * />
  * ```
@@ -195,10 +196,21 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
     caption
   } = props;
 
-  // Use auto-width hook when width is set to 'auto'
+  // Use auto-width hook for terminal width detection
   const autoWidth = useAutoWidth();
-  // For auto width, use 60% of terminal width for better readability
-  const effectiveWidth = width === 'auto' ? Math.floor(autoWidth.width * 0.6) : width;
+  
+  // Determine effective width based on width prop
+  let effectiveWidth: number;
+  if (width === 'auto') {
+    // Use data length for auto mode
+    effectiveWidth = data.length;
+  } else if (width === 'max') {
+    // Use full terminal width with margin for max mode
+    effectiveWidth = autoWidth.width;
+  } else {
+    // Use specified number
+    effectiveWidth = width;
+  }
 
   // Handle empty or invalid data
   if (!data || data.length === 0) {
