@@ -133,5 +133,33 @@ describe('BarChart Component', () => {
       // Descending should show C Item (30) first, then B Item (20), then A Item (10)
       expect(descContent?.toString()).toMatch(/C Item.*B Item.*A Item/s);
     });
+
+    // Test 5: Max value handling
+    it('should handle max="auto" vs fixed max values affecting bar lengths', () => {
+      const data: BarChartData[] = [
+        { label: 'Low', value: 10 },
+        { label: 'High', value: 20 }
+      ];
+      
+      // Test with auto max (should use data max of 20)
+      const autoResult = BarChart({ data, max: 'auto', width: 20 });
+      expect(autoResult).not.toBeNull();
+      
+      // Test with fixed max of 40 (bars should be shorter relative to this max)
+      const fixedResult = BarChart({ data, max: 40, width: 20 });
+      expect(fixedResult).not.toBeNull();
+      
+      // Bar lengths should be different between auto and fixed max
+      // This will fail until we implement max value handling logic
+      const autoContent = (autoResult as any)?.props?.children;
+      const fixedContent = (fixedResult as any)?.props?.children;
+      
+      expect(autoContent).not.toEqual(fixedContent);
+      
+      // With auto max, "High" should be full length
+      // With fixed max of 40, "High" (20) should be half length
+      expect(autoContent).toBeDefined();
+      expect(fixedContent).toBeDefined();
+    });
   });
 });
