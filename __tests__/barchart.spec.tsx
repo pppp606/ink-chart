@@ -60,5 +60,27 @@ describe('BarChart Component', () => {
       const renderedContent = (result as any)?.props?.children;
       expect(renderedContent).toContain('█'); // Should contain bar characters
     });
+
+    // Test 2: ShowValue positioning  
+    it('should position values to the right of bars when showValue="right"', () => {
+      const data: BarChartData[] = [
+        { label: 'Sales', value: 150 },
+        { label: 'Marketing', value: 75 }
+      ];
+      
+      const result = BarChart({ data, showValue: 'right', width: 30 });
+      
+      expect(result).not.toBeNull();
+      
+      // Should render with values positioned to the right of bars
+      // This will fail until we implement the showValue positioning logic
+      const renderedContent = (result as any)?.props?.children;
+      expect(renderedContent).toContain('150'); // Should show the values
+      expect(renderedContent).toContain('75');
+      
+      // Values should be positioned after the bars
+      // This specific formatting expectation will fail initially
+      expect(renderedContent).toMatch(/█+\s+150/); // Bar followed by spaces and value
+    });
   });
 });
