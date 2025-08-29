@@ -19,11 +19,13 @@ export interface UseAutoWidthResult {
  * @returns Object containing current width and auto-width indicator
  */
 export function useAutoWidth(): UseAutoWidthResult {
-  // Get initial width from terminal
+  // Get initial width from terminal with margin to prevent wrapping
   const getTerminalWidth = (): number => {
     const columns = process.stdout.columns;
     // Provide sensible fallback if columns is undefined
-    return typeof columns === 'number' && columns > 0 ? columns : 80;
+    const baseWidth = typeof columns === 'number' && columns > 0 ? columns : 80;
+    // Subtract margin to prevent line wrapping (2 chars for safety)
+    return Math.max(10, baseWidth - 2);
   };
 
   const [width, setWidth] = useState<number>(getTerminalWidth());
