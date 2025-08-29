@@ -91,6 +91,13 @@ export function cyan(text: string): string {
 }
 
 /**
+ * Apply orange color (RGB 255,165,0 approximated as bright yellow)
+ */
+export function orange(text: string): string {
+  return colorize(text, '\u001b[38;5;214m'); // Orange color using 256-color palette
+}
+
+/**
  * Apply bold styling
  */
 export function bold(text: string): string {
