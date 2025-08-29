@@ -100,6 +100,23 @@ export interface BarChartProps {
 }
 
 /**
+ * Sorts bar chart data based on the specified sort order
+ * @param data - Array of data points to sort
+ * @param sort - Sort order configuration
+ * @returns New sorted array (original array is not modified)
+ */
+function sortData(data: BarChartData[], sort: BarChartSortOrder): BarChartData[] {
+  const sortedData = [...data];
+  if (sort === 'asc') {
+    sortedData.sort((a, b) => a.value - b.value);
+  } else if (sort === 'desc') {
+    sortedData.sort((a, b) => b.value - a.value);
+  }
+  // 'none' requires no action - use original order
+  return sortedData;
+}
+
+/**
  * Renders a single bar row for fixed-width layout
  * @param item - Data point to render
  * @param ratio - Normalized value ratio (0-1)
@@ -211,13 +228,7 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
   }
 
   // Create sorted copy of data based on sort configuration
-  const sortedData = [...data];
-  if (sort === 'asc') {
-    sortedData.sort((a, b) => a.value - b.value);
-  } else if (sort === 'desc') {
-    sortedData.sort((a, b) => b.value - a.value);
-  }
-  // 'none' requires no action - use original order
+  const sortedData = sortData(data, sort);
 
   // Determine maximum value for bar scaling
   const maxValue = max === 'auto' ? Math.max(...sortedData.map(d => d.value)) : max;
