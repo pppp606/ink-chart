@@ -205,8 +205,8 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
     // Use data length for auto mode
     effectiveWidth = data.length;
   } else if (width === 'max') {
-    // Use full terminal width with margin for max mode
-    effectiveWidth = autoWidth.width;
+    // Use full terminal width with extra margin for max mode to prevent wrapping
+    effectiveWidth = Math.max(10, autoWidth.width - 4);
   } else {
     // Use specified number
     effectiveWidth = width;
