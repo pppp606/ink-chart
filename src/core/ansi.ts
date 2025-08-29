@@ -98,17 +98,24 @@ export function orange(text: string): string {
 }
 
 /**
- * Apply light red/pink color for gradient highlighting
+ * Apply light red color for gradient highlighting (24-bit RGB)
  */
 export function lightRed(text: string): string {
-  return colorize(text, '\u001b[38;5;196m'); // Bright red (256-color)
+  return colorize(text, '\u001b[38;2;255;120;120m'); // Light coral red #FF7878
 }
 
 /**
- * Apply dark red color for gradient highlighting
+ * Apply medium red color for gradient highlighting (24-bit RGB)
+ */
+export function mediumRed(text: string): string {
+  return colorize(text, '\u001b[38;2;255;69;58m'); // Medium red #FF453A
+}
+
+/**
+ * Apply dark red color for gradient highlighting (24-bit RGB)
  */
 export function darkRed(text: string): string {
-  return colorize(text, '\u001b[38;5;124m'); // Dark red (256-color)
+  return colorize(text, '\u001b[38;2;180;0;0m'); // Dark red #B40000
 }
 
 /**
