@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, Box } from 'ink';
+import { Text } from 'ink';
 import { measureWidth, truncateText } from '../measure.js';
 import { calculateLayout } from '../barchart.layout.js';
 
@@ -218,7 +218,6 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
     showValue = 'none',
     format = (value: number) => value.toString(),
     barChar = '█',
-    padding = 0,
     width = 'auto'
   } = props;
 
@@ -255,8 +254,7 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
 
   // Render each data point as a bar row
   const rows = sortedData.map(item => {
-    const { label, value } = item;
-    const ratio = value / maxValue;
+    const ratio = item.value / maxValue;
     
     return layout ? renderFixedWidthRow(item, ratio, layout, showValue, format, barChar) :
                    renderAutoWidthRow(item, ratio, showValue, format, barChar);
