@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
-import { red } from '../core/ansi.js';
+import { red, yellow, orange } from '../core/ansi.js';
 import { useAutoWidth } from '../core/useAutoWidth.js';
 
 /**
@@ -41,9 +41,11 @@ export interface SparklineProps {
   yDomain?: 'auto' | [number, number];
   
   /** 
-   * Threshold value for highlighting. Values above this will be colored red.
+   * Threshold value(s) for highlighting. 
+   * - number: Single threshold, values above will be colored red
+   * - array: Multiple thresholds for gradient coloring (yellow→orange→red)
    */
-  threshold?: number;
+  threshold?: number | number[];
   
   /** 
    * Optional caption to display below the sparkline
@@ -171,16 +173,37 @@ function scaleSymbolsToWidth(symbols: string[], targetWidth: number): string[] {
 }
 
 /**
- * Applies threshold highlighting to symbols
+ * Applies threshold highlighting to symbols with gradient support
  * @param symbols - Array of symbol characters
  * @param data - Original data values
- * @param threshold - Threshold value for highlighting
+ * @param threshold - Threshold value(s) for highlighting
  * @returns Highlighted symbols as a single string
  */
-function applyThresholdHighlighting(symbols: string[], data: number[], threshold: number): string {
+function applyThresholdHighlighting(symbols: string[], data: number[], threshold: number | number[]): string {
   const highlightedSymbols = symbols.map((symbol, index) => {
     const originalValue = data[Math.floor((index / symbols.length) * data.length)];
-    return originalValue !== undefined && originalValue > threshold ? red(symbol) : symbol;
+    
+    if (originalValue === undefined) {
+      return symbol;
+    }
+    
+    // Single threshold mode
+    if (typeof threshold === 'number') {
+      return originalValue > threshold ? red(symbol) : symbol;
+    }
+    
+    // Multiple thresholds mode (gradient)
+    const sortedThresholds = [...threshold].sort((a, b) => a - b);
+    
+    if (originalValue > sortedThresholds[2]) {
+      return red(symbol);        // Highest: red
+    } else if (originalValue > sortedThresholds[1]) {
+      return orange(symbol);     // Middle: orange  
+    } else if (originalValue > sortedThresholds[0]) {
+      return yellow(symbol);     // Low: yellow
+    }
+    
+    return symbol; // Below all thresholds
   });
   
   return highlightedSymbols.join('');
