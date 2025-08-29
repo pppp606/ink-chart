@@ -1,7 +1,11 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
-import { red, red1, red2, red3, red4, red5, red6, red7, red8 } from '../core/ansi.js';
+import { 
+  red, red1, red2, red3, red4, red5, red6, red7, red8,
+  blue1, blue2, blue3, blue4, blue5, blue6, blue7, blue8,
+  green1, green2, green3, green4, green5, green6, green7, green8
+} from '../core/ansi.js';
 import { useAutoWidth } from '../core/useAutoWidth.js';
 
 /**
@@ -42,10 +46,18 @@ export interface SparklineProps {
   
   /** 
    * Threshold value(s) for highlighting. 
-   * - number: Single threshold, values above will be colored red
-   * - array: Multiple thresholds for gradient coloring (yellow→orange→red)
+   * - number: Single threshold, values above will be colored
+   * - array: Multiple thresholds for gradient coloring
    */
   threshold?: number | number[];
+  
+  /**
+   * Color scheme for threshold highlighting
+   * - 'red': Red gradient (default)
+   * - 'blue': Blue gradient  
+   * - 'green': Green gradient
+   */
+  colorScheme?: 'red' | 'blue' | 'green';
   
   /** 
    * Optional caption to display below the sparkline
@@ -177,9 +189,10 @@ function scaleSymbolsToWidth(symbols: string[], targetWidth: number): string[] {
  * @param symbols - Array of symbol characters
  * @param data - Original data values
  * @param threshold - Threshold value(s) for highlighting
+ * @param colorScheme - Color scheme to use for highlighting
  * @returns Highlighted symbols as a single string
  */
-function applyThresholdHighlighting(symbols: string[], data: number[], threshold: number | number[]): string {
+function applyThresholdHighlighting(symbols: string[], data: number[], threshold: number | number[], colorScheme: 'red' | 'blue' | 'green' = 'red'): string {
   const highlightedSymbols = symbols.map((symbol, index) => {
     const originalValue = data[Math.floor((index / symbols.length) * data.length)];
     
@@ -192,9 +205,18 @@ function applyThresholdHighlighting(symbols: string[], data: number[], threshold
       return originalValue > threshold ? red(symbol) : symbol;
     }
     
-    // Multiple thresholds mode (smooth red gradient)
+    // Multiple thresholds mode (smooth gradient)
     const sortedThresholds = [...threshold].sort((a, b) => a - b);
-    const gradientColors = [red1, red2, red3, red4, red5, red6, red7, red8];
+    
+    // Select gradient colors based on color scheme
+    let gradientColors: ((text: string) => string)[];
+    if (colorScheme === 'blue') {
+      gradientColors = [blue1, blue2, blue3, blue4, blue5, blue6, blue7, blue8];
+    } else if (colorScheme === 'green') {
+      gradientColors = [green1, green2, green3, green4, green5, green6, green7, green8];
+    } else {
+      gradientColors = [red1, red2, red3, red4, red5, red6, red7, red8];
+    }
     
     // Find the highest threshold exceeded
     let colorIndex = -1;
@@ -222,6 +244,7 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
     mode = 'block',
     yDomain = 'auto',
     threshold,
+    colorScheme = 'red',
     caption
   } = props;
 
@@ -277,7 +300,7 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
 
   // Apply threshold highlighting if specified
   const sparklineText = threshold !== undefined 
-    ? applyThresholdHighlighting(symbols, validData, threshold)
+    ? applyThresholdHighlighting(symbols, validData, threshold, colorScheme)
     : symbols.join('');
 
   // Render component with or without caption
