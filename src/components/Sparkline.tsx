@@ -221,7 +221,7 @@ function applyThresholdHighlighting(symbols: string[], data: number[], threshold
     // Find the highest threshold exceeded
     let colorIndex = -1;
     for (let i = sortedThresholds.length - 1; i >= 0; i--) {
-      if (originalValue > sortedThresholds[i]) {
+      if (originalValue > sortedThresholds[i]!) {
         colorIndex = Math.min(i, gradientColors.length - 1);
         break;
       }
