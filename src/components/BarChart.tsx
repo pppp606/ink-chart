@@ -2,6 +2,7 @@ import React from 'react';
 import { Text } from 'ink';
 import { measureWidth, truncateText } from '../measure.js';
 import { calculateLayout } from '../barchart.layout.js';
+import { useAutoWidth } from '../core/useAutoWidth.js';
 
 /**
  * Data point for a bar chart entry
@@ -221,6 +222,10 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
     width = 'auto'
   } = props;
 
+  // Use auto-width hook when width is set to 'auto'
+  const autoWidth = useAutoWidth();
+  const effectiveWidth = width === 'auto' ? autoWidth.width : width;
+
   // Handle empty or invalid data
   if (!data || data.length === 0) {
     return null;
@@ -239,13 +244,13 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
 
   // Calculate layout for fixed-width rendering
   let layout: BarChartLayout | null = null;
-  if (typeof width === 'number') {
+  if (typeof effectiveWidth === 'number') {
     const maxLabelWidth = Math.max(...sortedData.map(d => measureWidth(d.label)));
     const maxValueWidth = showValue === 'right' ? 
       Math.max(...sortedData.map(d => measureWidth(format(d.value)))) : 0;
     
     layout = calculateLayout({
-      totalWidth: width,
+      totalWidth: effectiveWidth,
       labelWidth: maxLabelWidth,
       valueWidth: showValue === 'right' ? maxValueWidth + 1 : maxValueWidth, // +1 for space separator
       minBarWidth: 1
