@@ -3,22 +3,196 @@ import { Text, Box } from 'ink';
 import { measureWidth, truncateText } from '../measure.js';
 import { calculateLayout } from '../barchart.layout.js';
 
+/**
+ * Data point for a bar chart entry
+ */
 export interface BarChartData {
+  /** The label to display for this data point */
   label: string;
+  /** The numeric value to represent as a bar */
   value: number;
 }
 
+/**
+ * Layout dimensions for fixed-width bar chart rendering
+ */
+export interface BarChartLayout {
+  /** Allocated width for the label section */
+  labelWidth: number;
+  /** Allocated width for the bar section */
+  barWidth: number;
+  /** Allocated width for the value section */
+  valueWidth: number;
+}
+
+/**
+ * Available sort orders for bar chart data
+ */
+export type BarChartSortOrder = 'none' | 'asc' | 'desc';
+
+/**
+ * Available value display positions
+ */
+export type BarChartValueDisplay = 'right' | 'inside' | 'none';
+
+/**
+ * Available bar characters for rendering
+ */
+export type BarChartCharacter = '█' | '▓' | '▒' | '░';
+
+/**
+ * Props for the BarChart component
+ */
 export interface BarChartProps {
+  /** Array of data points to visualize as bars */
   data: BarChartData[];
+  
+  /** 
+   * Maximum value for scaling bars
+   * - 'auto': Uses the maximum value from the data
+   * - number: Fixed maximum value for consistent scaling
+   */
   max?: 'auto' | number;
-  sort?: 'none' | 'asc' | 'desc';
-  showValue?: 'right' | 'inside' | 'none';
+  
+  /** 
+   * Sort order for the data points
+   * - 'none': Display in original order
+   * - 'asc': Sort by value ascending
+   * - 'desc': Sort by value descending
+   */
+  sort?: BarChartSortOrder;
+  
+  /** 
+   * Where to display the numeric values
+   * - 'right': Show values to the right of bars
+   * - 'inside': Show values inside the bars (future use)
+   * - 'none': Don't show values
+   */
+  showValue?: BarChartValueDisplay;
+  
+  /** 
+   * Custom formatter for numeric values
+   * @param value - The numeric value to format
+   * @returns Formatted string representation
+   */
   format?: (value: number) => string;
-  barChar?: '█' | '▓' | '▒' | '░';
+  
+  /** 
+   * Character to use for drawing bars
+   * - '█': Full block (default, solid appearance)
+   * - '▓': Dark shade
+   * - '▒': Medium shade
+   * - '░': Light shade
+   */
+  barChar?: BarChartCharacter;
+  
+  /** 
+   * Padding around the chart (future use, currently unused)
+   */
   padding?: 0 | 1 | 2;
+  
+  /** 
+   * Total width constraint for the chart
+   * - 'auto': Use natural width based on content
+   * - number: Fixed width, content will be adjusted to fit
+   */
   width?: 'auto' | number;
 }
 
+/**
+ * Renders a single bar row for fixed-width layout
+ * @param item - Data point to render
+ * @param ratio - Normalized value ratio (0-1)
+ * @param layout - Calculated layout dimensions
+ * @param showValue - Value display configuration
+ * @param format - Value formatting function
+ * @param barChar - Character to use for bars
+ * @returns Formatted string for this bar row
+ */
+function renderFixedWidthRow(
+  item: BarChartData,
+  ratio: number,
+  layout: BarChartLayout,
+  showValue: BarChartValueDisplay,
+  format: (value: number) => string,
+  barChar: string
+): string {
+  const { label, value } = item;
+  const displayLabel = truncateText(label, layout.labelWidth);
+  const barLength = Math.max(1, Math.floor(ratio * layout.barWidth));
+  const bar = barChar.repeat(barLength);
+
+  if (showValue === 'right') {
+    const labelPart = displayLabel.padEnd(layout.labelWidth);
+    const barPart = bar + ' '.repeat(Math.max(1, layout.barWidth - bar.length));
+    const valuePart = format(value).padStart(layout.valueWidth - 1); // -1 for space separator
+    return labelPart + barPart + valuePart;
+  } else {
+    return displayLabel.padEnd(layout.labelWidth) + bar;
+  }
+}
+
+/**
+ * Renders a single bar row for auto-width layout
+ * @param item - Data point to render
+ * @param ratio - Normalized value ratio (0-1)
+ * @param showValue - Value display configuration
+ * @param format - Value formatting function
+ * @param barChar - Character to use for bars
+ * @returns Formatted string for this bar row
+ */
+function renderAutoWidthRow(
+  item: BarChartData,
+  ratio: number,
+  showValue: BarChartValueDisplay,
+  format: (value: number) => string,
+  barChar: string
+): string {
+  const { label, value } = item;
+  const barLength = Math.max(1, Math.floor(ratio * 20)); // Default bar length for auto width
+  const bar = barChar.repeat(barLength);
+
+  if (showValue === 'right') {
+    return `${label} ${bar} ${format(value)}`;
+  } else {
+    return `${label} ${bar}`;
+  }
+}
+
+/**
+ * A horizontal bar chart component for terminal applications.
+ * 
+ * Renders data as horizontal bars with customizable appearance, sorting,
+ * and value display options. Supports both auto-scaling and fixed-width layouts
+ * with intelligent space allocation between labels, bars, and values.
+ * 
+ * @example
+ * ```tsx
+ * // Basic usage with auto-scaling
+ * <BarChart data={[{ label: 'A', value: 10 }, { label: 'B', value: 20 }]} />
+ * 
+ * // Sorted with values shown and custom formatting
+ * <BarChart 
+ *   data={[{ label: 'Sales', value: 1250 }, { label: 'Marketing', value: 800 }]}
+ *   sort="desc"
+ *   showValue="right"
+ *   format={(v) => `$${v}`}
+ *   width={50}
+ * />
+ * 
+ * // Custom bar character and fixed maximum
+ * <BarChart 
+ *   data={[{ label: 'Progress', value: 75 }]}
+ *   max={100}
+ *   barChar="▓"
+ *   showValue="right"
+ *   format={(v) => `${v}%`}
+ * />
+ * ```
+ * 
+ * @param props - Component properties
+ * @returns React element containing the rendered bar chart, or null for empty/invalid data
+ */
 export function BarChart(props: BarChartProps): React.ReactElement | null {
   const {
     data,
@@ -31,31 +205,31 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
     width = 'auto'
   } = props;
 
-  // Handle empty data
+  // Handle empty or invalid data
   if (!data || data.length === 0) {
     return null;
   }
 
-  // Sort data if needed
+  // Create sorted copy of data based on sort configuration
   const sortedData = [...data];
   if (sort === 'asc') {
     sortedData.sort((a, b) => a.value - b.value);
   } else if (sort === 'desc') {
     sortedData.sort((a, b) => b.value - a.value);
   }
+  // 'none' requires no action - use original order
 
-  // Calculate max value
+  // Determine maximum value for bar scaling
   const maxValue = max === 'auto' ? Math.max(...sortedData.map(d => d.value)) : max;
   
-  // Handle case where maxValue is 0 or negative
+  // Cannot render meaningful bars with non-positive maximum
   if (maxValue <= 0) {
     return null;
   }
 
-  // Calculate layout if width is specified
-  let layout: { labelWidth: number; barWidth: number; valueWidth: number } | null = null;
+  // Calculate layout for fixed-width rendering
+  let layout: BarChartLayout | null = null;
   if (typeof width === 'number') {
-    // Calculate needed widths
     const maxLabelWidth = Math.max(...sortedData.map(d => measureWidth(d.label)));
     const maxValueWidth = showValue === 'right' ? 
       Math.max(...sortedData.map(d => measureWidth(format(d.value)))) : 0;
@@ -63,45 +237,18 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
     layout = calculateLayout({
       totalWidth: width,
       labelWidth: maxLabelWidth,
-      valueWidth: showValue === 'right' ? maxValueWidth + 1 : maxValueWidth, // +1 for space before value
+      valueWidth: showValue === 'right' ? maxValueWidth + 1 : maxValueWidth, // +1 for space separator
       minBarWidth: 1
     });
   }
 
+  // Render each data point as a bar row
   const rows = sortedData.map(item => {
     const { label, value } = item;
     const ratio = value / maxValue;
     
-    let displayLabel = label;
-    let barLength: number;
-    let displayValue = showValue === 'right' ? format(value) : '';
-
-    if (layout) {
-      // Use calculated layout
-      displayLabel = truncateText(label, layout.labelWidth);
-      barLength = Math.max(1, Math.floor(ratio * layout.barWidth));
-      displayValue = showValue === 'right' ? format(value) : '';
-    } else {
-      // Auto width - simple calculation
-      barLength = Math.max(1, Math.floor(ratio * 20)); // Default bar length
-    }
-
-    const bar = barChar.repeat(barLength);
-
-    if (layout && showValue === 'right') {
-      // Fixed width layout with values on the right
-      const labelPart = displayLabel.padEnd(layout.labelWidth);
-      // Ensure space between bars and values
-      const barPart = bar + ' '.repeat(Math.max(1, layout.barWidth - bar.length));
-      const valuePart = displayValue.padStart(layout.valueWidth - 1); // -1 for the space we added
-      return labelPart + barPart + valuePart;
-    } else if (showValue === 'right') {
-      // Auto width with values on the right - ensure proper spacing
-      return `${displayLabel} ${bar} ${displayValue}`;
-    } else {
-      // No values shown or different positioning
-      return layout ? displayLabel.padEnd(layout.labelWidth) + bar : `${displayLabel} ${bar}`;
-    }
+    return layout ? renderFixedWidthRow(item, ratio, layout, showValue, format, barChar) :
+                   renderAutoWidthRow(item, ratio, showValue, format, barChar);
   });
 
   return (
