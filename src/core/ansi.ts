@@ -1,5 +1,27 @@
 /**
- * ANSI color and styling utilities for terminal output
+ * ANSI color and styling utilities for terminal output.
+ * 
+ * This module provides a comprehensive set of functions for applying colors and 
+ * styles to text in terminal applications. It uses standard ANSI escape sequences
+ * that are widely supported across different terminal emulators.
+ * 
+ * The module includes both basic and bright color variants, as well as text
+ * styling options like bold and dim. All functions automatically handle the
+ * reset sequence to ensure proper color isolation.
+ * 
+ * @example
+ * ```typescript
+ * // Basic usage
+ * const redText = red('Error message');
+ * const boldText = bold('Important info');
+ * 
+ * // Combining styles
+ * const styledText = bold(red('Critical alert'));
+ * 
+ * // Utility functions
+ * const hasColors = hasAnsi(redText);     // true
+ * const cleanText = stripAnsi(redText);   // 'Error message' 
+ * ```
  */
 
 /**
