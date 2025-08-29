@@ -26,7 +26,7 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier -w .",
     "test": "jest --passWithNoTests",
-    "demo": "tsx bin/demo.ts"
+    "demo": "tsx bin/demo.tsx"
   },
   "keywords": [
     "ink",
