@@ -268,8 +268,8 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
                    renderAutoWidthRow(item, ratio, showValue, format, barChar);
   });
 
-  // Add empty line between rows for better readability
+  // Add spacing between rows using block character for better readability
   return (
-    <Text>{rows.join('\n')}</Text>
+    <Text>{rows.join('\n▇\n')}</Text>
   );
 }
