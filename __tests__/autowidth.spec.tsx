@@ -63,11 +63,11 @@ describe('useAutoWidth Hook', () => {
     });
     
     const mockSetState = jest.fn();
-    mockUseState.mockReturnValue([80, mockSetState]); // Fallback value
+    mockUseState.mockReturnValue([78, mockSetState]); // Fallback value with margin applied
     
     const result = useAutoWidth();
     
-    expect(result.width).toBe(80); // Expected fallback
+    expect(result.width).toBe(78); // Expected fallback (80 - 2 margin)
     expect(result.isAutoWidth).toBe(true);
   });
 
@@ -167,7 +167,7 @@ describe('useAutoWidth Hook', () => {
       // Fast forward past 120ms - should trigger only one update (the final state)
       jest.advanceTimersByTime(25); // Total: 125ms
       expect(stateChanges).toHaveLength(1);
-      expect(stateChanges[0]).toBe(40); // Final width should be 40
+      expect(stateChanges[0]).toBe(38); // Final width should be 38 (40 - 2 margin)
     }
     
     // Restore everything
@@ -225,7 +225,7 @@ describe('useAutoWidth Hook', () => {
       
       // Should have exactly one update with the final value
       expect(stateUpdates).toHaveLength(1);
-      expect(stateUpdates[0]).toBe(90);
+      expect(stateUpdates[0]).toBe(88); // 90 - 2 margin
     }
     
     // Restore
