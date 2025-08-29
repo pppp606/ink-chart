@@ -144,9 +144,9 @@ function renderFixedWidthRow(
     const labelPart = displayLabel.padEnd(layout.labelWidth);
     const barPart = bar + ' '.repeat(Math.max(1, layout.barWidth - bar.length));
     const valuePart = format(value).padStart(layout.valueWidth - 1); // -1 for space separator
-    return labelPart + barPart + valuePart;
+    return labelPart + ' ' + barPart + valuePart;  // Added space between label and bar
   } else {
-    return displayLabel.padEnd(layout.labelWidth) + bar;
+    return displayLabel.padEnd(layout.labelWidth) + ' ' + bar;  // Added space between label and bar
   }
 }
 
@@ -249,8 +249,11 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
     const maxValueWidth = showValue === 'right' ? 
       Math.max(...sortedData.map(d => measureWidth(format(d.value)))) : 0;
     
+    // Account for space between label and bar (1 char)
+    const adjustedWidth = effectiveWidth - 1;
+    
     layout = calculateLayout({
-      totalWidth: effectiveWidth,
+      totalWidth: adjustedWidth,
       labelWidth: maxLabelWidth,
       valueWidth: showValue === 'right' ? maxValueWidth + 1 : maxValueWidth, // +1 for space separator
       minBarWidth: 1
@@ -265,6 +268,7 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
                    renderAutoWidthRow(item, ratio, showValue, format, barChar);
   });
 
+  // Add empty line between rows for better readability
   return (
     <Text>{rows.join('\n')}</Text>
   );

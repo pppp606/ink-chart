@@ -197,7 +197,8 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
 
   // Use auto-width hook when width is set to 'auto'
   const autoWidth = useAutoWidth();
-  const effectiveWidth = width === 'auto' ? autoWidth.width : width;
+  // For auto width, use 60% of terminal width for better readability
+  const effectiveWidth = width === 'auto' ? Math.floor(autoWidth.width * 0.6) : width;
 
   // Handle empty or invalid data
   if (!data || data.length === 0) {
