@@ -100,5 +100,38 @@ describe('BarChart Component', () => {
       expect(renderedContent).toContain('…'); // Should contain ellipsis for truncated label
       expect(renderedContent).not.toContain('Very Long Label That Should Be Truncated'); // Full text should not appear
     });
+
+    // Test 4: Sorting functionality
+    it('should produce correct row ordering based on sort parameter', () => {
+      const data: BarChartData[] = [
+        { label: 'B Item', value: 20 },
+        { label: 'A Item', value: 10 },
+        { label: 'C Item', value: 30 }
+      ];
+      
+      // Test descending sort
+      const descResult = BarChart({ data, sort: 'desc' });
+      expect(descResult).not.toBeNull();
+      
+      // Test ascending sort  
+      const ascResult = BarChart({ data, sort: 'asc' });
+      expect(ascResult).not.toBeNull();
+      
+      // Test no sort (original order)
+      const noneResult = BarChart({ data, sort: 'none' });
+      expect(noneResult).not.toBeNull();
+      
+      // Results should be different based on sorting
+      // This will fail until we implement sorting logic
+      const descContent = (descResult as any)?.props?.children;
+      const ascContent = (ascResult as any)?.props?.children;
+      const noneContent = (noneResult as any)?.props?.children;
+      
+      expect(descContent).not.toEqual(ascContent);
+      expect(ascContent).not.toEqual(noneContent);
+      
+      // Descending should show C Item (30) first, then B Item (20), then A Item (10)
+      expect(descContent?.toString()).toMatch(/C Item.*B Item.*A Item/s);
+    });
   });
 });
