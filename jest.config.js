@@ -1,10 +1,8 @@
-import type { Config } from 'jest';
-
-const config: Config = {
+export default {
   preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
   transform: {
@@ -27,5 +25,3 @@ const config: Config = {
   ],
   setupFilesAfterEnv: ['<rootDir>/__tests__/setup.ts'],
 };
-
-export default config;
