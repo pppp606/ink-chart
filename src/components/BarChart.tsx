@@ -142,12 +142,12 @@ function renderFixedWidthRow(
   showValue: BarChartValueDisplay,
   format: (value: number) => string,
   barChar: string,
-  color?: string
+  _color?: string
 ): string {
-  const { label, value, color: itemColor } = item;
+  const { label, value } = item;
   const displayLabel = truncateText(label, layout.labelWidth);
   const barLength = Math.max(1, Math.floor(ratio * layout.barWidth));
-  let bar = barChar.repeat(barLength);
+  const bar = barChar.repeat(barLength);
   
 
   if (showValue === 'right') {
@@ -175,9 +175,9 @@ function renderAutoWidthRow(
   showValue: BarChartValueDisplay,
   format: (value: number) => string,
   barChar: string,
-  color?: string
+  _color?: string
 ): string {
-  const { label, value, color: itemColor } = item;
+  const { label, value } = item;
   const barLength = Math.max(1, Math.floor(ratio * 20)); // Default bar length for auto width
   const bar = barChar.repeat(barLength);
 
@@ -283,27 +283,25 @@ export const BarChart = React.memo<BarChartProps>(function BarChart(props: BarCh
   const autoWidth = useAutoWidth();
   const effectiveWidth = width === 'auto' ? autoWidth.width : width;
 
-  // Handle empty or invalid data
-  if (!data || data.length === 0) {
-    return null;
-  }
-
   // Memoize sorted data to prevent unnecessary recalculations
-  const sortedData = useMemo(() => sortData(data, sort), [data, sort]);
+  const sortedData = useMemo(() => {
+    if (!data || data.length === 0) {
+      return [];
+    }
+    return sortData(data, sort);
+  }, [data, sort]);
 
   // Memoize maximum value calculation
   const maxValue = useMemo(() => {
+    if (sortedData.length === 0) {
+      return 0;
+    }
     return max === 'auto' ? Math.max(...sortedData.map(d => d.value)) : max;
   }, [max, sortedData]);
-  
-  // Cannot render meaningful bars with non-positive maximum
-  if (maxValue <= 0) {
-    return null;
-  }
 
   // Memoize layout calculation for fixed-width rendering
   const layout = useMemo(() => {
-    if (typeof effectiveWidth === 'number') {
+    if (typeof effectiveWidth === 'number' && sortedData.length > 0) {
       const maxLabelWidth = Math.max(...sortedData.map(d => measureWidth(d.label)));
       const maxValueWidth = showValue === 'right' ? 
         Math.max(...sortedData.map(d => measureWidth(format(d.value)))) : 0;
@@ -322,8 +320,12 @@ export const BarChart = React.memo<BarChartProps>(function BarChart(props: BarCh
   }, [effectiveWidth, sortedData, showValue, format]);
 
   // Render each data point as a memoized bar row
-  const rows = useMemo(() => 
-    sortedData.map((item, index) => {
+  const rows = useMemo(() => {
+    if (sortedData.length === 0 || maxValue <= 0) {
+      return [];
+    }
+    
+    return sortedData.map((item, index) => {
       const ratio = item.value / maxValue;
       
       return (
@@ -338,7 +340,18 @@ export const BarChart = React.memo<BarChartProps>(function BarChart(props: BarCh
           {...(color ? { color } : {})}
         />
       );
-    }), [sortedData, maxValue, layout, showValue, format, barChar, color]);
+    });
+  }, [sortedData, maxValue, layout, showValue, format, barChar, color]);
+
+  // Handle empty or invalid data after hooks
+  if (!data || data.length === 0) {
+    return null;
+  }
+  
+  // Cannot render meaningful bars with non-positive maximum
+  if (maxValue <= 0) {
+    return null;
+  }
 
   return (
     <Box flexDirection="column">
