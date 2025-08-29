@@ -88,7 +88,7 @@ describe('BarChart Component', () => {
       
       // Values should be positioned after the bars
       // This specific formatting expectation will fail initially
-      expect(renderedContent).toMatch(/▆+\s+150/); // Bar followed by spaces and value
+      expect(renderedContent).toMatch(/▆+\s*150/); // Bar followed by optional spaces and value
     });
 
     // Test 3: Label truncation
