@@ -1,7 +1,11 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
-import { red } from '../core/ansi.js';
+import { 
+  red, red1, red2, red3, red4, red5, red6, red7, red8,
+  blue1, blue2, blue3, blue4, blue5, blue6, blue7, blue8,
+  green1, green2, green3, green4, green5, green6, green7, green8
+} from '../core/ansi.js';
 import { useAutoWidth } from '../core/useAutoWidth.js';
 
 /**
@@ -16,9 +20,10 @@ export interface SparklineProps {
   /** 
    * Width of the sparkline in characters. 
    * - 'auto': Uses the length of the data array
+   * - 'max': Uses full terminal width with margin
    * - number: Fixed width, data will be interpolated to fit
    */
-  width?: 'auto' | number;
+  width?: 'auto' | 'max' | number;
   
   /** 
    * Height of the sparkline (future use, currently unused) 
@@ -40,9 +45,19 @@ export interface SparklineProps {
   yDomain?: 'auto' | [number, number];
   
   /** 
-   * Threshold value for highlighting. Values above this will be colored red.
+   * Threshold value(s) for highlighting. 
+   * - number: Single threshold, values above will be colored
+   * - array: Multiple thresholds for gradient coloring
    */
-  threshold?: number;
+  threshold?: number | number[];
+  
+  /**
+   * Color scheme for threshold highlighting
+   * - 'red': Red gradient (default)
+   * - 'blue': Blue gradient  
+   * - 'green': Green gradient
+   */
+  colorScheme?: 'red' | 'blue' | 'green';
   
   /** 
    * Optional caption to display below the sparkline
@@ -60,7 +75,7 @@ export interface SparklineProps {
  * 
  * @example
  * ```tsx
- * // Basic usage with auto-scaling
+ * // Basic usage with auto width (uses data length)
  * <Sparkline data={[1, 3, 2, 5, 4]} />
  * 
  * // Fixed width with threshold highlighting
@@ -71,10 +86,10 @@ export interface SparklineProps {
  *   caption="Sales Trend"
  * />
  * 
- * // Fixed domain for consistent scaling
+ * // Full terminal width
  * <Sparkline 
  *   data={[20, 30, 40]} 
- *   yDomain={[0, 100]}
+ *   width="max"
  *   mode="braille"
  * />
  * ```
@@ -170,16 +185,53 @@ function scaleSymbolsToWidth(symbols: string[], targetWidth: number): string[] {
 }
 
 /**
- * Applies threshold highlighting to symbols
+ * Applies threshold highlighting to symbols with gradient support
  * @param symbols - Array of symbol characters
  * @param data - Original data values
- * @param threshold - Threshold value for highlighting
+ * @param threshold - Threshold value(s) for highlighting
+ * @param colorScheme - Color scheme to use for highlighting
  * @returns Highlighted symbols as a single string
  */
-function applyThresholdHighlighting(symbols: string[], data: number[], threshold: number): string {
+function applyThresholdHighlighting(symbols: string[], data: number[], threshold: number | number[], colorScheme: 'red' | 'blue' | 'green' = 'red'): string {
   const highlightedSymbols = symbols.map((symbol, index) => {
     const originalValue = data[Math.floor((index / symbols.length) * data.length)];
-    return originalValue !== undefined && originalValue > threshold ? red(symbol) : symbol;
+    
+    if (originalValue === undefined) {
+      return symbol;
+    }
+    
+    // Single threshold mode
+    if (typeof threshold === 'number') {
+      return originalValue > threshold ? red(symbol) : symbol;
+    }
+    
+    // Multiple thresholds mode (smooth gradient)
+    const sortedThresholds = [...threshold].sort((a, b) => a - b);
+    
+    // Select gradient colors based on color scheme
+    let gradientColors: ((text: string) => string)[];
+    if (colorScheme === 'blue') {
+      gradientColors = [blue1, blue2, blue3, blue4, blue5, blue6, blue7, blue8];
+    } else if (colorScheme === 'green') {
+      gradientColors = [green1, green2, green3, green4, green5, green6, green7, green8];
+    } else {
+      gradientColors = [red1, red2, red3, red4, red5, red6, red7, red8];
+    }
+    
+    // Find the highest threshold exceeded
+    let colorIndex = -1;
+    for (let i = sortedThresholds.length - 1; i >= 0; i--) {
+      if (originalValue > sortedThresholds[i]!) {
+        colorIndex = Math.min(i, gradientColors.length - 1);
+        break;
+      }
+    }
+    
+    if (colorIndex >= 0) {
+      return gradientColors[colorIndex]!(symbol);
+    }
+    
+    return symbol; // Below all thresholds
   });
   
   return highlightedSymbols.join('');
@@ -192,12 +244,25 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
     mode = 'block',
     yDomain = 'auto',
     threshold,
+    colorScheme = 'red',
     caption
   } = props;
 
-  // Use auto-width hook when width is set to 'auto'
+  // Use auto-width hook for terminal width detection
   const autoWidth = useAutoWidth();
-  const effectiveWidth = width === 'auto' ? autoWidth.width : width;
+  
+  // Determine effective width based on width prop
+  let effectiveWidth: number;
+  if (width === 'auto') {
+    // Use data length for auto mode
+    effectiveWidth = data.length;
+  } else if (width === 'max') {
+    // Use full terminal width with extra margin for max mode to prevent wrapping
+    effectiveWidth = Math.max(10, autoWidth.width - 4);
+  } else {
+    // Use specified number
+    effectiveWidth = width;
+  }
 
   // Handle empty or invalid data
   if (!data || data.length === 0) {
@@ -235,7 +300,7 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
 
   // Apply threshold highlighting if specified
   const sparklineText = threshold !== undefined 
-    ? applyThresholdHighlighting(symbols, validData, threshold)
+    ? applyThresholdHighlighting(symbols, validData, threshold, colorScheme)
     : symbols.join('');
 
   // Render component with or without caption
