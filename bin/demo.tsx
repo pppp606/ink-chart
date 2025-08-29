@@ -99,15 +99,24 @@ export function DemoApp(): React.ReactElement {
       </Box>
       <Text> </Text>
 
-      {/* Max Width Demo */}
-      <Text bold color="yellow">📏 Max Width Feature Demo</Text>
+      {/* Color Scheme Demo */}
+      <Text bold color="yellow">🎨 Color Scheme Variations</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text>Sparkline with full terminal width:</Text>
+        <Text>Blue gradient:</Text>
         <Sparkline 
-          data={[10, 20, 15, 25, 30, 18, 22, 12, 16, 24, 28, 22, 19, 14]}
-          width="max"
+          data={thresholdData}
+          width={40}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="blue"
           mode="block"
-          caption="Full terminal width"
+        />
+        <Text>Green gradient:</Text>
+        <Sparkline 
+          data={thresholdData}
+          width={40}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="green"
+          mode="block"
         />
       </Box>
       <Text> </Text>

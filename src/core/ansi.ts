@@ -101,19 +101,19 @@ export function orange(text: string): string {
  * Subtle red gradient colors for smooth transitions
  */
 export function red1(text: string): string {
-  return colorize(text, '\u001b[38;2;255;240;240m'); // Very light red #FFF0F0
+  return colorize(text, '\u001b[38;2;255;200;200m'); // Light red #FFC8C8 (more saturated)
 }
 
 export function red2(text: string): string {
-  return colorize(text, '\u001b[38;2;255;220;220m'); // Light red #FFDCDC
+  return colorize(text, '\u001b[38;2;255;180;180m'); // Soft red #FFB4B4
 }
 
 export function red3(text: string): string {
-  return colorize(text, '\u001b[38;2;255;200;200m'); // Soft red #FFC8C8
+  return colorize(text, '\u001b[38;2;255;160;160m'); // Medium light red #FFA0A0
 }
 
 export function red4(text: string): string {
-  return colorize(text, '\u001b[38;2;255;180;180m'); // Medium light red #FFB4B4
+  return colorize(text, '\u001b[38;2;255;140;140m'); // Medium red #FF8C8C
 }
 
 export function red5(text: string): string {
@@ -130,6 +130,76 @@ export function red7(text: string): string {
 
 export function red8(text: string): string {
   return colorize(text, '\u001b[38;2;220;50;50m'); // Deep red #DC3232
+}
+
+/**
+ * Blue gradient colors for smooth transitions
+ */
+export function blue1(text: string): string {
+  return colorize(text, '\u001b[38;2;200;200;255m'); // Light blue #C8C8FF
+}
+
+export function blue2(text: string): string {
+  return colorize(text, '\u001b[38;2;180;180;255m'); // Soft blue #B4B4FF
+}
+
+export function blue3(text: string): string {
+  return colorize(text, '\u001b[38;2;160;160;255m'); // Medium light blue #A0A0FF
+}
+
+export function blue4(text: string): string {
+  return colorize(text, '\u001b[38;2;140;140;255m'); // Medium blue #8C8CFF
+}
+
+export function blue5(text: string): string {
+  return colorize(text, '\u001b[38;2;120;120;255m'); // Strong blue #7878FF
+}
+
+export function blue6(text: string): string {
+  return colorize(text, '\u001b[38;2;100;100;255m'); // Vivid blue #6464FF
+}
+
+export function blue7(text: string): string {
+  return colorize(text, '\u001b[38;2;80;80;255m'); // Deep blue #5050FF
+}
+
+export function blue8(text: string): string {
+  return colorize(text, '\u001b[38;2;50;50;220m'); // Dark blue #3232DC
+}
+
+/**
+ * Green gradient colors for smooth transitions
+ */
+export function green1(text: string): string {
+  return colorize(text, '\u001b[38;2;200;255;200m'); // Light green #C8FFC8
+}
+
+export function green2(text: string): string {
+  return colorize(text, '\u001b[38;2;180;255;180m'); // Soft green #B4FFB4
+}
+
+export function green3(text: string): string {
+  return colorize(text, '\u001b[38;2;160;255;160m'); // Medium light green #A0FFA0
+}
+
+export function green4(text: string): string {
+  return colorize(text, '\u001b[38;2;140;255;140m'); // Medium green #8CFF8C
+}
+
+export function green5(text: string): string {
+  return colorize(text, '\u001b[38;2;120;255;120m'); // Strong green #78FF78
+}
+
+export function green6(text: string): string {
+  return colorize(text, '\u001b[38;2;100;255;100m'); // Vivid green #64FF64
+}
+
+export function green7(text: string): string {
+  return colorize(text, '\u001b[38;2;80;220;80m'); // Deep green #50DC50
+}
+
+export function green8(text: string): string {
+  return colorize(text, '\u001b[38;2;50;180;50m'); // Dark green #32B432
 }
 
 /**
