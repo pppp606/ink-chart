@@ -6,6 +6,14 @@ jest.mock('ink', () => ({
   Box: ({ children }: { children: React.ReactNode }) => children,
 }));
 
+// Mock useAutoWidth hook
+jest.mock('../src/core/useAutoWidth.js', () => ({
+  useAutoWidth: () => ({
+    width: 80,
+    isAutoWidth: true,
+  }),
+}));
+
 import { BarChart, BarChartData } from '../src/components/BarChart.js';
 
 describe('BarChart Component', () => {

@@ -6,6 +6,10 @@ export { BarChart } from './components/BarChart.js';
 export type { SparklineProps } from './components/Sparkline.js';
 export type { BarChartProps, BarChartData } from './components/BarChart.js';
 
+// Hooks
+export { useAutoWidth } from './core/useAutoWidth.js';
+export type { UseAutoWidthResult } from './core/useAutoWidth.js';
+
 // Core Utilities (for advanced usage)
 export { 
   valuesToSymbols, 
