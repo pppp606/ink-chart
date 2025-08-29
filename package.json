@@ -25,7 +25,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier -w .",
-    "test": "jest",
+    "test": "jest --passWithNoTests",
     "demo": "tsx bin/demo.ts"
   },
   "keywords": [
