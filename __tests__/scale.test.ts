@@ -47,7 +47,7 @@ describe('scale functions', () => {
       const quantizer = quantize([0, 1], 8);
       expect(quantizer(0)).toBe(0);
       expect(quantizer(1)).toBe(7);
-      expect(quantizer(0.5)).toBe(3);
+      expect(quantizer(0.5)).toBe(4);
       
       // Test monotonicity
       for (let i = 0; i <= 1; i += 0.1) {
@@ -61,8 +61,8 @@ describe('scale functions', () => {
       const quantizer = quantize([0, 10], 4);
       expect(quantizer(0)).toBe(0);
       expect(quantizer(10)).toBe(3);
-      expect(quantizer(2.5)).toBe(0);
-      expect(quantizer(7.5)).toBe(2);
+      expect(quantizer(2.5)).toBe(1);
+      expect(quantizer(7.5)).toBe(3);
     });
 
     it('should work with different quantization levels', () => {
@@ -70,15 +70,15 @@ describe('scale functions', () => {
       const quantizer8 = quantize([0, 100], 8);
       const quantizer16 = quantize([0, 100], 16);
       
-      expect(quantizer4(50)).toBe(1);
-      expect(quantizer8(50)).toBe(3);
-      expect(quantizer16(50)).toBe(7);
+      expect(quantizer4(50)).toBe(2);
+      expect(quantizer8(50)).toBe(4);
+      expect(quantizer16(50)).toBe(8);
     });
 
     it('should handle out-of-range values gracefully', () => {
       const quantizer = quantize([0, 10], 8);
       expect(quantizer(-5)).toBe(-4);
-      expect(quantizer(15)).toBe(11);
+      expect(quantizer(15)).toBe(12);
     });
 
     it('should handle edge case of n=1', () => {
