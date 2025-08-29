@@ -9,7 +9,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { render, Box, Text, Static } from 'ink';
+import { render, Box, Text } from 'ink';
 import { Sparkline, BarChart, BarChartData } from '../src/index.js';
 
 /**
@@ -151,7 +151,7 @@ function StaticDemo(): React.ReactElement {
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold color="cyan">🚀 ink-chart Demo - Static Examples</Text>
-      <Text dim>Press 'q' + Enter to quit or Ctrl+C</Text>
+      <Text dim>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
       <Text> </Text>
       
       {/* Sparkline RPS Example */}
@@ -260,7 +260,7 @@ function DynamicDemo(): React.ReactElement {
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold color="cyan">🚀 ink-chart Demo - Live Charts</Text>
-      <Text dim>Press 'q' + Enter to quit or Ctrl+C</Text>
+      <Text dim>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
       <Text> </Text>
 
       {/* Dynamic Sparkline */}
