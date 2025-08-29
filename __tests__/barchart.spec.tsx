@@ -66,7 +66,7 @@ describe('BarChart Component', () => {
       // The component should render bars with proper proportional lengths
       // This will fail until we implement the bar length calculation logic
       const renderedContent = (result as any)?.props?.children;
-      expect(renderedContent).toContain('█'); // Should contain bar characters
+      expect(renderedContent).toContain('▆'); // Should contain bar characters
     });
 
     // Test 2: ShowValue positioning  
@@ -88,7 +88,7 @@ describe('BarChart Component', () => {
       
       // Values should be positioned after the bars
       // This specific formatting expectation will fail initially
-      expect(renderedContent).toMatch(/█+\s+150/); // Bar followed by spaces and value
+      expect(renderedContent).toMatch(/▆+\s+150/); // Bar followed by spaces and value
     });
 
     // Test 3: Label truncation
