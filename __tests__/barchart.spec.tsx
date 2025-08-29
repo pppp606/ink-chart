@@ -82,5 +82,23 @@ describe('BarChart Component', () => {
       // This specific formatting expectation will fail initially
       expect(renderedContent).toMatch(/█+\s+150/); // Bar followed by spaces and value
     });
+
+    // Test 3: Label truncation
+    it('should truncate long labels with ellipsis within label area bounds', () => {
+      const data: BarChartData[] = [
+        { label: 'Very Long Label That Should Be Truncated', value: 100 },
+        { label: 'Short', value: 50 }
+      ];
+      
+      const result = BarChart({ data, width: 30 });
+      
+      expect(result).not.toBeNull();
+      
+      // Should truncate the long label with ellipsis (…)
+      // This will fail until we implement label truncation logic
+      const renderedContent = (result as any)?.props?.children;
+      expect(renderedContent).toContain('…'); // Should contain ellipsis for truncated label
+      expect(renderedContent).not.toContain('Very Long Label That Should Be Truncated'); // Full text should not appear
+    });
   });
 });
