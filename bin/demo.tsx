@@ -99,14 +99,14 @@ export function DemoApp(): React.ReactElement {
       </Box>
       <Text> </Text>
 
-      {/* Auto-width Demo */}
+      {/* Max Width Demo */}
       <Text bold color="yellow">📏 Max Width Feature Demo</Text>
       <Box flexDirection="column" marginLeft={2}>
         <Text>Sparkline with full terminal width:</Text>
         <Sparkline 
-          data={[10, 20, 15, 25, 30, 18, 22]}
+          data={[10, 20, 15, 25, 30, 18, 22, 12, 16, 24, 28, 22, 19, 14]}
           width="max"
-          mode="braille"
+          mode="block"
           caption="Full terminal width"
         />
       </Box>
