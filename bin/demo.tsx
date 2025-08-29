@@ -64,6 +64,7 @@ export function DemoApp(): React.ReactElement {
       <Box flexDirection="column" marginLeft={2}>
         <Sparkline 
           data={rpsData}
+          width={40}
           mode="block"
           caption="Requests per second (24h trend)"
         />
@@ -90,6 +91,7 @@ export function DemoApp(): React.ReactElement {
         <Text>Values above 80 highlighted in red:</Text>
         <Sparkline 
           data={thresholdData}
+          width={35}
           threshold={80}
           mode="block"
           caption="Performance metrics with alert threshold"
@@ -98,14 +100,14 @@ export function DemoApp(): React.ReactElement {
       <Text> </Text>
 
       {/* Auto-width Demo */}
-      <Text bold color="yellow">📏 Auto-width Feature Demo</Text>
+      <Text bold color="yellow">📏 Max Width Feature Demo</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text>Sparkline with auto-width:</Text>
+        <Text>Sparkline with full terminal width:</Text>
         <Sparkline 
           data={[10, 20, 15, 25, 30, 18, 22]}
-          width="auto"
+          width="max"
           mode="braille"
-          caption="Auto-sized to terminal width"
+          caption="Full terminal width"
         />
       </Box>
       <Text> </Text>
