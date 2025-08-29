@@ -39,11 +39,11 @@ function generateCategoryData(): BarChartData[] {
 
 /**
  * Generate threshold demonstration data
- * Shows values that exceed multiple performance thresholds for gradient highlighting
+ * Shows values that exceed multiple performance thresholds for smooth gradient highlighting
  */
 function generateThresholdData(): number[] {
-  // Values that cross multiple thresholds (60, 75, 85) for gradient demonstration
-  return [45, 60, 75, 85, 92, 78, 83, 95, 88, 72, 65, 58, 68, 82, 91, 55];
+  // Values that cross 8-level thresholds for smooth gradient demonstration
+  return [45, 55, 60, 65, 70, 75, 80, 85, 90, 95, 88, 82, 77, 72, 68, 62, 58, 52];
 }
 
 /**
@@ -88,11 +88,11 @@ export function DemoApp(): React.ReactElement {
       {/* Threshold Highlighting Demo */}
       <Text bold color="yellow">🎯 Gradient Threshold Demo</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text>Gradient: Light Red (60+) → Medium Red (75+) → Dark Red (85+)</Text>
+        <Text>Smooth 8-level red gradient (55, 62, 68, 74, 79, 84, 89, 94):</Text>
         <Sparkline 
           data={thresholdData}
-          width={50}
-          threshold={[60, 75, 85]}
+          width={55}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
           mode="block"
           caption="Performance metrics with gradient highlighting"
         />

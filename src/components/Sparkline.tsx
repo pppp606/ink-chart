@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
-import { red, lightRed, mediumRed, darkRed } from '../core/ansi.js';
+import { red, red1, red2, red3, red4, red5, red6, red7, red8 } from '../core/ansi.js';
 import { useAutoWidth } from '../core/useAutoWidth.js';
 
 /**
@@ -192,27 +192,21 @@ function applyThresholdHighlighting(symbols: string[], data: number[], threshold
       return originalValue > threshold ? red(symbol) : symbol;
     }
     
-    // Multiple thresholds mode (gradient - refined red theme)
+    // Multiple thresholds mode (smooth red gradient)
     const sortedThresholds = [...threshold].sort((a, b) => a - b);
+    const gradientColors = [red1, red2, red3, red4, red5, red6, red7, red8];
     
-    if (sortedThresholds.length >= 3) {
-      if (originalValue > sortedThresholds[2]) {
-        return darkRed(symbol);    // Highest: dark red
-      } else if (originalValue > sortedThresholds[1]) {
-        return mediumRed(symbol);  // High: medium red  
-      } else if (originalValue > sortedThresholds[0]) {
-        return lightRed(symbol);   // Medium: light red
+    // Find the highest threshold exceeded
+    let colorIndex = -1;
+    for (let i = sortedThresholds.length - 1; i >= 0; i--) {
+      if (originalValue > sortedThresholds[i]) {
+        colorIndex = Math.min(i, gradientColors.length - 1);
+        break;
       }
-    } else if (sortedThresholds.length >= 2) {
-      if (originalValue > sortedThresholds[1]) {
-        return mediumRed(symbol);  // High: medium red
-      } else if (originalValue > sortedThresholds[0]) {
-        return lightRed(symbol);   // Medium: light red
-      }
-    } else if (sortedThresholds.length >= 1) {
-      if (originalValue > sortedThresholds[0]) {
-        return red(symbol);        // Single threshold: bright red
-      }
+    }
+    
+    if (colorIndex >= 0) {
+      return gradientColors[colorIndex]!(symbol);
     }
     
     return symbol; // Below all thresholds

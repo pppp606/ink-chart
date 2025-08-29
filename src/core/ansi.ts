@@ -98,24 +98,38 @@ export function orange(text: string): string {
 }
 
 /**
- * Apply light red color for gradient highlighting (24-bit RGB)
+ * Subtle red gradient colors for smooth transitions
  */
-export function lightRed(text: string): string {
-  return colorize(text, '\u001b[38;2;255;120;120m'); // Light coral red #FF7878
+export function red1(text: string): string {
+  return colorize(text, '\u001b[38;2;255;240;240m'); // Very light red #FFF0F0
 }
 
-/**
- * Apply medium red color for gradient highlighting (24-bit RGB)
- */
-export function mediumRed(text: string): string {
-  return colorize(text, '\u001b[38;2;255;69;58m'); // Medium red #FF453A
+export function red2(text: string): string {
+  return colorize(text, '\u001b[38;2;255;220;220m'); // Light red #FFDCDC
 }
 
-/**
- * Apply dark red color for gradient highlighting (24-bit RGB)
- */
-export function darkRed(text: string): string {
-  return colorize(text, '\u001b[38;2;180;0;0m'); // Dark red #B40000
+export function red3(text: string): string {
+  return colorize(text, '\u001b[38;2;255;200;200m'); // Soft red #FFC8C8
+}
+
+export function red4(text: string): string {
+  return colorize(text, '\u001b[38;2;255;180;180m'); // Medium light red #FFB4B4
+}
+
+export function red5(text: string): string {
+  return colorize(text, '\u001b[38;2;255;160;160m'); // Medium red #FFA0A0
+}
+
+export function red6(text: string): string {
+  return colorize(text, '\u001b[38;2;255;130;130m'); // Strong red #FF8282
+}
+
+export function red7(text: string): string {
+  return colorize(text, '\u001b[38;2;255;100;100m'); // Vivid red #FF6464
+}
+
+export function red8(text: string): string {
+  return colorize(text, '\u001b[38;2;220;50;50m'); // Deep red #DC3232
 }
 
 /**
