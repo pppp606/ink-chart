@@ -88,7 +88,7 @@ export function DemoApp(): React.ReactElement {
       {/* Threshold Highlighting Demo */}
       <Text bold color="yellow">🎯 Gradient Threshold Demo</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text>Yellow (60+), Orange (75+), Red (85+):</Text>
+        <Text>Light Red (60+), Red (75+), Dark Red (85+):</Text>
         <Sparkline 
           data={thresholdData}
           width={50}

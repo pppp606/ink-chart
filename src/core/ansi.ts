@@ -98,6 +98,20 @@ export function orange(text: string): string {
 }
 
 /**
+ * Apply light red/pink color for gradient highlighting
+ */
+export function lightRed(text: string): string {
+  return colorize(text, '\u001b[38;5;196m'); // Bright red (256-color)
+}
+
+/**
+ * Apply dark red color for gradient highlighting
+ */
+export function darkRed(text: string): string {
+  return colorize(text, '\u001b[38;5;124m'); // Dark red (256-color)
+}
+
+/**
  * Apply bold styling
  */
 export function bold(text: string): string {

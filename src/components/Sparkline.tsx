@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
-import { red, yellow, orange } from '../core/ansi.js';
+import { red, lightRed, darkRed } from '../core/ansi.js';
 import { useAutoWidth } from '../core/useAutoWidth.js';
 
 /**
@@ -192,15 +192,15 @@ function applyThresholdHighlighting(symbols: string[], data: number[], threshold
       return originalValue > threshold ? red(symbol) : symbol;
     }
     
-    // Multiple thresholds mode (gradient)
+    // Multiple thresholds mode (gradient - red theme)
     const sortedThresholds = [...threshold].sort((a, b) => a - b);
     
     if (originalValue > sortedThresholds[2]) {
-      return red(symbol);        // Highest: red
+      return darkRed(symbol);    // Highest: dark red
     } else if (originalValue > sortedThresholds[1]) {
-      return orange(symbol);     // Middle: orange  
+      return red(symbol);        // Middle: bright red  
     } else if (originalValue > sortedThresholds[0]) {
-      return yellow(symbol);     // Low: yellow
+      return lightRed(symbol);   // Low: light red
     }
     
     return symbol; // Below all thresholds
