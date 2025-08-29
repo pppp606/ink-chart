@@ -143,7 +143,7 @@ function renderFixedWidthRow(
 
   if (showValue === 'right') {
     const labelPart = displayLabel.padEnd(layout.labelWidth);
-    const barPart = bar + ' '.repeat(Math.max(1, layout.barWidth - bar.length));
+    const barPart = bar.padEnd(layout.barWidth); // Ensure consistent width for bar area
     const valuePart = format(value).padStart(layout.valueWidth - 1); // -1 for space separator
     return labelPart + ' ' + barPart + valuePart;  // Added space between label and bar
   } else {
