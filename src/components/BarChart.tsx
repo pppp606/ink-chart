@@ -268,8 +268,10 @@ export function BarChart(props: BarChartProps): React.ReactElement | null {
                    renderAutoWidthRow(item, ratio, showValue, format, barChar);
   });
 
-  // Add spacing between rows using block character for better readability
+  // Join with spacing, avoiding trailing separator
+  const content = rows.length > 1 ? rows.slice(0, -1).join('\n▇\n') + '\n▇\n' + rows[rows.length - 1] : rows[0] || '';
+  
   return (
-    <Text>{rows.join('\n▇\n')}</Text>
+    <Text>{content}</Text>
   );
 }
