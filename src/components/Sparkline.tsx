@@ -1,12 +1,9 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
-import { 
-  red, red1, red2, red3, red4, red5, red6, red7, red8,
-  blue1, blue2, blue3, blue4, blue5, blue6, blue7, blue8,
-  green1, green2, green3, green4, green5, green6, green7, green8
-} from '../core/ansi.js';
+import { ThresholdColorizer, type ColorScheme } from '../core/threshold-colorizer.js';
 import { useAutoWidth } from '../core/useAutoWidth.js';
+import { calculateEffectiveWidth } from '../core/width-utils.js';
 
 /**
  * Props for the Sparkline component
@@ -20,10 +17,10 @@ export interface SparklineProps {
   /** 
    * Width of the sparkline in characters. 
    * - 'auto': Uses the length of the data array
-   * - 'max': Uses full terminal width with margin
+   * - 'full': Uses full terminal width with margin
    * - number: Fixed width, data will be interpolated to fit
    */
-  width?: 'auto' | 'max' | number;
+  width?: 'auto' | 'full' | number;
   
   /** 
    * Height of the sparkline (future use, currently unused) 
@@ -57,7 +54,7 @@ export interface SparklineProps {
    * - 'blue': Blue gradient  
    * - 'green': Green gradient
    */
-  colorScheme?: 'red' | 'blue' | 'green';
+  colorScheme?: ColorScheme;
   
   /** 
    * Optional caption to display below the sparkline
@@ -89,7 +86,7 @@ export interface SparklineProps {
  * // Full terminal width
  * <Sparkline 
  *   data={[20, 30, 40]} 
- *   width="max"
+ *   width="full"
  *   mode="braille"
  * />
  * ```
@@ -184,58 +181,6 @@ function scaleSymbolsToWidth(symbols: string[], targetWidth: number): string[] {
   return newSymbols;
 }
 
-/**
- * Applies threshold highlighting to symbols with gradient support
- * @param symbols - Array of symbol characters
- * @param data - Original data values
- * @param threshold - Threshold value(s) for highlighting
- * @param colorScheme - Color scheme to use for highlighting
- * @returns Highlighted symbols as a single string
- */
-function applyThresholdHighlighting(symbols: string[], data: number[], threshold: number | number[], colorScheme: 'red' | 'blue' | 'green' = 'red'): string {
-  const highlightedSymbols = symbols.map((symbol, index) => {
-    const originalValue = data[Math.floor((index / symbols.length) * data.length)];
-    
-    if (originalValue === undefined) {
-      return symbol;
-    }
-    
-    // Single threshold mode
-    if (typeof threshold === 'number') {
-      return originalValue > threshold ? red(symbol) : symbol;
-    }
-    
-    // Multiple thresholds mode (smooth gradient)
-    const sortedThresholds = [...threshold].sort((a, b) => a - b);
-    
-    // Select gradient colors based on color scheme
-    let gradientColors: ((text: string) => string)[];
-    if (colorScheme === 'blue') {
-      gradientColors = [blue1, blue2, blue3, blue4, blue5, blue6, blue7, blue8];
-    } else if (colorScheme === 'green') {
-      gradientColors = [green1, green2, green3, green4, green5, green6, green7, green8];
-    } else {
-      gradientColors = [red1, red2, red3, red4, red5, red6, red7, red8];
-    }
-    
-    // Find the highest threshold exceeded
-    let colorIndex = -1;
-    for (let i = sortedThresholds.length - 1; i >= 0; i--) {
-      if (originalValue > sortedThresholds[i]!) {
-        colorIndex = Math.min(i, gradientColors.length - 1);
-        break;
-      }
-    }
-    
-    if (colorIndex >= 0) {
-      return gradientColors[colorIndex]!(symbol);
-    }
-    
-    return symbol; // Below all thresholds
-  });
-  
-  return highlightedSymbols.join('');
-}
 
 export function Sparkline(props: SparklineProps): React.ReactElement | null {
   const {
@@ -256,12 +201,9 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
   if (width === 'auto') {
     // Use data length for auto mode
     effectiveWidth = data.length;
-  } else if (width === 'max') {
-    // Use full terminal width with extra margin for max mode to prevent wrapping
-    effectiveWidth = Math.max(10, autoWidth.width - 4);
   } else {
-    // Use specified number
-    effectiveWidth = width;
+    const calculated = calculateEffectiveWidth(width, autoWidth.width);
+    effectiveWidth = typeof calculated === 'number' ? calculated : data.length;
   }
 
   // Handle empty or invalid data
@@ -300,7 +242,7 @@ export function Sparkline(props: SparklineProps): React.ReactElement | null {
 
   // Apply threshold highlighting if specified
   const sparklineText = threshold !== undefined 
-    ? applyThresholdHighlighting(symbols, validData, threshold, colorScheme)
+    ? new ThresholdColorizer(colorScheme).applyHighlighting(symbols, validData, threshold)
     : symbols.join('');
 
   // Render component with or without caption

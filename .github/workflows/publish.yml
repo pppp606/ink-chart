@@ -1,0 +1,63 @@
+name: Publish to npm
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+      
+      - run: npm ci
+      
+      - run: npm run lint
+      
+      - run: npm run typecheck
+      
+      - run: npm run test:coverage
+      
+      - run: npm run build
+      
+      - name: Verify build outputs
+        run: |
+          test -f dist/index.js && test -f dist/index.d.ts
+          echo "✅ Build outputs verified"
+      
+      - run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref_name }}
+          body: |
+            🎉 New release published to npm!
+            
+            ### Installation
+            ```bash
+            npm install ink-chart@${{ github.ref_name }}
+            ```
+            
+            ### Demo
+            ```bash
+            npx ink-chart-demo
+            ```
+          draft: false
+          prerelease: false

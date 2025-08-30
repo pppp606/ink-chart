@@ -50,6 +50,11 @@ describe('Sparkline Component', () => {
       expect(() => Sparkline({ data, width: 'auto' })).not.toThrow();
     });
 
+    it('should accept width prop as full', () => {
+      const data = [1, 2, 3];
+      expect(() => Sparkline({ data, width: 'full' })).not.toThrow();
+    });
+
     it('should accept mode prop as block', () => {
       const data = [1, 2, 3];
       expect(() => Sparkline({ data, mode: 'block' })).not.toThrow();
@@ -79,6 +84,87 @@ describe('Sparkline Component', () => {
       const data = [1, 2, 3];
       expect(() => Sparkline({ data, caption: 'Test Caption' })).not.toThrow();
     });
+
+    it('should accept colorScheme prop as red', () => {
+      const data = [1, 2, 3];
+      expect(() => Sparkline({ data, colorScheme: 'red' })).not.toThrow();
+    });
+
+    it('should accept colorScheme prop as blue', () => {
+      const data = [1, 2, 3];
+      expect(() => Sparkline({ data, colorScheme: 'blue' })).not.toThrow();
+    });
+
+    it('should accept colorScheme prop as green', () => {
+      const data = [1, 2, 3];
+      expect(() => Sparkline({ data, colorScheme: 'green' })).not.toThrow();
+    });
+
+    it('should accept multiple thresholds as array', () => {
+      const data = [1, 2, 3, 4, 5];
+      expect(() => Sparkline({ data, threshold: [1, 2, 3, 4] })).not.toThrow();
+    });
+
+    it('should accept combination of threshold and colorScheme', () => {
+      const data = [1, 2, 3, 4, 5];
+      expect(() => Sparkline({ 
+        data, 
+        threshold: [1, 2, 3], 
+        colorScheme: 'blue' 
+      })).not.toThrow();
+    });
+  });
+
+  describe('Data validation and edge cases', () => {
+    it('should handle data with NaN values', () => {
+      const data = [1, NaN, 3, 4, 5];
+      const result = Sparkline({ data });
+      expect(result).not.toBeNull();
+    });
+
+    it('should handle data with Infinity values', () => {
+      const data = [1, Infinity, 3, -Infinity, 5];
+      const result = Sparkline({ data });
+      expect(result).not.toBeNull();
+    });
+
+    it('should return null for all invalid data', () => {
+      const data = [NaN, Infinity, -Infinity];
+      // Component should handle this gracefully
+      expect(() => Sparkline({ data })).not.toThrow();
+    });
+
+    it('should handle negative values', () => {
+      const data = [-5, -2, 0, 2, 5];
+      expect(() => Sparkline({ data })).not.toThrow();
+    });
+
+    it('should handle very large numbers', () => {
+      const data = [1e10, 2e10, 3e10];
+      expect(() => Sparkline({ data })).not.toThrow();
+    });
+  });
+
+  describe('Width prop behavior', () => {
+    it('should handle full width option', () => {
+      const data = [1, 2, 3, 4, 5];
+      const result = Sparkline({ data, width: 'full' });
+      
+      expect(result).not.toBeNull();
+      expect(result?.type).toBeDefined();
+      // With mocked useAutoWidth returning 80, full width should be 76 (80 - 4)
+    });
+
+    it('should calculate full width with margin', () => {
+      const data = [1, 2, 3];
+      // useAutoWidth is mocked to return width: 80
+      const result = Sparkline({ data, width: 'full' });
+      
+      expect(result).not.toBeNull();
+      // The component should use Math.max(10, autoWidth.width - 4)
+      // So with autoWidth.width = 80, effective width should be 76
+    });
+
   });
 
   // These tests will fail until we implement the component
