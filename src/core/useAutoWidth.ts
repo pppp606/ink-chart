@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { getSafeTerminalWidth } from './width-utils.js';
 
 /**
  * Return type for the useAutoWidth hook
@@ -21,11 +22,7 @@ export interface UseAutoWidthResult {
 export function useAutoWidth(): UseAutoWidthResult {
   // Get initial width from terminal with margin to prevent wrapping
   const getTerminalWidth = (): number => {
-    const columns = process.stdout.columns;
-    // Provide sensible fallback if columns is undefined
-    const baseWidth = typeof columns === 'number' && columns > 0 ? columns : 80;
-    // Subtract margin to prevent line wrapping (2 chars for safety)
-    return Math.max(10, baseWidth - 2);
+    return getSafeTerminalWidth(process.stdout.columns);
   };
 
   const [width, setWidth] = useState<number>(getTerminalWidth());
