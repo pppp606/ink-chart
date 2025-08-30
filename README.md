@@ -64,7 +64,7 @@ Compact trend visualization perfect for displaying time series data.
 
 **Props:**
 - `data: number[]` - Array of numeric values
-- `width?: 'auto' | 'max' | number` - Chart width (`'auto'`: data length, `'max'`: terminal width, `number`: fixed width)
+- `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: data length, `'full'`: terminal width, `number`: fixed width)
 - `threshold?: number | number[]` - Threshold(s) for highlighting (single or gradient)
 - `colorScheme?: 'red' | 'blue' | 'green'` - Color scheme for gradient highlighting
 - `mode?: 'block' | 'braille'` - Rendering mode
@@ -91,7 +91,7 @@ Horizontal bar charts with customizable appearance and individual row colors.
 - `data: BarChartData[]` - Array of data points
 - `sort?: 'none' | 'asc' | 'desc'` - Sort order
 - `showValue?: 'right' | 'inside' | 'none'` - Value display position
-- `width?: 'auto' | number` - Chart width
+- `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: natural content width, `'full'`: terminal width, `number`: fixed width)
 - `max?: 'auto' | number` - Maximum value for scaling
 - `format?: (value: number) => string` - Value formatter
 - `barChar?: '▆' | '█' | '▓' | '▒' | '░'` - Bar character
@@ -146,14 +146,11 @@ interface BarChartData {
 
 ## Demo
 
-Try the interactive demos to see all features:
+Try the interactive demo to see all features:
 
 ```bash
 # Static examples - all chart features
 npm run demo
-
-# Dynamic examples - live updating charts  
-npm run demo:dynamic
 ```
 
 ## Advanced Features
@@ -178,13 +175,13 @@ Components are optimized with `React.memo` to prevent unnecessary re-renders:
 <BarChart data={dynamicData} />
 ```
 
-### Auto-width Support
+### Full-width Support
 
-Charts automatically adapt to terminal width:
+Charts can adapt to full terminal width:
 
 ```tsx
-<Sparkline width="max" /> // Full terminal width
-<BarChart width="auto" />  // Natural content width
+<Sparkline width="full" /> // Full terminal width
+<BarChart width="full" />  // Full terminal width
 ```
 
 ## License
