@@ -2,6 +2,10 @@
 
 Small visualization components for ink CLI framework
 
+## Preview
+
+![Demo Screenshot](./assets/demo-preview.png)
+
 ## Features
 
 - **Sparkline** - Compact trend visualization with threshold highlighting and gradient colors
