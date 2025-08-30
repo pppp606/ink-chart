@@ -4,7 +4,7 @@ Small visualization components for ink CLI framework
 
 ## Preview
 
-![Demo Screenshot](./assets/demo-preview.png)
+<img src="./assets/demo-preview.png" alt="Demo Screenshot" width="532" />
 
 ## Features
 
