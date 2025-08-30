@@ -10,7 +10,7 @@
     "bin"
   ],
   "bin": {
-    "ink-chart-demo": "./bin/demo.js"
+    "ink-chart-demo": "./bin/demo.tsx"
   },
   "exports": {
     ".": {
@@ -26,8 +26,9 @@
     "lint:fix": "eslint . --fix",
     "format": "prettier -w .",
     "test": "jest --passWithNoTests",
+    "test:coverage": "jest --coverage",
     "demo": "tsx bin/demo.tsx",
-    "demo:dynamic": "tsx bin/demo-dynamic.tsx"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "ink",
@@ -39,7 +40,10 @@
     "react",
     "terminal"
   ],
-  "author": "",
+  "author": {
+    "name": "Takuto Yuki",
+    "url": "https://github.com/pppp606/ink-chart"
+  },
   "license": "MIT",
   "peerDependencies": {
     "ink": ">=4",
@@ -49,6 +53,7 @@
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.55",
+    "@types/react-dom": "^18.3.7",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "^8.56.0",
@@ -60,6 +65,7 @@
     "jest": "^29.7.0",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
+    "react-dom": "^18.3.1",
     "ts-jest": "^29.1.2",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"
