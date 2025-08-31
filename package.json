@@ -1,6 +1,6 @@
 {
   "name": "@pppp606/ink-chart",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Small visualization components for ink CLI framework",
   "type": "module",
   "main": "dist/index.js",
@@ -48,9 +48,6 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/pppp606/ink-chart.git"
-  },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
   },
   "peerDependencies": {
     "ink": ">=4",
