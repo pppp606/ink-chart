@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getSafeTerminalWidth } from './width-utils.js';
+import { getSafeTerminalWidth } from './widthUtils.js';
 
 /**
  * Return type for the useAutoWidth hook

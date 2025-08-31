@@ -1,4 +1,4 @@
-import { calculateLayout } from '../src/barchart.layout';
+import { calculateLayout } from '../src/barChartLayout';
 
 describe('barchart layout functions', () => {
   describe('calculateLayout', () => {
