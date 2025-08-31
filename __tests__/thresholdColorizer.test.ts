@@ -1,4 +1,4 @@
-import { ThresholdColorizer } from '../src/core/threshold-colorizer.js';
+import { ThresholdColorizer } from '../src/core/thresholdColorizer.js';
 
 // Mock the ansi module for testing
 jest.mock('../src/core/ansi.js', () => ({
