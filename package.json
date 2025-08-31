@@ -45,6 +45,10 @@
     "url": "https://github.com/pppp606/ink-chart"
   },
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pppp606/ink-chart.git"
+  },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
