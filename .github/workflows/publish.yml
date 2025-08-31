@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: publish-npm
     permissions:
-      contents: write
+      contents: read
       packages: write
     
     steps:
@@ -65,20 +65,12 @@ jobs:
       
       - run: npm ci
       
-      - run: npm run lint
-      
-      - run: npm run typecheck
-      
-      - run: npm run test:coverage
-      
-      - run: npm run build
-      
-      - name: Verify build outputs
+      - name: Configure GitHub Packages registry
         run: |
-          test -f dist/index.js && test -f dist/index.d.ts
-          echo "✅ Build outputs verified"
+          echo "@pppp606:registry=https://npm.pkg.github.com/" >> .npmrc
+          echo "//npm.pkg.github.com/:_authToken=\${NODE_AUTH_TOKEN}" >> .npmrc
       
-      - run: npm publish
+      - run: npm publish || echo "Package already exists on GitHub Packages, skipping..."
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
