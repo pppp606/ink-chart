@@ -42,7 +42,7 @@ jobs:
           test -f dist/index.js && test -f dist/index.d.ts
           echo "✅ Build outputs verified"
       
-      - run: npm publish --registry=https://registry.npmjs.org
+      - run: npm publish --access public --registry=https://registry.npmjs.org
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
