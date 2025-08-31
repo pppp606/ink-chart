@@ -1,5 +1,5 @@
 {
-  "name": "ink-chart",
+  "name": "@pppp606/ink-chart",
   "version": "0.1.0",
   "description": "Small visualization components for ink CLI framework",
   "type": "module",
@@ -45,6 +45,9 @@
     "url": "https://github.com/pppp606/ink-chart"
   },
   "license": "MIT",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
   "peerDependencies": {
     "ink": ">=4",
     "react": ">=18"
