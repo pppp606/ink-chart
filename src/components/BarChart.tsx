@@ -2,8 +2,8 @@ import React from 'react';
 import { Text, Box } from 'ink';
 import { useAutoWidth } from '../core/useAutoWidth.js';
 import { measureWidth, truncateText } from '../measure.js';
-import { calculateLayout } from '../barchart.layout.js';
-import { calculateEffectiveWidth } from '../core/width-utils.js';
+import { calculateLayout } from '../barChartLayout.js';
+import { calculateEffectiveWidth } from '../core/widthUtils.js';
 
 /**
  * Data point for a bar chart entry

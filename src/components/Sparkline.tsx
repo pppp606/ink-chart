@@ -1,9 +1,9 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
-import { ThresholdColorizer, type ColorScheme } from '../core/threshold-colorizer.js';
+import { ThresholdColorizer, type ColorScheme } from '../core/thresholdColorizer.js';
 import { useAutoWidth } from '../core/useAutoWidth.js';
-import { calculateEffectiveWidth } from '../core/width-utils.js';
+import { calculateEffectiveWidth } from '../core/widthUtils.js';
 
 /**
  * Props for the Sparkline component
