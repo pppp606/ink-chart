@@ -1,6 +1,6 @@
 # ink-chart
 
-Small visualization components for ink CLI framework
+Terminal visualization components for [Ink](https://github.com/vadimdemedes/ink), React CLI framework
 
 ## Preview
 
@@ -18,7 +18,7 @@ Small visualization components for ink CLI framework
 ## Installation
 
 ```bash
-npm install ink-chart
+npm install @pppp606/ink-chart
 ```
 
 ## Quick Start
@@ -26,7 +26,7 @@ npm install ink-chart
 ```tsx
 import React from 'react';
 import { render, Text, Box } from 'ink';
-import { Sparkline, BarChart } from 'ink-chart';
+import { Sparkline, BarChart } from '@pppp606/ink-chart';
 
 function App() {
   return (
