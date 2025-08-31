@@ -1,4 +1,4 @@
-import { calculateEffectiveWidth, getSafeTerminalWidth, DEFAULT_TERMINAL_MARGIN, MIN_COMPONENT_WIDTH } from '../src/core/width-utils.js';
+import { calculateEffectiveWidth, getSafeTerminalWidth, DEFAULT_TERMINAL_MARGIN, MIN_COMPONENT_WIDTH } from '../src/core/widthUtils.js';
 
 describe('Width Utilities', () => {
   describe('calculateEffectiveWidth', () => {
