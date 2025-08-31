@@ -12,7 +12,7 @@ Small visualization components for ink CLI framework
 - **BarChart** - Horizontal bar charts with individual row coloring and custom formatting
 - **TypeScript** - Full TypeScript support with comprehensive type definitions
 - **Auto-width** - Responsive charts that adapt to terminal width
-- **Gradient Colors** - 8-level smooth color gradients using 24-bit RGB
+- **Gradient Colors** - 8-level smooth color gradients with automatic terminal compatibility
 - **Performance** - Optimized rendering with React.memo to prevent flickering
 
 ## Installation
@@ -161,7 +161,7 @@ npm run demo
 
 ### Smooth Color Gradients
 
-8-level gradient highlighting using 24-bit RGB colors:
+8-level gradient highlighting with automatic terminal compatibility:
 
 ```tsx
 <Sparkline 
@@ -169,6 +169,13 @@ npm run demo
   colorScheme="blue" // red, blue, or green
 />
 ```
+
+**Color Support:**
+- **24-bit terminals** (iTerm, VSCode): Full RGB gradients
+- **256-color terminals**: Palette-based gradients
+- **16-color terminals**: Basic color fallbacks
+
+Detection is automatic based on `COLORTERM`, `TERM`, and `TERM_PROGRAM` environment variables.
 
 ### Performance Optimization
 
