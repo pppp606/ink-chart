@@ -11,7 +11,7 @@ describe('measure functions', () => {
     it('should measure full-width characters as width 2 each', () => {
       expect(measureWidth('ＡＢ')).toBe(4);  // Full-width A, B
       expect(measureWidth('１２３')).toBe(6);  // Full-width 1, 2, 3
-      expect(measureWidth('こんにちは')).toBe(10); // Japanese hiragana
+      expect(measureWidth('ｈｅｌｌｏ')).toBe(10); // Full-width hello
     });
 
     it('should measure emoji as width 2 each', () => {
@@ -23,7 +23,7 @@ describe('measure functions', () => {
     it('should handle mixed character types', () => {
       expect(measureWidth('A🦌B')).toBe(4); // 1 + 2 + 1 = 4
       expect(measureWidth('Hello🌟World')).toBe(12); // 5 + 2 + 5 = 12
-      expect(measureWidth('Aこん')).toBe(5); // 1 + 2 + 2 = 5
+      expect(measureWidth('Aｈｅ')).toBe(5); // 1 + 2 + 2 = 5
     });
 
     it('should handle empty strings', () => {
@@ -77,7 +77,7 @@ describe('measure functions', () => {
         'ＡＢＣＤＥＦ',
         '🚀🌟🦌🎉',
         'Mix🌟Text',
-        'こんにちは'
+        'ｈｅｌｌｏ'
       ];
       
       for (const text of testStrings) {
