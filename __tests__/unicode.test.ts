@@ -23,7 +23,7 @@ describe('Unicode Character Classification', () => {
 
     it('should return false for regular characters', () => {
       expect(isZeroWidth(0x0041)).toBe(false); // A
-      expect(isZeroWidth(0x3042)).toBe(false); // あ
+      expect(isZeroWidth(0x3042)).toBe(false); // a (hiragana)
       expect(isZeroWidth(0x1F600)).toBe(false); // 😀
     });
   });
@@ -57,7 +57,7 @@ describe('Unicode Character Classification', () => {
 
     it('should return false for non-combining characters', () => {
       expect(isCombining(0x0041)).toBe(false); // A
-      expect(isCombining(0x3042)).toBe(false); // あ
+      expect(isCombining(0x3042)).toBe(false); // a (hiragana)
       expect(isCombining(0x1F600)).toBe(false); // 😀
     });
   });
@@ -84,9 +84,9 @@ describe('Unicode Character Classification', () => {
     });
 
     it('should identify CJK characters', () => {
-      expect(isWideCharacter(0x3042)).toBe(true); // あ (Hiragana)
-      expect(isWideCharacter(0x30A2)).toBe(true); // ア (Katakana)
-      expect(isWideCharacter(0x4E00)).toBe(true); // 一 (CJK)
+      expect(isWideCharacter(0x3042)).toBe(true); // a (Hiragana)
+      expect(isWideCharacter(0x30A2)).toBe(true); // a (Katakana)
+      expect(isWideCharacter(0x4E00)).toBe(true); // one (CJK)
     });
 
     it('should identify hangul syllables', () => {
