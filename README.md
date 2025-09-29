@@ -195,6 +195,18 @@ Charts can adapt to full terminal width:
 <BarChart width="full" />  // Full terminal width
 ```
 
+## Security
+
+This package implements comprehensive security practices:
+
+- **Secure CI/CD**: SHA-pinned GitHub Actions with minimal permissions
+- **Supply Chain Protection**: Provenance attestation and OIDC authentication
+- **Secret Scanning**: Automated detection of accidentally committed secrets
+- **Dependency Security**: Regular security audits and automated vulnerability scanning
+- **Workflow Protection**: CODEOWNERS file and branch protection rules
+
+For security policy, vulnerability reporting, and detailed security information, see [SECURITY.md](SECURITY.md).
+
 ## License
 
 MIT
