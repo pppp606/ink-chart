@@ -71,9 +71,32 @@ The workflow provides clear logging to indicate which authentication method is b
 
 The implementation supports gradual transition:
 
-1. **Phase 1**: Deploy OIDC-ready workflow (current)
-2. **Phase 2**: Configure trusted publisher in npm registry
-3. **Phase 3**: Verify OIDC publishing works correctly
-4. **Phase 4**: Optionally remove NPM_TOKEN secret
+1. **Phase 1**: Deploy OIDC-ready workflow ✅ **COMPLETED**
+2. **Phase 2.1**: Add dual authentication and enhanced detection ✅ **COMPLETED**
+3. **Phase 2.2**: Implement comprehensive OIDC validation and testing ✅ **COMPLETED**
+4. **Phase 3**: Configure trusted publisher in npm registry
+5. **Phase 4**: Verify OIDC publishing works correctly
+6. **Phase 5**: Remove NPM_TOKEN secret (OIDC-only mode)
 
 This approach ensures no publishing downtime during the transition.
+
+### Phase 2.2 Enhancements
+
+**Phase 2.2** has introduced comprehensive improvements:
+
+- **Enhanced Authentication Detection**: Robust validation of OIDC environment variables
+- **Comprehensive Testing**: Dual authentication test suite with TDD methodology
+- **Security Validation**: OIDC token claims validation and security checks
+- **Error Handling**: Detailed error messages and troubleshooting guidance
+- **Workflow Integration**: End-to-end OIDC publishing validation tests
+- **Migration Warnings**: Clear deprecation notices for NPM_TOKEN usage
+
+**New Test Suites:**
+- `__tests__/oidc-validation.test.ts`: Core authentication logic testing
+- `__tests__/oidc-publishing.test.ts`: End-to-end publishing workflow validation
+
+**Key Features:**
+- Automatic OIDC preference when both authentication methods are available
+- Detailed logging and validation during authentication detection
+- Comprehensive error messages with troubleshooting links
+- Security validation of OIDC token claims and environment
