@@ -22,7 +22,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
+    "lint": "eslint . && npm run lint:secrets",
+    "lint:secrets": "secretlint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier -w .",
     "test": "jest --passWithNoTests",
@@ -56,6 +57,8 @@
     "react": ">=18"
   },
   "devDependencies": {
+    "@secretlint/secretlint-rule-no-homedir": "^11.2.4",
+    "@secretlint/secretlint-rule-preset-recommend": "^11.2.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.55",
@@ -72,6 +75,7 @@
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.3.1",
+    "secretlint": "^11.2.4",
     "ts-jest": "^29.1.2",
     "tsx": "^4.7.1",
     "typescript": "^5.3.3"
