@@ -47,16 +47,37 @@
     "barchart",
     "visualization",
     "react",
-    "terminal"
+    "terminal",
+    "secure",
+    "typescript",
+    "provenance"
   ],
   "author": {
     "name": "Takuto Yuki",
+    "email": "takuto.yuki@example.com",
     "url": "https://github.com/pppp606/ink-chart"
   },
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/pppp606/ink-chart.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pppp606/ink-chart/issues"
+  },
+  "homepage": "https://github.com/pppp606/ink-chart#readme",
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/pppp606"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public",
+    "tag": "latest",
+    "provenance": true
   },
   "peerDependencies": {
     "ink": ">=4",
