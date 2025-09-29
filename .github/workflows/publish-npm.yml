@@ -89,6 +89,31 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Validate provenance requirements
+        if: steps.auth.outputs.method == 'oidc'
+        run: |
+          echo "🔍 Validating provenance attestation requirements..."
+
+          # Validate required environment for provenance
+          if [[ -z "$GITHUB_REPOSITORY" || -z "$GITHUB_REF" || -z "$GITHUB_SHA" ]]; then
+            echo "❌ Missing GitHub context variables required for provenance"
+            echo "📊 GITHUB_REPOSITORY: ${GITHUB_REPOSITORY:-'missing'}"
+            echo "📊 GITHUB_REF: ${GITHUB_REF:-'missing'}"
+            echo "📊 GITHUB_SHA: ${GITHUB_SHA:-'missing'}"
+            exit 1
+          fi
+
+          # Validate OIDC environment
+          if [[ -z "$ACTIONS_ID_TOKEN_REQUEST_URL" || -z "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" ]]; then
+            echo "❌ OIDC environment not properly configured for provenance"
+            exit 1
+          fi
+
+          echo "✅ Provenance requirements validated successfully"
+          echo "🔐 Repository: $GITHUB_REPOSITORY"
+          echo "🏷️  Reference: $GITHUB_REF"
+          echo "📋 Commit SHA: $GITHUB_SHA"
+
       - name: Publish with OIDC
         if: steps.auth.outputs.method == 'oidc'
         run: |
@@ -96,16 +121,20 @@ jobs:
           echo "📦 Package: @pppp606/ink-chart"
           echo "🏷️  Version: $(node -p "require('./package.json').version")"
           echo "🔐 Using provenance for supply chain security"
+          echo "📋 Generating cryptographic attestation..."
 
           # Attempt OIDC publishing with detailed output
           if npm publish --access public --provenance --registry=https://registry.npmjs.org; then
             echo "✅ Successfully published with OIDC!"
             echo "🔒 Package published with cryptographic provenance"
-            echo "📋 Provenance details available at: https://npmjs.com/package/@pppp606/ink-chart"
+            echo "📋 Provenance attestation generated and signed"
+            echo "🔍 Provenance details available at: https://npmjs.com/package/@pppp606/ink-chart"
+            echo "🛡️  Supply chain security: Enhanced with attestation"
           else
-            echo "❌ OIDC publishing failed"
-            echo "🔍 Checking OIDC configuration..."
+            echo "❌ OIDC publishing with provenance failed"
+            echo "🔍 Checking OIDC and provenance configuration..."
             echo "📖 Troubleshooting guide: docs/OIDC-SETUP.md"
+            echo "💡 Ensure id-token: write permission is set"
             exit 1
           fi
 
@@ -117,11 +146,13 @@ jobs:
           echo "📦 Package: @pppp606/ink-chart"
           echo "🏷️  Version: $(node -p "require('./package.json').version")"
           echo "💡 Recommendation: Migrate to OIDC for enhanced security"
+          echo "🔒 Note: Provenance attestation not available with NPM_TOKEN"
 
-          # Attempt NPM token publishing
+          # Attempt NPM token publishing (without provenance)
           if npm publish --access public --registry=https://registry.npmjs.org; then
             echo "✅ Successfully published with NPM_TOKEN!"
             echo "📖 Migration guide: docs/OIDC-SETUP.md"
+            echo "🛡️  For provenance attestation, migrate to OIDC authentication"
           else
             echo "❌ NPM_TOKEN publishing failed"
             echo "🔍 Check NPM_TOKEN secret configuration"
