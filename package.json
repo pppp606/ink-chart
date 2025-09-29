@@ -19,6 +19,9 @@
     }
   },
   "sideEffects": false,
+  "config": {
+    "audit-level": "high"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
@@ -29,6 +32,9 @@
     "test": "jest --passWithNoTests",
     "test:coverage": "jest --coverage",
     "demo": "tsx bin/demo.tsx",
+    "audit": "npm audit --audit-level high",
+    "audit:fix": "npm audit fix --dry-run",
+    "license-check": "npx license-checker --summary",
     "validate:sha-pinning": "node scripts/validate-sha-pinning.js",
     "validate:permissions": "node scripts/validate-permissions.js",
     "prepublishOnly": "npm run build"
@@ -72,6 +78,8 @@
     "ink": "^4.4.1",
     "ink-testing-library": "^3.0.0",
     "jest": "^29.7.0",
+    "js-yaml": "^4.1.0",
+    "license-checker": "^25.0.1",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
     "react-dom": "^18.3.1",
