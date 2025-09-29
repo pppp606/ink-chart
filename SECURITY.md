@@ -14,6 +14,14 @@ If you discover a security vulnerability within ink-chart, please send an email 
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
+### Security Contact
+
+For security-related communications:
+
+- **GitHub**: Create a private security advisory in the repository
+- **Email**: Contact repository maintainer directly for urgent security matters
+- **Response Time**: Security reports acknowledged within 48 hours
+
 ### Contact Information
 
 - **Email**: Contact via GitHub issues for non-security matters, or reach out directly through GitHub for security concerns
@@ -59,6 +67,35 @@ This project implements several automated security measures:
 - **Secret Detection**: secretlint scans for accidentally committed secrets
 - **Permission Minimization**: GitHub Actions workflows use minimal permissions
 - **SHA Pinning**: GitHub Actions use SHA-pinned versions for security
+
+### Workflow Protection
+
+This repository implements comprehensive workflow protection to prevent supply chain attacks:
+
+#### CODEOWNERS Protection
+- All workflow files (`.github/workflows/`) require maintainer approval
+- Security configuration files require code owner review
+- Package and dependency changes require security approval
+- Documentation changes are protected by code ownership rules
+
+#### Branch Protection Rules
+- Required status checks for all security validations
+- Pull request reviews mandatory for all changes
+- Workflow changes require additional security review
+- See [Branch Protection Documentation](docs/BRANCH-PROTECTION.md) for details
+
+#### CI/CD Security
+- All GitHub Actions use SHA-pinned versions for reproducibility
+- Minimal permissions implemented across all workflows
+- OIDC authentication with attestation and provenance
+- Secretlint validation prevents accidental secret exposure
+- Automated validation of workflow security configurations
+
+#### Supply Chain Protection
+- Dependency updates through Dependabot with security review
+- Package publishing with provenance attestation
+- Comprehensive security scanning in CI pipeline
+- Regular security audits and compliance validation
 
 ### Security Updates
 
