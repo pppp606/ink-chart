@@ -29,6 +29,7 @@
     "test:coverage": "jest --coverage",
     "demo": "tsx bin/demo.tsx",
     "validate:sha-pinning": "node scripts/validate-sha-pinning.js",
+    "validate:permissions": "node scripts/validate-permissions.js",
     "prepublishOnly": "npm run build"
   },
   "keywords": [
