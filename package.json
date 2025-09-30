@@ -10,7 +10,7 @@
     "bin"
   ],
   "bin": {
-    "ink-chart-demo": "./bin/demo.tsx"
+    "ink-chart-demo": "./bin/demo.js"
   },
   "exports": {
     ".": {
@@ -23,7 +23,7 @@
     "audit-level": "high"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.bin.json && cp build/bin/demo.js bin/demo.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . && npm run lint:secrets",
     "lint:secrets": "secretlint .",
