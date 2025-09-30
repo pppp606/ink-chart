@@ -38,6 +38,11 @@ jobs:
       - name: Run linting
         run: npm run lint
 
+      - name: Security validation
+        run: |
+          npm run validate:sha-pinning
+          npm run validate:permissions
+
       - name: Run tests
         run: npm test
 
