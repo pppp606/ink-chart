@@ -1,0 +1,50 @@
+# CODEOWNERS File for Workflow Protection
+#
+# This file defines code ownership for critical files and directories.
+# It ensures that security-sensitive changes require appropriate review.
+#
+# Workflow Protection Rules:
+# - All workflow changes require security team approval
+# - Security configuration files require maintainer review
+# - Package and dependency changes require security review
+# - Documentation changes require maintainer review
+#
+# For more information on CODEOWNERS syntax:
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global ownership
+# All files require review from the maintainer
+* @pppp606
+
+# Workflow security
+# GitHub Actions workflows and configuration require security review
+/.github/workflows/ @pppp606
+/.github/dependabot.yml @pppp606
+
+# Security configuration
+# Critical security files require maintainer approval
+/SECURITY.md @pppp606
+/.secretlintrc.json @pppp606
+/.secretlintignore @pppp606
+/package.json @pppp606
+/package-lock.json @pppp606
+
+# Validation scripts
+# Security validation scripts require maintainer review
+/scripts/validate-* @pppp606
+
+# Documentation
+# Documentation and guides require maintainer review
+/docs/ @pppp606
+/README.md @pppp606
+
+# Configuration files
+# Important configuration files require review
+/.eslintrc.cjs @pppp606
+/.prettierrc @pppp606
+/tsconfig.json @pppp606
+/jest.config.js @pppp606
+
+# License and legal
+# Legal and licensing files require careful review
+/LICENSE @pppp606

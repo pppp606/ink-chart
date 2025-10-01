@@ -1,4 +1,4 @@
-#!/usr/bin/env npx tsx
+#!/usr/bin/env node
 
 /**
  * Demo CLI application for ink-chart components
@@ -75,7 +75,7 @@ function DynamicSparklineDemo() {
         threshold={[60, 70, 80, 90]}
         colorScheme="blue"
       />
-      <Text dim>Current: {rpsHistory[rpsHistory.length - 1]?.toFixed(0)} RPS | Peak: {Math.max(...rpsHistory).toFixed(0)} RPS</Text>
+      <Text dimColor>Current: {rpsHistory[rpsHistory.length - 1]?.toFixed(0)} RPS | Peak: {Math.max(...rpsHistory).toFixed(0)} RPS</Text>
       <Text> </Text>
     </Box>
   );
@@ -166,17 +166,20 @@ function StaticDemo(): React.ReactElement {
         const match = line.match(/^\s*(\S+)\s+\|\s+([0-9.]+)/);
         if (match) {
           const [, filename, coverage] = match;
-          if (filename && filename.includes('.ts') && !filename.includes('All files')) {
+          if (filename && coverage && filename.includes('.ts') && !filename.includes('All files')) {
             const coverageNum = parseFloat(coverage);
-            const color = coverageNum >= 90 ? '#4CAF50' : 
-                         coverageNum >= 75 ? '#8BC34A' : 
+            const color = coverageNum >= 90 ? '#4CAF50' :
+                         coverageNum >= 75 ? '#8BC34A' :
                          coverageNum >= 60 ? '#CDDC39' : '#FF9800';
-            
-            data.push({
-              label: filename.split('/').pop() || filename,
-              value: coverageNum,
-              color
-            });
+
+            const filename_part = filename.split('/').pop();
+            if (filename_part) {
+              data.push({
+                label: filename_part,
+                value: coverageNum,
+                color
+              });
+            }
           }
         }
       }
@@ -190,7 +193,7 @@ function StaticDemo(): React.ReactElement {
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold color="cyan">🚀 ink-chart Demo - Static Examples</Text>
-      <Text dim>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
+      <Text dimColor>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
       <Text> </Text>
       
       {/* Sparkline RPS Example */}
@@ -202,7 +205,7 @@ function StaticDemo(): React.ReactElement {
           mode="block"
           caption="Requests per second (24h trend)"
         />
-        <Text dim>Peak: {Math.max(...rpsData)} RPS | Average: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)} RPS</Text>
+        <Text dimColor>Peak: {Math.max(...rpsData)} RPS | Average: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)} RPS</Text>
       </Box>
       <Text> </Text>
 
@@ -296,7 +299,7 @@ function DynamicDemo(): React.ReactElement {
   return (
     <Box flexDirection="column" padding={1}>
       <Text bold color="cyan">🚀 ink-chart Demo - Live Charts</Text>
-      <Text dim>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
+      <Text dimColor>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
       <Text> </Text>
 
       {/* Dynamic Sparkline */}
