@@ -19,6 +19,14 @@ describe('OIDC Publishing Workflow Validation', () => {
   beforeEach(() => {
     jest.resetModules();
     process.env = { ...originalEnv };
+
+    // Clear OIDC/GitHub environment variables to ensure clean test state
+    delete process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
+    delete process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
+    delete process.env.GITHUB_REPOSITORY;
+    delete process.env.GITHUB_REF;
+    delete process.env.GITHUB_SHA;
+    delete process.env.CI;
   });
 
   afterEach(() => {
@@ -91,10 +99,10 @@ describe('OIDC Publishing Workflow Validation', () => {
 
       // Note: In a real test environment, we'd run the build first
       // For now, we'll test the validation logic
-      const buildOutputsExist = validateBuildOutputs(distPath, expectedFiles);
 
       // This should pass if dist files exist, otherwise provide clear error
       if (fs.existsSync(distPath)) {
+        const buildOutputsExist = validateBuildOutputs(distPath, expectedFiles);
         expect(buildOutputsExist).toBe(true);
       } else {
         expect(() => validateBuildOutputs(distPath, expectedFiles)).toThrow('Build outputs not found');
@@ -327,10 +335,18 @@ function validatePublicationReadiness(): {
 } {
   const packageJsonPath = path.resolve(process.cwd(), 'package.json');
   const distPath = path.resolve(process.cwd(), 'dist');
+  const expectedFiles = ['index.js', 'index.d.ts'];
+
+  let buildOutputsValid = false;
+  try {
+    buildOutputsValid = validateBuildOutputs(distPath, expectedFiles);
+  } catch {
+    buildOutputsValid = false;
+  }
 
   return {
     packageJson: fs.existsSync(packageJsonPath),
-    buildOutputs: fs.existsSync(distPath),
+    buildOutputs: buildOutputsValid,
     npmRegistry: true // Assume registry is accessible
   };
 }
