@@ -1,0 +1,30 @@
+{
+  "description": "Test configuration file with embedded secrets for secretlint testing",
+  "services": {
+    "database": {
+      "host": "localhost",
+      "port": 5432,
+      "username": "admin",
+      "password": "super-secret-password-123"
+    },
+    "api": {
+      "baseUrl": "https://api.example.com",
+      "apiKey": "sk-1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      "secret": "api-secret-xyz789abc123"
+    },
+    "github": {
+      "token": "ghp_1234567890abcdef1234567890abcdef12345678",
+      "webhook_secret": "github-webhook-secret-456def789ghi"
+    },
+    "aws": {
+      "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+      "secretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+      "region": "us-east-1"
+    }
+  },
+  "security": {
+    "jwtSecret": "jwt-signing-key-should-not-be-in-config-123456789",
+    "encryptionKey": "32-char-encryption-key-abc123def456",
+    "sessionSecret": "session-secret-for-cookies-xyz789"
+  }
+}
