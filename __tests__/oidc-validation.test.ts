@@ -19,7 +19,8 @@ describe('OIDC Configuration Validation', () => {
       if (process.env.CI) {
         // In CI environment, this should be available when OIDC is configured
         expect(tokenRequestUrl).toBeDefined();
-        expect(tokenRequestUrl).toMatch(/^https:\/\/vstoken\.actions\.githubusercontent\.com/);
+        // GitHub uses different OIDC URLs across regions (vstoken, run-actions-*, etc.)
+        expect(tokenRequestUrl).toMatch(/^https:\/\/.*\.actions\.githubusercontent\.com/);
       } else {
         // In local development, this won't be available
         expect(tokenRequestUrl).toBeUndefined();
