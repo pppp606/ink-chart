@@ -177,7 +177,8 @@ describe('OIDC Publishing Workflow Validation', () => {
 
       // In CI, build outputs may not exist yet (build runs after tests)
       // In local dev after building, build outputs should exist
-      if (!process.env.CI) {
+      // Use originalEnv because beforeEach clears process.env.CI
+      if (!originalEnv.CI) {
         expect(readinessCheck.buildOutputs).toBeTruthy();
       }
 
