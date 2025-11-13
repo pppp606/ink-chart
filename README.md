@@ -271,7 +271,6 @@ The demo showcases:
 **BarChart Examples:**
 - Department performance comparison with sorting
 - Multi-color status indicators (Success, Warnings, Errors)
-- Real-time test coverage visualization
 
 **StackedBarChart Examples:**
 - **Percentage Mode**: 100% stacked bar showing percentage distribution

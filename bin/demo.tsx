@@ -10,7 +10,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text } from 'ink';
-import { exec } from 'child_process';
 import { Sparkline, BarChart, BarChartData, StackedBarChart } from '../src/index.js';
 
 /**
@@ -148,47 +147,6 @@ function StaticDemo(): React.ReactElement {
   const rpsData = generateRpsData();
   const categoryData = generateCategoryData();
   const thresholdData = generateThresholdData();
-  const [coverageData, setCoverageData] = useState<BarChartData[]>([]);
-
-  useEffect(() => {
-    exec('npm run test:coverage -- --silent 2>/dev/null', (error, stdout, _stderr) => {
-      if (error) {
-        setCoverageData([
-          { label: 'Coverage data unavailable', value: 0, color: '#666666' }
-        ]);
-        return;
-      }
-
-      const lines = stdout.split('\n');
-      const data: BarChartData[] = [];
-      
-      for (const line of lines) {
-        const match = line.match(/^\s*(\S+)\s+\|\s+([0-9.]+)/);
-        if (match) {
-          const [, filename, coverage] = match;
-          if (filename && coverage && filename.includes('.ts') && !filename.includes('All files')) {
-            const coverageNum = parseFloat(coverage);
-            const color = coverageNum >= 90 ? '#4CAF50' :
-                         coverageNum >= 75 ? '#8BC34A' :
-                         coverageNum >= 60 ? '#CDDC39' : '#FF9800';
-
-            const filename_part = filename.split('/').pop();
-            if (filename_part) {
-              data.push({
-                label: filename_part,
-                value: coverageNum,
-                color
-              });
-            }
-          }
-        }
-      }
-      
-      if (data.length > 0) {
-        setCoverageData(data);
-      }
-    });
-  }, []);
 
   return (
     <Box flexDirection="column" padding={1}>
@@ -267,26 +225,6 @@ function StaticDemo(): React.ReactElement {
           showValue="right"
           width={50}
         />
-      </Box>
-      <Text> </Text>
-
-      {/* Test Coverage Example */}
-      <Text bold color="yellow">📊 Test Coverage Example</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>Real project test coverage visualization</Text>
-        {coverageData.length > 0 ? (
-          <BarChart
-            data={coverageData}
-            sort="desc"
-            showValue="right"
-            format={(v) => `${v.toFixed(1)}%`}
-            width={60}
-            max={100}
-            barChar="▓"
-          />
-        ) : (
-          <Text dimColor>Loading coverage data...</Text>
-        )}
       </Box>
       <Text> </Text>
 
