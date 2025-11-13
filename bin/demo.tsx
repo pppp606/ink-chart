@@ -231,54 +231,54 @@ function StaticDemo(): React.ReactElement {
       {/* BarChart Character Styles */}
       <Text bold color="yellow">📊 BarChart Character Styles</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>Different bar characters for visual variety</Text>
-        <Text>Full Block (█):</Text>
+        <Text dimColor>Using Lower Five Eighths Block (▆) for visual clarity</Text>
+        <Text>API Performance:</Text>
         <BarChart
           data={[
             { label: 'API', value: 85 },
             { label: 'DB', value: 65 },
             { label: 'Cache', value: 92 }
           ]}
-          barChar="█"
+          barChar="▆"
           showValue="right"
           width={45}
           max={100}
         />
         <Text> </Text>
-        <Text>Dark Shade (▓):</Text>
+        <Text>DB Performance:</Text>
         <BarChart
           data={[
             { label: 'API', value: 85 },
             { label: 'DB', value: 65 },
             { label: 'Cache', value: 92 }
           ]}
-          barChar="▓"
+          barChar="▆"
           showValue="right"
           width={45}
           max={100}
         />
         <Text> </Text>
-        <Text>Medium Shade (▒):</Text>
+        <Text>Cache Performance:</Text>
         <BarChart
           data={[
             { label: 'API', value: 85 },
             { label: 'DB', value: 65 },
             { label: 'Cache', value: 92 }
           ]}
-          barChar="▒"
+          barChar="▆"
           showValue="right"
           width={45}
           max={100}
         />
         <Text> </Text>
-        <Text>Light Shade (░):</Text>
+        <Text>Overall Performance:</Text>
         <BarChart
           data={[
             { label: 'API', value: 85 },
             { label: 'DB', value: 65 },
             { label: 'Cache', value: 92 }
           ]}
-          barChar="░"
+          barChar="▆"
           showValue="right"
           width={45}
           max={100}
