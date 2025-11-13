@@ -206,6 +206,38 @@ interface StackedBarSegment {
 />
 ```
 
+### Different Bar Characters
+
+```tsx
+// Full Block (█)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="█"
+  max={100}
+/>
+
+// Dark Shade (▓)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="▓"
+  max={100}
+/>
+
+// Medium Shade (▒)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="▒"
+  max={100}
+/>
+
+// Light Shade (░)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="░"
+  max={100}
+/>
+```
+
 ### Stacked Distribution (Percentage Mode)
 
 ```tsx
@@ -271,6 +303,7 @@ The demo showcases:
 **BarChart Examples:**
 - Department performance comparison with sorting
 - Multi-color status indicators (Success, Warnings, Errors)
+- Different bar character styles (█, ▓, ▒, ░)
 
 **StackedBarChart Examples:**
 - **Percentage Mode**: 100% stacked bar showing percentage distribution

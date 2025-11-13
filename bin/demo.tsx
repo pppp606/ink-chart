@@ -215,7 +215,7 @@ function StaticDemo(): React.ReactElement {
       {/* Colored BarChart Demo */}
       <Text bold color="yellow">🎨 BarChart Multi-Color Example</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <BarChart 
+        <BarChart
           data={[
             { label: 'Success', value: 22, color: '#4aaa1a' },
             { label: 'Warnings', value: 8, color: '#d89612' },
@@ -224,6 +224,64 @@ function StaticDemo(): React.ReactElement {
           sort="none"
           showValue="right"
           width={50}
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* BarChart Character Styles */}
+      <Text bold color="yellow">📊 BarChart Character Styles</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>Different bar characters for visual variety</Text>
+        <Text>Full Block (█):</Text>
+        <BarChart
+          data={[
+            { label: 'API', value: 85 },
+            { label: 'DB', value: 65 },
+            { label: 'Cache', value: 92 }
+          ]}
+          barChar="█"
+          showValue="right"
+          width={45}
+          max={100}
+        />
+        <Text> </Text>
+        <Text>Dark Shade (▓):</Text>
+        <BarChart
+          data={[
+            { label: 'API', value: 85 },
+            { label: 'DB', value: 65 },
+            { label: 'Cache', value: 92 }
+          ]}
+          barChar="▓"
+          showValue="right"
+          width={45}
+          max={100}
+        />
+        <Text> </Text>
+        <Text>Medium Shade (▒):</Text>
+        <BarChart
+          data={[
+            { label: 'API', value: 85 },
+            { label: 'DB', value: 65 },
+            { label: 'Cache', value: 92 }
+          ]}
+          barChar="▒"
+          showValue="right"
+          width={45}
+          max={100}
+        />
+        <Text> </Text>
+        <Text>Light Shade (░):</Text>
+        <BarChart
+          data={[
+            { label: 'API', value: 85 },
+            { label: 'DB', value: 65 },
+            { label: 'Cache', value: 92 }
+          ]}
+          barChar="░"
+          showValue="right"
+          width={45}
+          max={100}
         />
       </Box>
       <Text> </Text>
