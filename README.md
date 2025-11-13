@@ -10,6 +10,7 @@ Terminal visualization components for [Ink](https://github.com/vadimdemedes/ink)
 
 - **Sparkline** - Compact trend visualization with threshold highlighting and gradient colors
 - **BarChart** - Horizontal bar charts with individual row coloring and custom formatting
+- **StackedBarChart** - 100% stacked horizontal bar charts showing percentage distribution
 - **TypeScript** - Full TypeScript support with comprehensive type definitions
 - **Auto-width** - Responsive charts that adapt to terminal width
 - **Gradient Colors** - 8-level smooth color gradients with automatic terminal compatibility
@@ -26,22 +27,30 @@ npm install @pppp606/ink-chart
 ```tsx
 import React from 'react';
 import { render, Text, Box } from 'ink';
-import { Sparkline, BarChart } from '@pppp606/ink-chart';
+import { Sparkline, BarChart, StackedBarChart } from '@pppp606/ink-chart';
 
 function App() {
   return (
     <Box flexDirection="column">
       {/* Simple sparkline */}
       <Sparkline data={[1, 3, 2, 5, 4, 6, 3]} />
-      
+
       {/* Bar chart with values */}
-      <BarChart 
+      <BarChart
         data={[
           { label: 'Sales', value: 1250 },
           { label: 'Marketing', value: 800 }
         ]}
         showValue="right"
         sort="desc"
+      />
+
+      {/* Stacked bar chart showing distribution */}
+      <StackedBarChart
+        data={[
+          { label: 'Complete', value: 75, color: '#4aaa1a' },
+          { label: 'Remaining', value: 25, color: '#d89612' }
+        ]}
       />
     </Box>
   );
@@ -110,6 +119,38 @@ interface BarChartData {
 }
 ```
 
+### StackedBarChart
+
+100% stacked horizontal bar chart showing percentage distribution with labels and values aligned to segment positions.
+
+```tsx
+<StackedBarChart
+  data={[
+    { label: 'Sales', value: 30, color: '#4aaa1a' },
+    { label: 'Warning', value: 20, color: '#d89612' },
+    { label: 'Error', value: 50, color: '#a61d24' }
+  ]}
+  width={50}
+/>
+```
+
+**Props:**
+- `data: StackedBarSegment[]` - Array of segments to display
+- `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: 40 characters default, `'full'`: terminal width, `number`: fixed width)
+- `showLabels?: boolean` - Whether to show segment labels above bar (default: `true`)
+- `showValues?: boolean` - Whether to show percentage values below bar (default: `true`)
+- `format?: (value: number) => string` - Percentage formatter (default: `v => ${v.toFixed(1)}%`)
+
+**StackedBarSegment interface:**
+```tsx
+interface StackedBarSegment {
+  label: string;
+  value: number;
+  color?: string; // Hex code or Ink color name
+  char?: string;  // Custom character for this segment
+}
+```
+
 ## Examples
 
 ### Gradient Highlighting
@@ -139,13 +180,35 @@ interface BarChartData {
 ### Individual Colors
 
 ```tsx
-<BarChart 
+<BarChart
   data={[
     { label: 'Success', value: 85, color: '#4aaa1a' },
     { label: 'Warning', value: 12, color: '#d89612' },
     { label: 'Error', value: 3, color: '#a61d24' }
   ]}
 />
+```
+
+### Stacked Distribution
+
+```tsx
+<StackedBarChart
+  data={[
+    { label: 'Development', value: 45, color: '#1890ff', char: '█' },
+    { label: 'Testing', value: 25, color: '#52c41a', char: '▓' },
+    { label: 'Planning', value: 15, color: '#faad14', char: '▒' },
+    { label: 'Meetings', value: 15, color: '#f5222d', char: '░' }
+  ]}
+  width={60}
+  format={(v) => `${v.toFixed(0)}%`}
+/>
+```
+
+Output:
+```
+Development                Testing        Planning Meetings
+███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░
+45%                        25%            15%      15%
 ```
 
 ## Demo

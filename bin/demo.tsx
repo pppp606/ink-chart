@@ -11,7 +11,7 @@
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text } from 'ink';
 import { exec } from 'child_process';
-import { Sparkline, BarChart, BarChartData } from '../src/index.js';
+import { Sparkline, BarChart, BarChartData, StackedBarChart, StackedBarSegment } from '../src/index.js';
 
 /**
  * Generate realistic RPS (Requests Per Second) data
@@ -275,7 +275,7 @@ function StaticDemo(): React.ReactElement {
       <Box flexDirection="column" marginLeft={2}>
         <Text dimColor>Real project test coverage visualization</Text>
         {coverageData.length > 0 ? (
-          <BarChart 
+          <BarChart
             data={coverageData}
             sort="desc"
             showValue="right"
@@ -287,6 +287,37 @@ function StaticDemo(): React.ReactElement {
         ) : (
           <Text dimColor>Loading coverage data...</Text>
         )}
+      </Box>
+      <Text> </Text>
+
+      {/* StackedBarChart Example */}
+      <Text bold color="yellow">📊 StackedBarChart Example: Distribution</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>100% stacked bar showing percentage distribution</Text>
+        <StackedBarChart
+          data={[
+            { label: 'Sales', value: 30, color: '#4aaa1a' },
+            { label: 'Warning', value: 20, color: '#d89612' },
+            { label: 'Error', value: 50, color: '#a61d24' }
+          ]}
+          width={50}
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* StackedBarChart Example 2 */}
+      <Text bold color="yellow">🎯 StackedBarChart: Project Time Allocation</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <StackedBarChart
+          data={[
+            { label: 'Development', value: 45, color: '#1890ff', char: '█' },
+            { label: 'Testing', value: 25, color: '#52c41a', char: '▓' },
+            { label: 'Planning', value: 15, color: '#faad14', char: '▒' },
+            { label: 'Meetings', value: 15, color: '#f5222d', char: '░' }
+          ]}
+          width={60}
+          format={(v) => `${v.toFixed(0)}%`}
+        />
       </Box>
     </Box>
   );
