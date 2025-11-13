@@ -233,22 +233,12 @@ function StaticDemo(): React.ReactElement {
       <Box flexDirection="column" marginLeft={2}>
         <Text dimColor>Different bar characters for visual variety</Text>
         <BarChart
-          data={[{ label: 'API', value: 85 }]}
-          barChar="▆"
-          showValue="right"
-          width={45}
-          max={100}
-        />
-        <BarChart
-          data={[{ label: 'DB', value: 65 }]}
-          barChar="▓"
-          showValue="right"
-          width={45}
-          max={100}
-        />
-        <BarChart
-          data={[{ label: 'Cache', value: 92 }]}
-          barChar="▒"
+          data={[
+            { label: 'API', value: 85, char: '▆' },
+            { label: 'DB', value: 65, char: '▓' },
+            { label: 'Cache', value: 92, char: '▒' }
+          ]}
+          sort="none"
           showValue="right"
           width={45}
           max={100}
