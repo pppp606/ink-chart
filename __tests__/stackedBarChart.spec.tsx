@@ -198,4 +198,133 @@ describe('StackedBarChart Component', () => {
 
     expect(result).not.toBeNull();
   });
+
+  // Absolute mode tests
+  it('should execute with absolute mode', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'Complete', value: 75 },
+      { label: 'In Progress', value: 25 }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'absolute',
+      max: 200
+    });
+
+    expect(result).not.toBeNull();
+  });
+
+  it('should execute with absolute mode and auto max', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'A', value: 30 },
+      { label: 'B', value: 70 }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'absolute',
+      max: 'auto'
+    });
+
+    expect(result).not.toBeNull();
+  });
+
+  it('should execute with absolute mode and custom format', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'Downloads', value: 1250 },
+      { label: 'Uploads', value: 450 }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'absolute',
+      max: 5000,
+      format: (v: number, mode: string) =>
+        mode === 'percentage' ? `${v.toFixed(1)}%` : `${v}`
+    });
+
+    expect(result).not.toBeNull();
+  });
+
+  it('should execute with percentage mode explicitly', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'A', value: 40 },
+      { label: 'B', value: 60 }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'percentage'
+    });
+
+    expect(result).not.toBeNull();
+  });
+
+  it('should execute with absolute mode showing labels and values', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'CPU', value: 45 },
+      { label: 'Memory', value: 30 },
+      { label: 'Disk', value: 25 }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'absolute',
+      max: 100,
+      showLabels: true,
+      showValues: true,
+      width: 50
+    });
+
+    expect(result).not.toBeNull();
+  });
+
+  it('should execute with absolute mode without labels', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'A', value: 50 },
+      { label: 'B', value: 50 }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'absolute',
+      showLabels: false,
+      max: 200
+    });
+
+    expect(result).not.toBeNull();
+  });
+
+  it('should execute with absolute mode without values', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'A', value: 50 },
+      { label: 'B', value: 50 }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'absolute',
+      showValues: false,
+      max: 200
+    });
+
+    expect(result).not.toBeNull();
+  });
+
+  it('should execute with absolute mode and colors', () => {
+    const data: StackedBarSegment[] = [
+      { label: 'Success', value: 150, color: '#4aaa1a' },
+      { label: 'Warning', value: 50, color: '#d89612' },
+      { label: 'Error', value: 20, color: '#a61d24' }
+    ];
+
+    const result = executeComponent({
+      data,
+      mode: 'absolute',
+      max: 300
+    });
+
+    expect(result).not.toBeNull();
+  });
 });

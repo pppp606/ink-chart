@@ -29,11 +29,32 @@ export type StackedBarCharacter = '█' | '▓' | '▒' | '░' | '▆' | '▪' 
 const DEFAULT_CHARS: StackedBarCharacter[] = ['█', '▓', '▒', '░'];
 
 /**
+ * Stacked bar chart display mode
+ */
+export type StackedBarChartMode = 'percentage' | 'absolute';
+
+/**
  * Props for the StackedBarChart component
  */
 export interface StackedBarChartProps {
   /** Array of segments to display in the stacked bar */
   data: StackedBarSegment[];
+
+  /**
+   * Display mode for the chart
+   * - 'percentage': 100% stacked bar showing percentage distribution (default)
+   * - 'absolute': Stacked bar showing absolute values scaled to max
+   * @default 'percentage'
+   */
+  mode?: StackedBarChartMode;
+
+  /**
+   * Maximum value for scaling (only used in 'absolute' mode)
+   * - 'auto': Uses the sum of all segment values
+   * - number: Fixed maximum value for consistent scaling
+   * @default 'auto'
+   */
+  max?: 'auto' | number;
 
   /**
    * Total width constraint for the chart
@@ -50,17 +71,18 @@ export interface StackedBarChartProps {
   showLabels?: boolean;
 
   /**
-   * Whether to show percentage values below the bar
+   * Whether to show values below the bar
    * @default true
    */
   showValues?: boolean;
 
   /**
-   * Custom formatter for percentage values
-   * @param value - The percentage value (0-100)
+   * Custom formatter for values
+   * @param value - The value to format (percentage in percentage mode, absolute value in absolute mode)
+   * @param mode - The current display mode
    * @returns Formatted string representation
    */
-  format?: (value: number) => string;
+  format?: (value: number, mode: StackedBarChartMode) => string;
 }
 
 /**
@@ -68,7 +90,7 @@ export interface StackedBarChartProps {
  */
 interface PositionedSegment {
   segment: StackedBarSegment;
-  percentage: number;
+  displayValue: number; // The value to display (percentage or absolute)
   startPos: number;
   length: number;
   char: string;
@@ -86,7 +108,9 @@ function calculateTotal(data: StackedBarSegment[]): number {
  */
 function calculateSegmentPositions(
   data: StackedBarSegment[],
-  barWidth: number
+  barWidth: number,
+  mode: StackedBarChartMode,
+  max: 'auto' | number
 ): PositionedSegment[] {
   const total = calculateTotal(data);
   if (total <= 0) {
@@ -96,18 +120,35 @@ function calculateSegmentPositions(
   const positions: PositionedSegment[] = [];
   let currentPos = 0;
 
+  // In percentage mode, always use total as max
+  // In absolute mode, use max parameter or total
+  const maxValue = mode === 'percentage' ? total : (max === 'auto' ? total : max);
+
   for (let i = 0; i < data.length; i++) {
     const segment = data[i];
     if (!segment) {
       continue;
     }
-    const percentage = (segment.value / total) * 100;
-    const length = Math.max(1, Math.round((percentage / 100) * barWidth));
+
+    // Calculate display value and bar length based on mode
+    let displayValue: number;
+    let barRatio: number;
+
+    if (mode === 'percentage') {
+      displayValue = (segment.value / total) * 100;
+      barRatio = segment.value / total;
+    } else {
+      // absolute mode
+      displayValue = segment.value;
+      barRatio = segment.value / maxValue;
+    }
+
+    const length = Math.max(1, Math.round(barRatio * barWidth));
     const char = segment.char || DEFAULT_CHARS[i % DEFAULT_CHARS.length] || '█';
 
     positions.push({
       segment,
-      percentage,
+      displayValue,
       startPos: currentPos,
       length,
       char
@@ -116,8 +157,8 @@ function calculateSegmentPositions(
     currentPos += length;
   }
 
-  // Adjust last segment to fill exactly to barWidth
-  if (positions.length > 0 && currentPos !== barWidth) {
+  // Adjust last segment to fill exactly to barWidth (only in percentage mode)
+  if (mode === 'percentage' && positions.length > 0 && currentPos !== barWidth) {
     const lastSegment = positions[positions.length - 1];
     if (lastSegment) {
       lastSegment.length += barWidth - currentPos;
@@ -152,12 +193,13 @@ function renderLabelLine(positions: PositionedSegment[], barWidth: number): stri
 function renderValueLine(
   positions: PositionedSegment[],
   barWidth: number,
-  format: (value: number) => string
+  format: (value: number, mode: StackedBarChartMode) => string,
+  mode: StackedBarChartMode
 ): string {
   const line = new Array(barWidth).fill(' ');
 
   for (const pos of positions) {
-    const valueText = format(pos.percentage);
+    const valueText = format(pos.displayValue, mode);
     const startPos = pos.startPos;
 
     // Place value at segment start position
@@ -170,15 +212,16 @@ function renderValueLine(
 }
 
 /**
- * A horizontal stacked bar chart component showing percentage distribution.
+ * A horizontal stacked bar chart component showing percentage distribution or absolute values.
  *
- * Displays data as a single bar divided into colored segments, with each segment
- * representing a percentage of the total. Labels and values are aligned to each
+ * Displays data as a single bar divided into colored segments. In percentage mode,
+ * each segment represents a percentage of the total. In absolute mode, segments show
+ * actual values scaled to a maximum. Labels and values are aligned to each
  * segment's starting position for clear visual association.
  *
  * @example
  * ```tsx
- * // Basic usage with automatic percentage calculation
+ * // Percentage mode (default) - 100% stacked
  * <StackedBarChart
  *   data={[
  *     { label: 'Sales', value: 30, color: '#4aaa1a' },
@@ -187,14 +230,15 @@ function renderValueLine(
  *   ]}
  * />
  *
- * // Without labels, custom formatting
+ * // Absolute mode - showing actual values
  * <StackedBarChart
  *   data={[
  *     { label: 'Complete', value: 75 },
- *     { label: 'Remaining', value: 25 }
+ *     { label: 'In Progress', value: 25 }
  *   ]}
- *   showLabels={false}
- *   format={(v) => `${v.toFixed(1)}%`}
+ *   mode="absolute"
+ *   max={200}
+ *   format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v}`}
  *   width={60}
  * />
  * ```
@@ -206,10 +250,13 @@ export const StackedBarChart = React.memo<StackedBarChartProps>(
   function StackedBarChart(props: StackedBarChartProps): React.ReactElement | null {
     const {
       data,
+      mode = 'percentage',
+      max = 'auto',
       width = 'auto',
       showLabels = true,
       showValues = true,
-      format = (value: number) => `${value.toFixed(1)}%`
+      format = (value: number, displayMode: StackedBarChartMode) =>
+        displayMode === 'percentage' ? `${value.toFixed(1)}%` : `${value.toFixed(0)}`
     } = props;
 
     // Use auto-width hook for terminal width detection
@@ -231,7 +278,7 @@ export const StackedBarChart = React.memo<StackedBarChartProps>(
     const barWidth = typeof effectiveWidth === 'number' ? effectiveWidth : 40;
 
     // Calculate segment positions
-    const positions = calculateSegmentPositions(data, barWidth);
+    const positions = calculateSegmentPositions(data, barWidth, mode, max);
     if (positions.length === 0) {
       return null;
     }
@@ -240,7 +287,7 @@ export const StackedBarChart = React.memo<StackedBarChartProps>(
     const labelLine = showLabels ? renderLabelLine(positions, barWidth) : null;
 
     // Render value line
-    const valueLine = showValues ? renderValueLine(positions, barWidth, format) : null;
+    const valueLine = showValues ? renderValueLine(positions, barWidth, format, mode) : null;
 
     // Render bar segments
     const barElements = positions.map((pos, index) => {

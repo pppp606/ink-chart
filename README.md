@@ -121,9 +121,10 @@ interface BarChartData {
 
 ### StackedBarChart
 
-100% stacked horizontal bar chart showing percentage distribution with labels and values aligned to segment positions.
+Stacked horizontal bar chart with two modes: 100% percentage distribution or absolute values.
 
 ```tsx
+// Percentage mode (default) - 100% stacked
 <StackedBarChart
   data={[
     { label: 'Sales', value: 30, color: '#4aaa1a' },
@@ -132,14 +133,30 @@ interface BarChartData {
   ]}
   width={50}
 />
+
+// Absolute mode - showing actual values
+<StackedBarChart
+  data={[
+    { label: 'Downloads', value: 1250 },
+    { label: 'Uploads', value: 450 }
+  ]}
+  mode="absolute"
+  max={5000}
+  format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v}`}
+  width={50}
+/>
 ```
 
 **Props:**
 - `data: StackedBarSegment[]` - Array of segments to display
+- `mode?: 'percentage' | 'absolute'` - Display mode (default: `'percentage'`)
+  - `'percentage'`: 100% stacked showing percentage distribution
+  - `'absolute'`: Stacked bar showing actual values scaled to max
+- `max?: 'auto' | number` - Maximum value for scaling in absolute mode (default: `'auto'`)
 - `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: 40 characters default, `'full'`: terminal width, `number`: fixed width)
 - `showLabels?: boolean` - Whether to show segment labels above bar (default: `true`)
-- `showValues?: boolean` - Whether to show percentage values below bar (default: `true`)
-- `format?: (value: number) => string` - Percentage formatter (default: `v => ${v.toFixed(1)}%`)
+- `showValues?: boolean` - Whether to show values below bar (default: `true`)
+- `format?: (value: number, mode: StackedBarChartMode) => string` - Value formatter
 
 **StackedBarSegment interface:**
 ```tsx
@@ -189,7 +206,7 @@ interface StackedBarSegment {
 />
 ```
 
-### Stacked Distribution
+### Stacked Distribution (Percentage Mode)
 
 ```tsx
 <StackedBarChart
@@ -209,6 +226,29 @@ Output:
 Development                Testing        Planning Meetings
 ███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░
 45%                        25%            15%      15%
+```
+
+### Stacked Distribution (Absolute Mode)
+
+```tsx
+<StackedBarChart
+  data={[
+    { label: 'CPU', value: 45, color: '#1890ff' },
+    { label: 'Memory', value: 30, color: '#52c41a' },
+    { label: 'Disk', value: 15, color: '#faad14' }
+  ]}
+  mode="absolute"
+  max={100}
+  width={60}
+  format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
+/>
+```
+
+Output:
+```
+CPU                        Memory          Disk
+███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒
+45                         30              15
 ```
 
 ## Demo

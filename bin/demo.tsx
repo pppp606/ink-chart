@@ -319,6 +319,24 @@ function StaticDemo(): React.ReactElement {
           format={(v) => `${v.toFixed(0)}%`}
         />
       </Box>
+      <Text> </Text>
+
+      {/* StackedBarChart Absolute Mode Example */}
+      <Text bold color="yellow">📈 StackedBarChart (Absolute Mode): Server Resources</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>Showing absolute values (out of 100 max)</Text>
+        <StackedBarChart
+          data={[
+            { label: 'CPU', value: 45, color: '#1890ff' },
+            { label: 'Memory', value: 30, color: '#52c41a' },
+            { label: 'Disk', value: 15, color: '#faad14' }
+          ]}
+          mode="absolute"
+          max={100}
+          width={60}
+          format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
+        />
+      </Box>
     </Box>
   );
 }

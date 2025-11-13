@@ -144,7 +144,11 @@ function StaticDemo() {
                         { label: 'Testing', value: 25, color: '#52c41a', char: '▓' },
                         { label: 'Planning', value: 15, color: '#faad14', char: '▒' },
                         { label: 'Meetings', value: 15, color: '#f5222d', char: '░' }
-                    ], width: 60, format: (v) => `${v.toFixed(0)}%` }) })] }));
+                    ], width: 60, format: (v) => `${v.toFixed(0)}%` }) }), _jsx(Text, { children: " " }), _jsx(Text, { bold: true, color: "yellow", children: "\uD83D\uDCC8 StackedBarChart (Absolute Mode): Server Resources" }), _jsxs(Box, { flexDirection: "column", marginLeft: 2, children: [_jsx(Text, { dimColor: true, children: "Showing absolute values (out of 100 max)" }), _jsx(StackedBarChart, { data: [
+                            { label: 'CPU', value: 45, color: '#1890ff' },
+                            { label: 'Memory', value: 30, color: '#52c41a' },
+                            { label: 'Disk', value: 15, color: '#faad14' }
+                        ], mode: "absolute", max: 100, width: 60, format: (v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}` })] })] }));
 }
 /**
  * Dynamic demo - live updating charts
