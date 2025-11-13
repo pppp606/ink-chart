@@ -24,9 +24,9 @@ export type StackedBarCharacter = '█' | '▓' | '▒' | '░' | '▆' | '▪' 
 
 /**
  * Default characters for segments (cycles through these)
- * All use Full Block (U+2588) for consistent height - differentiate by color
+ * All use Lower Five Eighths Block (U+2586) for visual separation - differentiate by color
  */
-const DEFAULT_CHARS: StackedBarCharacter[] = ['█', '█', '█', '█'];
+const DEFAULT_CHARS: StackedBarCharacter[] = ['▆', '▆', '▆', '▆'];
 
 /**
  * Stacked bar chart display mode
