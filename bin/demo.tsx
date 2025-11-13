@@ -11,7 +11,7 @@
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text } from 'ink';
 import { exec } from 'child_process';
-import { Sparkline, BarChart, BarChartData, StackedBarChart, StackedBarSegment } from '../src/index.js';
+import { Sparkline, BarChart, BarChartData, StackedBarChart } from '../src/index.js';
 
 /**
  * Generate realistic RPS (Requests Per Second) data

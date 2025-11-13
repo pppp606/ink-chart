@@ -1,7 +1,6 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import { useAutoWidth } from '../core/useAutoWidth.js';
-import { measureWidth } from '../measure.js';
 import { calculateEffectiveWidth } from '../core/widthUtils.js';
 
 /**
