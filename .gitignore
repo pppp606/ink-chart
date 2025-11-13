@@ -85,6 +85,9 @@ dist
 # TypeScript build output for bins
 build/
 
+# Built demo file (generated from bin/demo.tsx)
+bin/demo.js
+
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js

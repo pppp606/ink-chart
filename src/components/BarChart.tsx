@@ -15,6 +15,8 @@ export interface BarChartData {
   value: number;
   /** Optional color for this specific bar (hex code or Ink color name) */
   color?: string;
+  /** Optional character for this specific bar */
+  char?: string;
 }
 
 /**
@@ -109,7 +111,8 @@ function renderFixedWidthRow(
   const { label, value } = item;
   const displayLabel = truncateText(label, layout.labelWidth);
   const barLength = Math.max(1, Math.floor(ratio * layout.barWidth));
-  const bar = barChar.repeat(barLength);
+  const effectiveChar = item.char || barChar;
+  const bar = effectiveChar.repeat(barLength);
   
   if (showValue === 'right') {
     const labelPart = displayLabel.padEnd(layout.labelWidth);
@@ -133,7 +136,8 @@ function renderAutoWidthRow(
 ): string {
   const { label, value } = item;
   const barLength = Math.max(1, Math.floor(ratio * 20));
-  const bar = barChar.repeat(barLength);
+  const effectiveChar = item.char || barChar;
+  const bar = effectiveChar.repeat(barLength);
 
   if (showValue === 'right') {
     return `${label} ${bar} ${format(value)}`;

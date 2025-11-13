@@ -10,6 +10,7 @@ Terminal visualization components for [Ink](https://github.com/vadimdemedes/ink)
 
 - **Sparkline** - Compact trend visualization with threshold highlighting and gradient colors
 - **BarChart** - Horizontal bar charts with individual row coloring and custom formatting
+- **StackedBarChart** - 100% stacked horizontal bar charts showing percentage distribution
 - **TypeScript** - Full TypeScript support with comprehensive type definitions
 - **Auto-width** - Responsive charts that adapt to terminal width
 - **Gradient Colors** - 8-level smooth color gradients with automatic terminal compatibility
@@ -26,22 +27,30 @@ npm install @pppp606/ink-chart
 ```tsx
 import React from 'react';
 import { render, Text, Box } from 'ink';
-import { Sparkline, BarChart } from '@pppp606/ink-chart';
+import { Sparkline, BarChart, StackedBarChart } from '@pppp606/ink-chart';
 
 function App() {
   return (
     <Box flexDirection="column">
       {/* Simple sparkline */}
       <Sparkline data={[1, 3, 2, 5, 4, 6, 3]} />
-      
+
       {/* Bar chart with values */}
-      <BarChart 
+      <BarChart
         data={[
           { label: 'Sales', value: 1250 },
           { label: 'Marketing', value: 800 }
         ]}
         showValue="right"
         sort="desc"
+      />
+
+      {/* Stacked bar chart showing distribution */}
+      <StackedBarChart
+        data={[
+          { label: 'Complete', value: 75, color: '#4aaa1a' },
+          { label: 'Remaining', value: 25, color: '#d89612' }
+        ]}
       />
     </Box>
   );
@@ -110,6 +119,55 @@ interface BarChartData {
 }
 ```
 
+### StackedBarChart
+
+Stacked horizontal bar chart with two modes: 100% percentage distribution or absolute values.
+
+```tsx
+// Percentage mode (default) - 100% stacked
+<StackedBarChart
+  data={[
+    { label: 'Sales', value: 30, color: '#4aaa1a' },
+    { label: 'Warning', value: 20, color: '#d89612' },
+    { label: 'Error', value: 50, color: '#a61d24' }
+  ]}
+  width={50}
+/>
+
+// Absolute mode - showing actual values
+<StackedBarChart
+  data={[
+    { label: 'Downloads', value: 1250 },
+    { label: 'Uploads', value: 450 }
+  ]}
+  mode="absolute"
+  max={5000}
+  format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v}`}
+  width={50}
+/>
+```
+
+**Props:**
+- `data: StackedBarSegment[]` - Array of segments to display
+- `mode?: 'percentage' | 'absolute'` - Display mode (default: `'percentage'`)
+  - `'percentage'`: 100% stacked showing percentage distribution
+  - `'absolute'`: Stacked bar showing actual values scaled to max
+- `max?: 'auto' | number` - Maximum value for scaling in absolute mode (default: `'auto'`)
+- `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: 40 characters default, `'full'`: terminal width, `number`: fixed width)
+- `showLabels?: boolean` - Whether to show segment labels above bar (default: `true`)
+- `showValues?: boolean` - Whether to show values below bar (default: `true`)
+- `format?: (value: number, mode: StackedBarChartMode) => string` - Value formatter
+
+**StackedBarSegment interface:**
+```tsx
+interface StackedBarSegment {
+  label: string;
+  value: number;
+  color?: string; // Hex code or Ink color name
+  char?: string;  // Custom character for this segment
+}
+```
+
 ## Examples
 
 ### Gradient Highlighting
@@ -139,7 +197,7 @@ interface BarChartData {
 ### Individual Colors
 
 ```tsx
-<BarChart 
+<BarChart
   data={[
     { label: 'Success', value: 85, color: '#4aaa1a' },
     { label: 'Warning', value: 12, color: '#d89612' },
@@ -148,14 +206,127 @@ interface BarChartData {
 />
 ```
 
+### Different Bar Characters
+
+```tsx
+// Full Block (█)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="█"
+  max={100}
+/>
+
+// Dark Shade (▓)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="▓"
+  max={100}
+/>
+
+// Medium Shade (▒)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="▒"
+  max={100}
+/>
+
+// Light Shade (░)
+<BarChart
+  data={[{ label: 'Progress', value: 75 }]}
+  barChar="░"
+  max={100}
+/>
+```
+
+### Stacked Distribution (Percentage Mode)
+
+```tsx
+<StackedBarChart
+  data={[
+    { label: 'Development', value: 45, color: '#1890ff' },
+    { label: 'Testing', value: 25, color: '#52c41a' },
+    { label: 'Planning', value: 15, color: '#faad14' },
+    { label: 'Meetings', value: 15, color: '#f5222d' }
+  ]}
+  width={60}
+  format={(v) => `${v.toFixed(0)}%`}
+/>
+```
+
+Output:
+```
+Development                Testing        Planning Meetings
+████████████████████████████████████████████████████████████
+45%                        25%            15%      15%
+```
+*Colors differentiate segments (not visible in plain text)*
+
+### Stacked Distribution (Absolute Mode)
+
+```tsx
+<StackedBarChart
+  data={[
+    { label: 'CPU', value: 45, color: '#1890ff' },
+    { label: 'Memory', value: 30, color: '#52c41a' },
+    { label: 'Disk', value: 15, color: '#faad14' }
+  ]}
+  mode="absolute"
+  max={100}
+  width={60}
+  format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
+/>
+```
+
+Output:
+```
+CPU                        Memory          Disk
+███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒
+45                         30              15
+```
+
 ## Demo
 
-Try the interactive demo to see all features:
+Try the interactive demo to see all features in action:
 
 ```bash
 # Static examples - all chart features
 npm run demo
 ```
+
+The demo showcases:
+
+**Sparkline Examples:**
+- Server RPS (Requests Per Second) trend over 24 hours
+- 8-level smooth color gradients (red, blue, green)
+- Threshold highlighting with multiple gradient levels
+
+**BarChart Examples:**
+- Department performance comparison with sorting
+- Multi-color status indicators (Success, Warnings, Errors)
+- Different bar character styles (█, ▓, ▒, ░)
+
+**StackedBarChart Examples:**
+- **Percentage Mode**: 100% stacked bar showing percentage distribution
+  ```
+  Sales          Warning   Error
+  ███████████████▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+  30.0%          20.0%     50.0%
+  ```
+
+- **Project Time Allocation**: Color-coded segments
+  ```
+  Development                Testing        Planning Meetings
+  ████████████████████████████████████████████████████████████
+  45%                        25%            15%      15%
+  ```
+  *Each segment uses the same character (█) but different colors*
+
+- **Absolute Mode**: Server resource usage with actual values
+  ```
+  CPU                        Memory          Disk
+  ███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒
+  45                         30              15
+  ```
 
 ## Advanced Features
 

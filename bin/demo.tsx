@@ -10,8 +10,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text } from 'ink';
-import { exec } from 'child_process';
-import { Sparkline, BarChart, BarChartData } from '../src/index.js';
+import { Sparkline, BarChart, BarChartData, StackedBarChart } from '../src/index.js';
 
 /**
  * Generate realistic RPS (Requests Per Second) data
@@ -148,47 +147,6 @@ function StaticDemo(): React.ReactElement {
   const rpsData = generateRpsData();
   const categoryData = generateCategoryData();
   const thresholdData = generateThresholdData();
-  const [coverageData, setCoverageData] = useState<BarChartData[]>([]);
-
-  useEffect(() => {
-    exec('npm run test:coverage -- --silent 2>/dev/null', (error, stdout, _stderr) => {
-      if (error) {
-        setCoverageData([
-          { label: 'Coverage data unavailable', value: 0, color: '#666666' }
-        ]);
-        return;
-      }
-
-      const lines = stdout.split('\n');
-      const data: BarChartData[] = [];
-      
-      for (const line of lines) {
-        const match = line.match(/^\s*(\S+)\s+\|\s+([0-9.]+)/);
-        if (match) {
-          const [, filename, coverage] = match;
-          if (filename && coverage && filename.includes('.ts') && !filename.includes('All files')) {
-            const coverageNum = parseFloat(coverage);
-            const color = coverageNum >= 90 ? '#4CAF50' :
-                         coverageNum >= 75 ? '#8BC34A' :
-                         coverageNum >= 60 ? '#CDDC39' : '#FF9800';
-
-            const filename_part = filename.split('/').pop();
-            if (filename_part) {
-              data.push({
-                label: filename_part,
-                value: coverageNum,
-                color
-              });
-            }
-          }
-        }
-      }
-      
-      if (data.length > 0) {
-        setCoverageData(data);
-      }
-    });
-  }, []);
 
   return (
     <Box flexDirection="column" padding={1}>
@@ -257,7 +215,7 @@ function StaticDemo(): React.ReactElement {
       {/* Colored BarChart Demo */}
       <Text bold color="yellow">🎨 BarChart Multi-Color Example</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <BarChart 
+        <BarChart
           data={[
             { label: 'Success', value: 22, color: '#4aaa1a' },
             { label: 'Warnings', value: 8, color: '#d89612' },
@@ -270,23 +228,70 @@ function StaticDemo(): React.ReactElement {
       </Box>
       <Text> </Text>
 
-      {/* Test Coverage Example */}
-      <Text bold color="yellow">📊 Test Coverage Example</Text>
+      {/* BarChart Character Styles */}
+      <Text bold color="yellow">📊 BarChart Character Styles</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>Real project test coverage visualization</Text>
-        {coverageData.length > 0 ? (
-          <BarChart 
-            data={coverageData}
-            sort="desc"
-            showValue="right"
-            format={(v) => `${v.toFixed(1)}%`}
-            width={60}
-            max={100}
-            barChar="▓"
-          />
-        ) : (
-          <Text dimColor>Loading coverage data...</Text>
-        )}
+        <Text dimColor>Different bar characters for visual variety</Text>
+        <BarChart
+          data={[
+            { label: 'API', value: 85, char: '▆' },
+            { label: 'DB', value: 65, char: '▓' },
+            { label: 'Cache', value: 92, char: '▒' }
+          ]}
+          sort="none"
+          showValue="right"
+          width={45}
+          max={100}
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* StackedBarChart Example */}
+      <Text bold color="yellow">📊 StackedBarChart Example: Distribution</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>100% stacked bar showing percentage distribution</Text>
+        <StackedBarChart
+          data={[
+            { label: 'Sales', value: 30, color: '#4aaa1a' },
+            { label: 'Warning', value: 20, color: '#d89612' },
+            { label: 'Error', value: 50, color: '#a61d24' }
+          ]}
+          width={50}
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* StackedBarChart Example 2 */}
+      <Text bold color="yellow">🎯 StackedBarChart: Project Time Allocation</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <StackedBarChart
+          data={[
+            { label: 'Development', value: 45, color: '#1890ff' },
+            { label: 'Testing', value: 25, color: '#52c41a' },
+            { label: 'Planning', value: 15, color: '#faad14' },
+            { label: 'Meetings', value: 15, color: '#f5222d' }
+          ]}
+          width={60}
+          format={(v) => `${v.toFixed(0)}%`}
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* StackedBarChart Absolute Mode Example */}
+      <Text bold color="yellow">📈 StackedBarChart (Absolute Mode): Server Resources</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>Showing absolute values (out of 100 max)</Text>
+        <StackedBarChart
+          data={[
+            { label: 'CPU', value: 45, color: '#1890ff' },
+            { label: 'Memory', value: 30, color: '#52c41a' },
+            { label: 'Disk', value: 15, color: '#faad14' }
+          ]}
+          mode="absolute"
+          max={100}
+          width={60}
+          format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
+        />
       </Box>
     </Box>
   );

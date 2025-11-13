@@ -1,10 +1,16 @@
 // Main Components
 export { Sparkline } from './components/Sparkline.js';
 export { BarChart } from './components/BarChart.js';
+export { StackedBarChart } from './components/StackedBarChart.js';
 
 // Component Types
 export type { SparklineProps } from './components/Sparkline.js';
 export type { BarChartProps, BarChartData } from './components/BarChart.js';
+export type {
+  StackedBarChartProps,
+  StackedBarSegment,
+  StackedBarChartMode
+} from './components/StackedBarChart.js';
 
 // Hooks
 export { useAutoWidth } from './core/useAutoWidth.js';
