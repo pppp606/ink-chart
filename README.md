@@ -211,10 +211,10 @@ interface StackedBarSegment {
 ```tsx
 <StackedBarChart
   data={[
-    { label: 'Development', value: 45, color: '#1890ff', char: '█' },
-    { label: 'Testing', value: 25, color: '#52c41a', char: '▓' },
-    { label: 'Planning', value: 15, color: '#faad14', char: '▒' },
-    { label: 'Meetings', value: 15, color: '#f5222d', char: '░' }
+    { label: 'Development', value: 45, color: '#1890ff' },
+    { label: 'Testing', value: 25, color: '#52c41a' },
+    { label: 'Planning', value: 15, color: '#faad14' },
+    { label: 'Meetings', value: 15, color: '#f5222d' }
   ]}
   width={60}
   format={(v) => `${v.toFixed(0)}%`}
@@ -224,9 +224,10 @@ interface StackedBarSegment {
 Output:
 ```
 Development                Testing        Planning Meetings
-███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░
+████████████████████████████████████████████████████████████
 45%                        25%            15%      15%
 ```
+*Colors differentiate segments (not visible in plain text)*
 
 ### Stacked Distribution (Absolute Mode)
 
@@ -280,12 +281,13 @@ The demo showcases:
   30.0%          20.0%     50.0%
   ```
 
-- **Project Time Allocation**: Custom characters for each segment
+- **Project Time Allocation**: Color-coded segments
   ```
   Development                Testing        Planning Meetings
-  ███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░
+  ████████████████████████████████████████████████████████████
   45%                        25%            15%      15%
   ```
+  *Each segment uses the same character (█) but different colors*
 
 - **Absolute Mode**: Server resource usage with actual values
   ```

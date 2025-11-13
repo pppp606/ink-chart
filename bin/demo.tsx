@@ -310,10 +310,10 @@ function StaticDemo(): React.ReactElement {
       <Box flexDirection="column" marginLeft={2}>
         <StackedBarChart
           data={[
-            { label: 'Development', value: 45, color: '#1890ff', char: '█' },
-            { label: 'Testing', value: 25, color: '#52c41a', char: '▓' },
-            { label: 'Planning', value: 15, color: '#faad14', char: '▒' },
-            { label: 'Meetings', value: 15, color: '#f5222d', char: '░' }
+            { label: 'Development', value: 45, color: '#1890ff' },
+            { label: 'Testing', value: 25, color: '#52c41a' },
+            { label: 'Planning', value: 15, color: '#faad14' },
+            { label: 'Meetings', value: 15, color: '#f5222d' }
           ]}
           width={60}
           format={(v) => `${v.toFixed(0)}%`}
