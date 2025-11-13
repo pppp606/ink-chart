@@ -253,12 +253,46 @@ CPU                        Memory          Disk
 
 ## Demo
 
-Try the interactive demo to see all features:
+Try the interactive demo to see all features in action:
 
 ```bash
 # Static examples - all chart features
 npm run demo
 ```
+
+The demo showcases:
+
+**Sparkline Examples:**
+- Server RPS (Requests Per Second) trend over 24 hours
+- 8-level smooth color gradients (red, blue, green)
+- Threshold highlighting with multiple gradient levels
+
+**BarChart Examples:**
+- Department performance comparison with sorting
+- Multi-color status indicators (Success, Warnings, Errors)
+- Real-time test coverage visualization
+
+**StackedBarChart Examples:**
+- **Percentage Mode**: 100% stacked bar showing percentage distribution
+  ```
+  Sales          Warning   Error
+  ███████████████▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+  30.0%          20.0%     50.0%
+  ```
+
+- **Project Time Allocation**: Custom characters for each segment
+  ```
+  Development                Testing        Planning Meetings
+  ███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒░░░░░░░░░
+  45%                        25%            15%      15%
+  ```
+
+- **Absolute Mode**: Server resource usage with actual values
+  ```
+  CPU                        Memory          Disk
+  ███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒
+  45                         30              15
+  ```
 
 ## Advanced Features
 
