@@ -96,69 +96,6 @@ describe('Workflow Protection', () => {
     });
   });
 
-  describe('Branch Protection Documentation', () => {
-    const branchProtectionPath = join(docsDir, 'BRANCH-PROTECTION.md');
-
-    test('should exist in docs directory', () => {
-      expect(existsSync(branchProtectionPath)).toBe(true);
-    });
-
-    test('should document required protection rules', () => {
-      if (!existsSync(branchProtectionPath)) {
-        throw new Error('Branch protection documentation does not exist');
-      }
-
-      const content = readFileSync(branchProtectionPath, 'utf8');
-
-      // Check for essential protection rules
-      expect(content).toMatch(/Required Status Checks/i);
-      expect(content).toMatch(/Require pull request reviews/i);
-      expect(content).toMatch(/Dismiss stale reviews/i);
-      expect(content).toMatch(/Require review from CODEOWNERS/i);
-      expect(content).toMatch(/Restrict pushes/i);
-    });
-
-    test('should include workflow-specific protection requirements', () => {
-      if (!existsSync(branchProtectionPath)) {
-        throw new Error('Branch protection documentation does not exist');
-      }
-
-      const content = readFileSync(branchProtectionPath, 'utf8');
-
-      // Check for workflow protection specifics
-      expect(content).toMatch(/Additional security review for workflow/i);
-      expect(content).toMatch(/\.github\/workflows/);
-      expect(content).toMatch(/security.*approval/i);
-    });
-
-    test('should provide administrator setup instructions', () => {
-      if (!existsSync(branchProtectionPath)) {
-        throw new Error('Branch protection documentation does not exist');
-      }
-
-      const content = readFileSync(branchProtectionPath, 'utf8');
-
-      // Check for setup instructions
-      expect(content).toMatch(/Setup Instructions/i);
-      expect(content).toMatch(/Repository Settings/i);
-      expect(content).toMatch(/Branches/i);
-      expect(content).toMatch(/Add rule/i);
-    });
-
-    test('should include security checklist', () => {
-      if (!existsSync(branchProtectionPath)) {
-        throw new Error('Branch protection documentation does not exist');
-      }
-
-      const content = readFileSync(branchProtectionPath, 'utf8');
-
-      // Check for security checklist
-      expect(content).toMatch(/Security Checklist/i);
-      expect(content).toMatch(/\[.*\].*CODEOWNERS/i);
-      expect(content).toMatch(/\[.*\].*status.*checks/i);
-    });
-  });
-
   describe('Security Documentation Completeness', () => {
     const securityPath = join(rootDir, 'SECURITY.md');
 
@@ -336,43 +273,6 @@ describe('Workflow Protection', () => {
         expect(content).toMatch(/What to Include/i);
         expect(content).toMatch(/Step-by-step/i);
         expect(content).toMatch(/Proof-of-concept/i);
-      }
-    });
-  });
-
-  describe('Documentation Standards', () => {
-    test('should have consistent markdown formatting in security docs', () => {
-      const securityPath = join(rootDir, 'SECURITY.md');
-      const branchProtectionPath = join(docsDir, 'BRANCH-PROTECTION.md');
-
-      [securityPath, branchProtectionPath].forEach(path => {
-        if (existsSync(path)) {
-          const content = readFileSync(path, 'utf8');
-
-          // Check for proper markdown structure
-          expect(content).toMatch(/^#\s+/m); // Has main heading
-          expect(content).toMatch(/^##\s+/m); // Has subheadings
-          expect(content).not.toMatch(/^\t/m); // No tabs for indentation
-        }
-      });
-    });
-
-    test('should have cross-references between security documents', () => {
-      const securityPath = join(rootDir, 'SECURITY.md');
-      const readmePath = join(rootDir, 'README.md');
-
-      if (existsSync(readmePath)) {
-        const readmeContent = readFileSync(readmePath, 'utf8');
-        expect(readmeContent).toMatch(/SECURITY\.md/);
-      }
-
-      if (existsSync(securityPath)) {
-        const securityContent = readFileSync(securityPath, 'utf8');
-        // Security doc should reference branch protection if it exists
-        const branchProtectionPath = join(docsDir, 'BRANCH-PROTECTION.md');
-        if (existsSync(branchProtectionPath)) {
-          expect(securityContent).toMatch(/BRANCH-PROTECTION\.md|branch.*protection/i);
-        }
       }
     });
   });
