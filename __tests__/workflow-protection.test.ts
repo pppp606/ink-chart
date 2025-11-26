@@ -14,7 +14,6 @@ import { join } from 'path';
 describe('Workflow Protection', () => {
   const rootDir = process.cwd();
   const githubDir = join(rootDir, '.github');
-  const docsDir = join(rootDir, 'docs');
 
   describe('CODEOWNERS File', () => {
     const codeownersPath = join(githubDir, 'CODEOWNERS');
