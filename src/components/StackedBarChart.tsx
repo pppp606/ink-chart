@@ -161,7 +161,7 @@ function calculateSegmentPositions(
   if (mode === 'percentage' && positions.length > 0 && currentPos !== barWidth) {
     const lastSegment = positions[positions.length - 1];
     if (lastSegment) {
-      lastSegment.length += barWidth - currentPos;
+      lastSegment.length += Math.max(0, barWidth - currentPos);
     }
   }
 
