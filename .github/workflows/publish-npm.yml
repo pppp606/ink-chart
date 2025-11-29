@@ -21,11 +21,16 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           cache: 'npm'
       
+      - name: Upgrade npm for OIDC support
+        run: |
+          npm install -g npm@latest
+          npm --version
+
       - name: Configure npm for npmjs.org
         run: |
           echo "registry=https://registry.npmjs.org" > .npmrc
           echo "@pppp606:registry=https://registry.npmjs.org" >> .npmrc
-      
+
       - run: npm ci
       
       - run: npm run lint
