@@ -7,7 +7,7 @@
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { BarChart } from '../../src/components/BarChart.js';
-import { hasAnsi, stripAnsi } from '../../src/core/ansi.js';
+import { stripAnsi } from '../../src/core/ansi.js';
 
 describe('E2E: BarChart', () => {
   describe('Basic rendering', () => {

@@ -7,7 +7,7 @@
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { StackedBarChart } from '../../src/components/StackedBarChart.js';
-import { hasAnsi, stripAnsi } from '../../src/core/ansi.js';
+import { stripAnsi } from '../../src/core/ansi.js';
 
 describe('E2E: StackedBarChart', () => {
   describe('Basic rendering', () => {
