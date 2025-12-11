@@ -44,8 +44,11 @@ jobs:
           npm run validate:sha-pinning
           npm run validate:permissions
 
-      - name: Run tests
+      - name: Run unit tests
         run: npm test
+
+      - name: Run E2E tests
+        run: npm run test:e2e
 
       - name: Build project
         run: npm run build
