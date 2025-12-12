@@ -4,9 +4,19 @@ import { useAutoWidth } from '../core/useAutoWidth.js';
 import { calculateEffectiveWidth } from '../core/widthUtils.js';
 
 /**
- * Dot character options for the line graph
+ * Rendering mode for the line graph
+ * - 'dot': Uses dots at different vertical positions (˙ · .)
+ * - 'line': Uses horizontal lines at different vertical positions (‾ ─ _)
  */
-export type DotChar = '.' | '●' | '○' | '◆' | '◇' | '•' | '*';
+export type LineGraphMode = 'dot' | 'line';
+
+/**
+ * Characters for each mode (top, middle, bottom positions within a row)
+ */
+const MODE_CHARS: Record<LineGraphMode, [string, string, string]> = {
+  dot: ['˙', '·', '.'],   // top, middle, bottom
+  line: ['‾', '─', '_'],  // top, middle, bottom
+};
 
 /**
  * Props for the LineGraph component
@@ -26,7 +36,9 @@ export interface LineGraphProps {
   width?: 'auto' | 'full' | number;
 
   /**
-   * Height of the graph in rows (lines)
+   * Height of the graph in rows (lines).
+   * Each row provides 3 levels of resolution (top/middle/bottom).
+   * So height=5 gives 15 vertical levels of resolution.
    * @default 10
    */
   height?: number;
@@ -39,19 +51,15 @@ export interface LineGraphProps {
   yDomain?: 'auto' | [number, number];
 
   /**
-   * Character used for data points
-   * @default '.'
+   * Rendering mode
+   * - 'dot': Uses dots (˙ · .) - default
+   * - 'line': Uses horizontal lines (‾ ─ _)
+   * @default 'dot'
    */
-  dotChar?: DotChar;
+  mode?: LineGraphMode;
 
   /**
-   * Character used for empty space
-   * @default ' '
-   */
-  emptyChar?: string;
-
-  /**
-   * Color for the dots (ink color name)
+   * Color for the graph (ink color name)
    */
   color?: string;
 
@@ -68,40 +76,65 @@ export interface LineGraphProps {
 }
 
 /**
- * Creates a 2D grid filled with empty characters
+ * Creates a 2D grid filled with spaces
  */
-function createGrid(width: number, height: number, emptyChar: string): string[][] {
+function createGrid(width: number, height: number): string[][] {
   return Array.from({ length: height }, () =>
-    Array.from({ length: width }, () => emptyChar)
+    Array.from({ length: width }, () => ' ')
   );
 }
 
 /**
- * Normalizes a value to a row index (0 = top, height-1 = bottom)
+ * Converts a value to a position index (0 to totalLevels-1)
+ * where 0 is bottom and totalLevels-1 is top
  */
-function valueToRowIndex(
+function valueToPosition(
   value: number,
   min: number,
   max: number,
-  height: number
+  totalLevels: number
 ): number {
   if (max === min) {
-    return Math.floor(height / 2);
+    return Math.floor(totalLevels / 2);
   }
   const normalized = (value - min) / (max - min);
-  // Clamp to [0, 1]
   const clamped = Math.max(0, Math.min(1, normalized));
-  // Convert to row index (inverted: higher values = lower row index)
-  const rowIndex = Math.round((1 - clamped) * (height - 1));
-  return rowIndex;
+  // Map to [0, totalLevels-1]
+  return Math.round(clamped * (totalLevels - 1));
 }
 
 /**
- * Scales data to match target width
+ * Converts a position (0 = bottom, totalLevels-1 = top) to row and sub-position
+ * @returns [rowIndex, subPosition] where subPosition is 0=bottom, 1=middle, 2=top within row
+ */
+function positionToRowAndSub(
+  position: number,
+  height: number
+): [number, number] {
+  // position 0 is bottom-most, position (height*3-1) is top-most
+  // Row 0 is top of display, row (height-1) is bottom
+  const levelsPerRow = 3;
+  const totalLevels = height * levelsPerRow;
+
+  // Invert: position 0 -> row (height-1), subPos 0
+  //         position (totalLevels-1) -> row 0, subPos 2
+  const invertedPosition = totalLevels - 1 - position;
+  const rowIndex = Math.floor(invertedPosition / levelsPerRow);
+  const subPosition = levelsPerRow - 1 - (invertedPosition % levelsPerRow);
+
+  return [rowIndex, subPosition];
+}
+
+/**
+ * Scales data to match target width using linear interpolation
  */
 function scaleDataToWidth(data: number[], targetWidth: number): number[] {
   if (data.length === targetWidth) {
     return data;
+  }
+
+  if (data.length === 1) {
+    return Array(targetWidth).fill(data[0]);
   }
 
   const scaled: number[] = [];
@@ -114,7 +147,6 @@ function scaleDataToWidth(data: number[], targetWidth: number): number[] {
     if (lowerIndex === upperIndex || upperIndex >= data.length) {
       scaled.push(data[lowerIndex] ?? data[data.length - 1]!);
     } else {
-      // Linear interpolation
       const lowerValue = data[lowerIndex]!;
       const upperValue = data[upperIndex]!;
       scaled.push(lowerValue + fraction * (upperValue - lowerValue));
@@ -140,20 +172,23 @@ function formatAxisLabel(value: number, maxLabelWidth: number): string {
 }
 
 /**
- * A line graph component that visualizes numeric trends using dots in a 2D grid.
+ * A high-resolution line graph component that visualizes numeric trends.
+ *
+ * Uses Unicode characters at different vertical positions within each row
+ * to achieve 3x the vertical resolution of a simple dot-per-row approach.
  *
  * @example
  * ```tsx
- * // Basic usage
+ * // Basic usage with dots
  * <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={5} />
  *
- * // With fixed width and color
+ * // With horizontal lines
  * <LineGraph
  *   data={[10, 20, 15, 30, 25]}
  *   width={40}
  *   height={8}
+ *   mode="line"
  *   color="cyan"
- *   caption="Sales Trend"
  * />
  *
  * // With Y-axis labels
@@ -170,8 +205,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     width = 'auto',
     height = 10,
     yDomain = 'auto',
-    dotChar = '.',
-    emptyChar = ' ',
+    mode = 'dot',
     color,
     caption,
     showYAxis = false,
@@ -217,18 +251,25 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
   const scaledData = scaleDataToWidth(validData, graphWidth);
 
   // Create grid
-  const grid = createGrid(graphWidth, height, emptyChar);
+  const grid = createGrid(graphWidth, height);
 
-  // Place dots on grid
+  // Get characters for this mode
+  const chars = MODE_CHARS[mode];
+  const totalLevels = height * 3;
+
+  // Place characters on grid
   for (let x = 0; x < scaledData.length; x++) {
     const value = scaledData[x]!;
-    const rowIndex = valueToRowIndex(value, min, max, height);
+    const position = valueToPosition(value, min, max, totalLevels);
+    const [rowIndex, subPosition] = positionToRowAndSub(position, height);
+
     if (rowIndex >= 0 && rowIndex < height) {
-      grid[rowIndex]![x] = dotChar;
+      // subPosition: 0=bottom, 1=middle, 2=top -> chars[2-subPosition]
+      grid[rowIndex]![x] = chars[2 - subPosition]!;
     }
   }
 
-  // Convert grid to strings
+  // Convert grid to React elements
   const lines: React.ReactElement[] = [];
 
   // Calculate Y-axis labels

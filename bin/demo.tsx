@@ -295,44 +295,43 @@ function StaticDemo(): React.ReactElement {
       </Box>
       <Text> </Text>
 
-      {/* LineGraph Example */}
-      <Text bold color="yellow">📉 LineGraph Example: Temperature Trend</Text>
+      {/* LineGraph Example - Dot Mode */}
+      <Text bold color="yellow">📉 LineGraph (Dot Mode): Temperature Trend</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>2D grid-based line graph with dots</Text>
+        <Text dimColor>High-resolution with 3 vertical levels per row (˙ · .)</Text>
         <LineGraph
           data={[15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18]}
           width={40}
-          height={8}
+          height={6}
+          mode="dot"
           color="cyan"
           caption="Monthly temperature (°C)"
         />
       </Box>
       <Text> </Text>
 
-      {/* LineGraph with Y-Axis Example */}
-      <Text bold color="yellow">📉 LineGraph with Y-Axis: Stock Price</Text>
+      {/* LineGraph Example - Line Mode */}
+      <Text bold color="yellow">📉 LineGraph (Line Mode): Stock Price</Text>
       <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>High-resolution with 3 vertical levels per row (‾ ─ _)</Text>
         <LineGraph
           data={[100, 105, 98, 110, 115, 108, 120, 125, 118, 130]}
           width={50}
-          height={6}
+          height={5}
+          mode="line"
           showYAxis={true}
           color="green"
         />
       </Box>
       <Text> </Text>
 
-      {/* LineGraph Different Dot Characters */}
-      <Text bold color="yellow">📉 LineGraph: Dot Character Styles</Text>
+      {/* LineGraph Mode Comparison */}
+      <Text bold color="yellow">📉 LineGraph: Mode Comparison</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>. (dot, default):</Text>
-        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} />
-        <Text dimColor>● (filled circle):</Text>
-        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="●" />
-        <Text dimColor>○ (empty circle):</Text>
-        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="○" />
-        <Text dimColor>* (asterisk):</Text>
-        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="*" />
+        <Text dimColor>Dot mode (˙ · .):</Text>
+        <LineGraph data={[1, 3, 2, 6, 4, 8, 5, 7, 3, 5]} height={3} width={30} mode="dot" />
+        <Text dimColor>Line mode (‾ ─ _):</Text>
+        <LineGraph data={[1, 3, 2, 6, 4, 8, 5, 7, 3, 5]} height={3} width={30} mode="line" />
       </Box>
     </Box>
   );

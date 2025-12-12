@@ -12,7 +12,7 @@ export type {
   StackedBarSegment,
   StackedBarChartMode
 } from './components/StackedBarChart.js';
-export type { LineGraphProps, DotChar } from './components/LineGraph.js';
+export type { LineGraphProps, LineGraphMode } from './components/LineGraph.js';
 
 // Hooks
 export { useAutoWidth } from './core/useAutoWidth.js';

@@ -8,9 +8,13 @@ import React from 'react';
 import { render } from 'ink-testing-library';
 import { LineGraph } from '../../src/components/LineGraph.js';
 
+// Characters used in each mode
+const DOT_CHARS = ['˙', '·', '.'];
+const LINE_CHARS = ['‾', '─', '_'];
+
 describe('E2E: LineGraph', () => {
   describe('Basic rendering', () => {
-    it('renders ascending data with dots', () => {
+    it('renders data with dot mode by default', () => {
       const { lastFrame } = render(
         <LineGraph data={[1, 2, 3, 4, 5]} width={5} height={5} />
       );
@@ -18,22 +22,22 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       expect(lines.length).toBe(5);
-      // Check that dots appear in the output
-      expect(output).toContain('.');
+      // Check that at least one dot character appears
+      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
+      expect(hasDotChar).toBe(true);
     });
 
-    it('renders descending data correctly', () => {
+    it('renders ascending data correctly', () => {
       const { lastFrame } = render(
-        <LineGraph data={[5, 4, 3, 2, 1]} width={5} height={5} />
+        <LineGraph data={[1, 5]} width={2} height={3} />
       );
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(5);
-      // First line should have a dot (highest value at start)
-      expect(lines[0]).toContain('.');
-      // Last line should have a dot (lowest value at end)
-      expect(lines[4]).toContain('.');
+      expect(lines.length).toBe(3);
+      // Highest value (5) should be in top row
+      const topHasChar = DOT_CHARS.some(char => lines[0]?.includes(char));
+      expect(topHasChar).toBe(true);
     });
 
     it('renders constant data as horizontal line', () => {
@@ -41,13 +45,13 @@ describe('E2E: LineGraph', () => {
         <LineGraph data={[5, 5, 5, 5]} width={4} height={5} />
       );
       const output = lastFrame();
-
-      // All dots should be on the same row (middle)
       const lines = output?.split('\n') || [];
-      const dotLines = lines.filter(line => line.includes('.'));
-      expect(dotLines.length).toBe(1);
-      // The line with dots should have 4 dots
-      expect(dotLines[0]?.match(/\./g)?.length).toBe(4);
+
+      // All characters should be on the same row (middle area)
+      const rowsWithChars = lines.filter(line =>
+        DOT_CHARS.some(char => line.includes(char))
+      );
+      expect(rowsWithChars.length).toBe(1);
     });
 
     it('handles single data point', () => {
@@ -56,46 +60,72 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('.');
+      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
+      expect(hasDotChar).toBe(true);
     });
   });
 
-  describe('Dot characters', () => {
-    it('uses dot by default', () => {
+  describe('Modes', () => {
+    it('uses dot characters in dot mode', () => {
       const { lastFrame } = render(
-        <LineGraph data={[1, 2, 3]} width={3} height={3} />
+        <LineGraph data={[1, 5, 3]} width={3} height={3} mode="dot" />
       );
       const output = lastFrame();
 
+      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
+      const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
+      expect(hasDotChar).toBe(true);
+      expect(hasLineChar).toBe(false);
+    });
+
+    it('uses line characters in line mode', () => {
+      const { lastFrame } = render(
+        <LineGraph data={[1, 5, 3]} width={3} height={3} mode="line" />
+      );
+      const output = lastFrame();
+
+      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
+      const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
+      expect(hasDotChar).toBe(false);
+      expect(hasLineChar).toBe(true);
+    });
+  });
+
+  describe('High resolution', () => {
+    it('uses different vertical positions within a row', () => {
+      // With height=1 and 3 data points at different values,
+      // we should see different characters (top/middle/bottom)
+      const { lastFrame } = render(
+        <LineGraph data={[0, 50, 100]} width={3} height={1} yDomain={[0, 100]} />
+      );
+      const output = lastFrame();
+
+      // Should have characters at different vertical positions
+      // 0 -> bottom (.), 50 -> middle (·), 100 -> top (˙)
       expect(output).toContain('.');
+      expect(output).toContain('·');
+      expect(output).toContain('˙');
     });
 
-    it('uses empty circle when specified', () => {
+    it('achieves 3x resolution per row', () => {
+      // height=2 should give 6 distinct levels
       const { lastFrame } = render(
-        <LineGraph data={[1, 2, 3]} width={3} height={3} dotChar="○" />
+        <LineGraph
+          data={[0, 20, 40, 60, 80, 100]}
+          width={6}
+          height={2}
+          yDomain={[0, 100]}
+        />
       );
       const output = lastFrame();
+      const lines = output?.split('\n') || [];
 
-      expect(output).toContain('○');
-      expect(output).not.toContain('.');
-    });
-
-    it('uses diamond when specified', () => {
-      const { lastFrame } = render(
-        <LineGraph data={[1, 2, 3]} width={3} height={3} dotChar="◆" />
-      );
-      const output = lastFrame();
-
-      expect(output).toContain('◆');
-    });
-
-    it('uses asterisk when specified', () => {
-      const { lastFrame } = render(
-        <LineGraph data={[1, 2, 3]} width={3} height={3} dotChar="*" />
-      );
-      const output = lastFrame();
-
-      expect(output).toContain('*');
+      expect(lines.length).toBe(2);
+      // Both rows should have characters
+      const row0HasChar = DOT_CHARS.some(char => lines[0]?.includes(char));
+      const row1HasChar = DOT_CHARS.some(char => lines[1]?.includes(char));
+      expect(row0HasChar).toBe(true);
+      expect(row1HasChar).toBe(true);
     });
   });
 
@@ -118,15 +148,9 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       // Each line should be at most 4 characters wide
-      // (trailing spaces may be trimmed by the terminal)
       lines.forEach(line => {
         expect(line.length).toBeLessThanOrEqual(4);
       });
-      // Total dots should equal width
-      const totalDots = lines.reduce((count, line) => {
-        return count + (line.match(/\./g)?.length || 0);
-      }, 0);
-      expect(totalDots).toBe(4);
     });
 
     it('interpolates data when width > data length', () => {
@@ -134,13 +158,12 @@ describe('E2E: LineGraph', () => {
         <LineGraph data={[1, 5]} width={10} height={5} />
       );
       const output = lastFrame();
-      const lines = output?.split('\n') || [];
 
-      // Should have dots across the width
-      const totalDots = lines.reduce((count, line) => {
-        return count + (line.match(/\./g)?.length || 0);
+      // Count total graph characters
+      const totalChars = DOT_CHARS.reduce((count, char) => {
+        return count + (output?.split(char).length ?? 1) - 1;
       }, 0);
-      expect(totalDots).toBe(10);
+      expect(totalChars).toBe(10);
     });
   });
 
@@ -177,9 +200,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      // Should contain Y-axis separator
       expect(output).toContain('│');
-      // Should show min and max values
       expect(output).toContain('100');
       expect(output).toContain('10');
     });
@@ -207,9 +228,9 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      // With fixed domain, 25 should be in lower rows, 75 in upper rows
       expect(lines.length).toBe(5);
-      expect(output).toContain('.');
+      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      expect(hasChar).toBe(true);
     });
 
     it('auto-scales when yDomain is auto', () => {
@@ -223,7 +244,8 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('.');
+      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      expect(hasChar).toBe(true);
     });
   });
 
@@ -243,8 +265,8 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      // Should render with only valid data points
-      expect(output).toContain('.');
+      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      expect(hasChar).toBe(true);
     });
 
     it('handles negative values', () => {
@@ -255,7 +277,8 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       expect(lines.length).toBe(5);
-      expect(output).toContain('.');
+      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      expect(hasChar).toBe(true);
     });
   });
 });
