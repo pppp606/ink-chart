@@ -378,10 +378,13 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
         // Position-based placement for numbers
         for (const label of yLabelsProp) {
           const value = label as number;
+          // Skip labels outside yDomain range
+          if (value < min || value > max) {
+            continue;
+          }
           // Calculate which row this value corresponds to
           const normalizedPos = max === min ? 0.5 : (value - min) / (max - min);
-          const clampedPos = Math.max(0, Math.min(1, normalizedPos));
-          const row = Math.round((1 - clampedPos) * (height - 1));
+          const row = Math.round((1 - normalizedPos) * (height - 1));
           if (row >= 0 && row < height) {
             yLabels[row] = formatAxisLabel(value, yAxisLabelWidth);
           }
