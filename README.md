@@ -8,10 +8,10 @@ Terminal visualization components for [Ink](https://github.com/vadimdemedes/ink)
 
 ## Features
 
-- **Sparkline** - Compact trend visualization with threshold highlighting and gradient colors
 - **BarChart** - Horizontal bar charts with individual row coloring and custom formatting
 - **StackedBarChart** - 100% stacked horizontal bar charts showing percentage distribution
 - **LineGraph** - High-resolution line graphs with multi-series support and axis labels
+- **Sparkline** - Compact trend visualization with threshold highlighting and gradient colors
 - **TypeScript** - Full TypeScript support with comprehensive type definitions
 - **Auto-width** - Responsive charts that adapt to terminal width
 - **Gradient Colors** - 8-level smooth color gradients with automatic terminal compatibility
@@ -28,14 +28,11 @@ npm install @pppp606/ink-chart
 ```tsx
 import React from 'react';
 import { render, Text, Box } from 'ink';
-import { Sparkline, BarChart, StackedBarChart, LineGraph } from '@pppp606/ink-chart';
+import { BarChart, StackedBarChart, LineGraph, Sparkline } from '@pppp606/ink-chart';
 
 function App() {
   return (
     <Box flexDirection="column">
-      {/* Simple sparkline */}
-      <Sparkline data={[1, 3, 2, 5, 4, 6, 3]} />
-
       {/* Bar chart with values */}
       <BarChart
         data={[
@@ -64,6 +61,9 @@ function App() {
         showYAxis={true}
         xLabels={['Jan', 'Jun']}
       />
+
+      {/* Simple sparkline */}
+      <Sparkline data={[1, 3, 2, 5, 4, 6, 3]} />
     </Box>
   );
 }
@@ -73,34 +73,12 @@ render(<App />);
 
 ## Components
 
-### Sparkline
-
-Compact trend visualization perfect for displaying time series data.
-
-```tsx
-<Sparkline 
-  data={[1, 3, 2, 8, 4]}
-  width={30}
-  threshold={5}
-  colorScheme="red"
-  caption="Sales Trend"
-/>
-```
-
-**Props:**
-- `data: number[]` - Array of numeric values
-- `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: data length, `'full'`: terminal width, `number`: fixed width)
-- `threshold?: number | number[]` - Threshold(s) for highlighting (single or gradient)
-- `colorScheme?: 'red' | 'blue' | 'green'` - Color scheme for gradient highlighting
-- `mode?: 'block' | 'braille'` - Rendering mode
-- `caption?: string` - Optional caption below chart
-
 ### BarChart
 
 Horizontal bar charts with customizable appearance and individual row colors.
 
 ```tsx
-<BarChart 
+<BarChart
   data={[
     { label: 'Success', value: 22, color: '#4aaa1a' },
     { label: 'Warnings', value: 8, color: '#d89612' },
@@ -215,7 +193,8 @@ Output:
 - `height?: number` - Chart height in rows (default: 10, each row = 5 vertical levels)
 - `yDomain?: 'auto' | [number, number]` - Y-axis range
 - `showYAxis?: boolean` - Show Y-axis labels (default: false)
-- `xLabels?: [string | number, string | number]` - X-axis start/end labels
+- `yLabels?: (string | number)[]` - Custom Y-axis labels (numbers: position-based, strings: evenly distributed)
+- `xLabels?: (string | number)[]` - X-axis labels (numbers: position-based, strings: evenly distributed)
 - `caption?: string` - Optional caption below chart
 
 **LineGraphSeries interface:**
@@ -225,6 +204,28 @@ interface LineGraphSeries {
   color?: string; // Ink color name or hex
 }
 ```
+
+### Sparkline
+
+Compact trend visualization perfect for displaying time series data.
+
+```tsx
+<Sparkline
+  data={[1, 3, 2, 8, 4]}
+  width={30}
+  threshold={5}
+  colorScheme="red"
+  caption="Sales Trend"
+/>
+```
+
+**Props:**
+- `data: number[]` - Array of numeric values
+- `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: data length, `'full'`: terminal width, `number`: fixed width)
+- `threshold?: number | number[]` - Threshold(s) for highlighting (single or gradient)
+- `colorScheme?: 'red' | 'blue' | 'green'` - Color scheme for gradient highlighting
+- `mode?: 'block' | 'braille'` - Rendering mode
+- `caption?: string` - Optional caption below chart
 
 ## Examples
 
@@ -353,11 +354,6 @@ npm run demo
 
 The demo showcases:
 
-**Sparkline Examples:**
-- Server RPS (Requests Per Second) trend over 24 hours
-- 8-level smooth color gradients (red, blue, green)
-- Threshold highlighting with multiple gradient levels
-
 **BarChart Examples:**
 - Department performance comparison with sorting
 - Multi-color status indicators (Success, Warnings, Errors)
@@ -411,6 +407,11 @@ The demo showcases:
          Q1                                        Q4
   ```
   *Red and blue lines show different series (colors not visible in plain text)*
+
+**Sparkline Examples:**
+- Server RPS (Requests Per Second) trend over 24 hours
+- 8-level smooth color gradients (red, blue, green)
+- Threshold highlighting with multiple gradient levels
 
 ## Advanced Features
 

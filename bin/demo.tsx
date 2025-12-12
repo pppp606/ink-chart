@@ -154,51 +154,6 @@ function StaticDemo(): React.ReactElement {
       <Text dimColor>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
       <Text> </Text>
       
-      {/* Sparkline RPS Example */}
-      <Text bold color="yellow">📈 Sparkline Example: Server RPS Over 24 Hours</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Sparkline 
-          data={rpsData}
-          width={50}
-          mode="block"
-          caption="Requests per second (24h trend)"
-        />
-        <Text dimColor>Peak: {Math.max(...rpsData)} RPS | Average: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)} RPS</Text>
-      </Box>
-      <Text> </Text>
-
-      {/* Color Gradient Demo */}
-      <Text bold color="yellow">🎨 Sparkline Gradient Color Schemes</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text>8-level gradients (55, 62, 68, 74, 79, 84, 89, 94):</Text>
-        <Text> </Text>
-        <Text>Red:   </Text>
-        <Sparkline 
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="red"
-          mode="block"
-        />
-        <Text>Blue:  </Text>
-        <Sparkline 
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="blue"
-          mode="block"
-        />
-        <Text>Green: </Text>
-        <Sparkline 
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="green"
-          mode="block"
-        />
-      </Box>
-      <Text> </Text>
-
       {/* BarChart Category Example */}
       <Text bold color="yellow">📊 BarChart Example: Department Performance</Text>
       <Box flexDirection="column" marginLeft={2}>
@@ -322,6 +277,51 @@ function StaticDemo(): React.ReactElement {
           height={6}
           yLabels={[100, 140, 160]}
           xLabels={['Q1', 'Q2', 'Q3', 'Q4']}
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* Sparkline RPS Example */}
+      <Text bold color="yellow">📈 Sparkline Example: Server RPS Over 24 Hours</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Sparkline
+          data={rpsData}
+          width={50}
+          mode="block"
+          caption="Requests per second (24h trend)"
+        />
+        <Text dimColor>Peak: {Math.max(...rpsData)} RPS | Average: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)} RPS</Text>
+      </Box>
+      <Text> </Text>
+
+      {/* Color Gradient Demo */}
+      <Text bold color="yellow">🎨 Sparkline Gradient Color Schemes</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text>8-level gradients (55, 62, 68, 74, 79, 84, 89, 94):</Text>
+        <Text> </Text>
+        <Text>Red:   </Text>
+        <Sparkline
+          data={thresholdData}
+          width={50}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="red"
+          mode="block"
+        />
+        <Text>Blue:  </Text>
+        <Sparkline
+          data={thresholdData}
+          width={50}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="blue"
+          mode="block"
+        />
+        <Text>Green: </Text>
+        <Sparkline
+          data={thresholdData}
+          width={50}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="green"
+          mode="block"
         />
       </Box>
     </Box>
