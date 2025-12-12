@@ -4,19 +4,9 @@ import { useAutoWidth } from '../core/useAutoWidth.js';
 import { calculateEffectiveWidth } from '../core/widthUtils.js';
 
 /**
- * Rendering mode for the line graph
- * - 'dot': Uses dots at different vertical positions (˙ · .)
- * - 'line': Uses horizontal lines at different vertical positions (‾ ─ _)
+ * Characters for line rendering (top, middle, bottom positions within a row)
  */
-export type LineGraphMode = 'dot' | 'line';
-
-/**
- * Characters for each mode (top, middle, bottom positions within a row)
- */
-const MODE_CHARS: Record<LineGraphMode, [string, string, string]> = {
-  dot: ['˙', '·', '.'],   // top, middle, bottom
-  line: ['‾', '─', '_'],  // top, middle, bottom
-};
+const LINE_CHARS: [string, string, string] = ['‾', '─', '_'];
 
 /**
  * Props for the LineGraph component
@@ -49,14 +39,6 @@ export interface LineGraphProps {
    * - [min, max]: Fixed domain range for consistent scaling
    */
   yDomain?: 'auto' | [number, number];
-
-  /**
-   * Rendering mode
-   * - 'dot': Uses dots (˙ · .) - default
-   * - 'line': Uses horizontal lines (‾ ─ _)
-   * @default 'dot'
-   */
-  mode?: LineGraphMode;
 
   /**
    * Color for the graph (ink color name)
@@ -174,21 +156,21 @@ function formatAxisLabel(value: number, maxLabelWidth: number): string {
 /**
  * A high-resolution line graph component that visualizes numeric trends.
  *
- * Uses Unicode characters at different vertical positions within each row
- * to achieve 3x the vertical resolution of a simple dot-per-row approach.
+ * Uses Unicode line characters (‾ ─ _) at different vertical positions
+ * within each row to achieve 3x the vertical resolution.
  *
  * @example
  * ```tsx
- * // Basic usage with dots
+ * // Basic usage
  * <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={5} />
  *
- * // With horizontal lines
+ * // With color and caption
  * <LineGraph
  *   data={[10, 20, 15, 30, 25]}
  *   width={40}
  *   height={8}
- *   mode="line"
  *   color="cyan"
+ *   caption="Sales Trend"
  * />
  *
  * // With Y-axis labels
@@ -205,7 +187,6 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     width = 'auto',
     height = 10,
     yDomain = 'auto',
-    mode = 'dot',
     color,
     caption,
     showYAxis = false,
@@ -253,8 +234,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
   // Create grid
   const grid = createGrid(graphWidth, height);
 
-  // Get characters for this mode
-  const chars = MODE_CHARS[mode];
+  // Get line characters
   const totalLevels = height * 3;
 
   // Place characters on grid
@@ -264,8 +244,8 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     const [rowIndex, subPosition] = positionToRowAndSub(position, height);
 
     if (rowIndex >= 0 && rowIndex < height) {
-      // subPosition: 0=bottom, 1=middle, 2=top -> chars[2-subPosition]
-      grid[rowIndex]![x] = chars[2 - subPosition]!;
+      // subPosition: 0=bottom, 1=middle, 2=top -> LINE_CHARS[2-subPosition]
+      grid[rowIndex]![x] = LINE_CHARS[2 - subPosition]!;
     }
   }
 

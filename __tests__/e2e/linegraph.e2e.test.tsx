@@ -8,13 +8,12 @@ import React from 'react';
 import { render } from 'ink-testing-library';
 import { LineGraph } from '../../src/components/LineGraph.js';
 
-// Characters used in each mode
-const DOT_CHARS = ['˙', '·', '.'];
+// Line characters used for rendering (top, middle, bottom)
 const LINE_CHARS = ['‾', '─', '_'];
 
 describe('E2E: LineGraph', () => {
   describe('Basic rendering', () => {
-    it('renders data with dot mode by default', () => {
+    it('renders data with line characters', () => {
       const { lastFrame } = render(
         <LineGraph data={[1, 2, 3, 4, 5]} width={5} height={5} />
       );
@@ -22,9 +21,9 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       expect(lines.length).toBe(5);
-      // Check that at least one dot character appears
-      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
-      expect(hasDotChar).toBe(true);
+      // Check that at least one line character appears
+      const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
+      expect(hasLineChar).toBe(true);
     });
 
     it('renders ascending data correctly', () => {
@@ -36,7 +35,7 @@ describe('E2E: LineGraph', () => {
 
       expect(lines.length).toBe(3);
       // Highest value (5) should be in top row
-      const topHasChar = DOT_CHARS.some(char => lines[0]?.includes(char));
+      const topHasChar = LINE_CHARS.some(char => lines[0]?.includes(char));
       expect(topHasChar).toBe(true);
     });
 
@@ -49,7 +48,7 @@ describe('E2E: LineGraph', () => {
 
       // All characters should be on the same row (middle area)
       const rowsWithChars = lines.filter(line =>
-        DOT_CHARS.some(char => line.includes(char))
+        LINE_CHARS.some(char => line.includes(char))
       );
       expect(rowsWithChars.length).toBe(1);
     });
@@ -60,33 +59,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
-      expect(hasDotChar).toBe(true);
-    });
-  });
-
-  describe('Modes', () => {
-    it('uses dot characters in dot mode', () => {
-      const { lastFrame } = render(
-        <LineGraph data={[1, 5, 3]} width={3} height={3} mode="dot" />
-      );
-      const output = lastFrame();
-
-      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
       const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasDotChar).toBe(true);
-      expect(hasLineChar).toBe(false);
-    });
-
-    it('uses line characters in line mode', () => {
-      const { lastFrame } = render(
-        <LineGraph data={[1, 5, 3]} width={3} height={3} mode="line" />
-      );
-      const output = lastFrame();
-
-      const hasDotChar = DOT_CHARS.some(char => output?.includes(char));
-      const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasDotChar).toBe(false);
       expect(hasLineChar).toBe(true);
     });
   });
@@ -101,10 +74,10 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       // Should have characters at different vertical positions
-      // 0 -> bottom (.), 50 -> middle (·), 100 -> top (˙)
-      expect(output).toContain('.');
-      expect(output).toContain('·');
-      expect(output).toContain('˙');
+      // 0 -> bottom (_), 50 -> middle (─), 100 -> top (‾)
+      expect(output).toContain('_');
+      expect(output).toContain('─');
+      expect(output).toContain('‾');
     });
 
     it('achieves 3x resolution per row', () => {
@@ -122,8 +95,8 @@ describe('E2E: LineGraph', () => {
 
       expect(lines.length).toBe(2);
       // Both rows should have characters
-      const row0HasChar = DOT_CHARS.some(char => lines[0]?.includes(char));
-      const row1HasChar = DOT_CHARS.some(char => lines[1]?.includes(char));
+      const row0HasChar = LINE_CHARS.some(char => lines[0]?.includes(char));
+      const row1HasChar = LINE_CHARS.some(char => lines[1]?.includes(char));
       expect(row0HasChar).toBe(true);
       expect(row1HasChar).toBe(true);
     });
@@ -160,7 +133,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       // Count total graph characters
-      const totalChars = DOT_CHARS.reduce((count, char) => {
+      const totalChars = LINE_CHARS.reduce((count, char) => {
         return count + (output?.split(char).length ?? 1) - 1;
       }, 0);
       expect(totalChars).toBe(10);
@@ -229,7 +202,7 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       expect(lines.length).toBe(5);
-      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      const hasChar = LINE_CHARS.some(char => output?.includes(char));
       expect(hasChar).toBe(true);
     });
 
@@ -244,7 +217,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      const hasChar = LINE_CHARS.some(char => output?.includes(char));
       expect(hasChar).toBe(true);
     });
   });
@@ -265,7 +238,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      const hasChar = LINE_CHARS.some(char => output?.includes(char));
       expect(hasChar).toBe(true);
     });
 
@@ -277,7 +250,7 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       expect(lines.length).toBe(5);
-      const hasChar = DOT_CHARS.some(char => output?.includes(char));
+      const hasChar = LINE_CHARS.some(char => output?.includes(char));
       expect(hasChar).toBe(true);
     });
   });
