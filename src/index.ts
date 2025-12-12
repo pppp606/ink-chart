@@ -2,6 +2,7 @@
 export { Sparkline } from './components/Sparkline.js';
 export { BarChart } from './components/BarChart.js';
 export { StackedBarChart } from './components/StackedBarChart.js';
+export { LineGraph } from './components/LineGraph.js';
 
 // Component Types
 export type { SparklineProps } from './components/Sparkline.js';
@@ -11,6 +12,7 @@ export type {
   StackedBarSegment,
   StackedBarChartMode
 } from './components/StackedBarChart.js';
+export type { LineGraphProps, DotChar } from './components/LineGraph.js';
 
 // Hooks
 export { useAutoWidth } from './core/useAutoWidth.js';

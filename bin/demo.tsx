@@ -10,7 +10,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text } from 'ink';
-import { Sparkline, BarChart, BarChartData, StackedBarChart } from '../src/index.js';
+import { Sparkline, BarChart, BarChartData, StackedBarChart, LineGraph } from '../src/index.js';
 
 /**
  * Generate realistic RPS (Requests Per Second) data
@@ -292,6 +292,47 @@ function StaticDemo(): React.ReactElement {
           width={60}
           format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
         />
+      </Box>
+      <Text> </Text>
+
+      {/* LineGraph Example */}
+      <Text bold color="yellow">📉 LineGraph Example: Temperature Trend</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>2D grid-based line graph with dots</Text>
+        <LineGraph
+          data={[15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18]}
+          width={40}
+          height={8}
+          color="cyan"
+          caption="Monthly temperature (°C)"
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* LineGraph with Y-Axis Example */}
+      <Text bold color="yellow">📉 LineGraph with Y-Axis: Stock Price</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <LineGraph
+          data={[100, 105, 98, 110, 115, 108, 120, 125, 118, 130]}
+          width={50}
+          height={6}
+          showYAxis={true}
+          color="green"
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* LineGraph Different Dot Characters */}
+      <Text bold color="yellow">📉 LineGraph: Dot Character Styles</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>● (filled circle):</Text>
+        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="●" />
+        <Text dimColor>○ (empty circle):</Text>
+        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="○" />
+        <Text dimColor>◆ (diamond):</Text>
+        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="◆" />
+        <Text dimColor>* (asterisk):</Text>
+        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="*" />
       </Box>
     </Box>
   );
