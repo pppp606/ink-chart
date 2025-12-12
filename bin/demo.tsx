@@ -327,6 +327,50 @@ function StaticDemo(): React.ReactElement {
 }
 
 /**
+ * Dynamic LineGraph demo with simulated stock prices
+ */
+function DynamicLineGraphDemo() {
+  const [stockA, setStockA] = useState<number[]>([100, 102, 98, 105, 103, 108, 106, 110, 107, 112, 109, 115, 112, 118, 115, 120]);
+  const [stockB, setStockB] = useState<number[]>([95, 97, 100, 96, 99, 102, 98, 105, 101, 108, 104, 110, 107, 112, 109, 114]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStockA(prev => {
+        const lastValue = prev[prev.length - 1] ?? 100;
+        const change = (Math.random() - 0.5) * 6;
+        const newValue = Math.max(80, Math.min(140, lastValue + change));
+        return [...prev.slice(1), newValue];
+      });
+      setStockB(prev => {
+        const lastValue = prev[prev.length - 1] ?? 95;
+        const change = (Math.random() - 0.5) * 5;
+        const newValue = Math.max(75, Math.min(135, lastValue + change));
+        return [...prev.slice(1), newValue];
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <Box flexDirection="column">
+      <Text dimColor>Red: Stock A, Blue: Stock B</Text>
+      <LineGraph
+        data={[
+          { values: stockA, color: 'red' },
+          { values: stockB, color: 'blue' },
+        ]}
+        width={50}
+        height={6}
+        yDomain={[70, 145]}
+        showYAxis={true}
+      />
+      <Text dimColor>A: ${stockA[stockA.length - 1]?.toFixed(1)} | B: ${stockB[stockB.length - 1]?.toFixed(1)}</Text>
+    </Box>
+  );
+}
+
+/**
  * Dynamic demo - live updating charts
  */
 function DynamicDemo(): React.ReactElement {
@@ -346,6 +390,12 @@ function DynamicDemo(): React.ReactElement {
       <Text bold color="yellow">⚡ Live System Stats</Text>
       <Box flexDirection="column" marginLeft={2}>
         <DynamicSystemDemo />
+      </Box>
+
+      {/* Dynamic LineGraph */}
+      <Text bold color="yellow">📉 Live Stock Prices</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <DynamicLineGraphDemo />
       </Box>
     </Box>
   );
