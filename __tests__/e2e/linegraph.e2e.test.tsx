@@ -266,6 +266,123 @@ describe('E2E: LineGraph', () => {
 
       expect(output).not.toContain('│');
     });
+
+    it('shows multiple numeric Y-axis labels at correct positions', () => {
+      const { lastFrame } = render(
+        <LineGraph
+          data={[{ values: [0, 50, 100] }]}
+          width={20}
+          height={5}
+          yLabels={[0, 50, 100]}
+        />
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('│');
+      expect(output).toContain('100');
+      expect(output).toContain('50');
+      expect(output).toContain('0');
+    });
+
+    it('enables Y-axis automatically when yLabels is provided', () => {
+      const { lastFrame } = render(
+        <LineGraph
+          data={[{ values: [10, 50, 100] }]}
+          width={20}
+          height={5}
+          yLabels={[10, 100]}
+        />
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('│');
+    });
+
+    it('shows string Y-axis labels distributed evenly', () => {
+      const { lastFrame } = render(
+        <LineGraph
+          data={[{ values: [1, 2, 3, 4, 5] }]}
+          width={20}
+          height={5}
+          yLabels={['High', 'Mid', 'Low']}
+        />
+      );
+      const output = lastFrame();
+      const lines = output?.split('\n') || [];
+
+      expect(output).toContain('│');
+      expect(lines[0]).toContain('High');
+      expect(lines[2]).toContain('Mid');
+      expect(lines[4]).toContain('Low');
+    });
+  });
+
+  describe('X-Axis Labels', () => {
+    it('shows multiple string X-axis labels distributed evenly', () => {
+      const { lastFrame } = render(
+        <LineGraph
+          data={[{ values: [1, 2, 3, 4, 5] }]}
+          width={40}
+          height={3}
+          xLabels={['Q1', 'Q2', 'Q3', 'Q4']}
+        />
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('└');
+      expect(output).toContain('─');
+      expect(output).toContain('Q1');
+      expect(output).toContain('Q2');
+      expect(output).toContain('Q3');
+      expect(output).toContain('Q4');
+    });
+
+    it('shows numeric X-axis labels at correct positions', () => {
+      const { lastFrame } = render(
+        <LineGraph
+          data={[{ values: [0, 25, 50, 75, 100] }]}
+          width={40}
+          height={3}
+          showYAxis={true}
+          xLabels={[0, 50, 100]}
+        />
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('0');
+      expect(output).toContain('50');
+      expect(output).toContain('100');
+    });
+
+    it('shows single X-axis label', () => {
+      const { lastFrame } = render(
+        <LineGraph
+          data={[{ values: [1, 2, 3] }]}
+          width={20}
+          height={3}
+          xLabels={['Start']}
+        />
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('Start');
+    });
+
+    it('renders X-axis line with Y-axis corner when both are shown', () => {
+      const { lastFrame } = render(
+        <LineGraph
+          data={[{ values: [1, 2, 3] }]}
+          width={20}
+          height={3}
+          showYAxis={true}
+          xLabels={['A', 'B']}
+        />
+      );
+      const output = lastFrame();
+
+      expect(output).toContain('└');
+      expect(output).toContain('─');
+    });
   });
 
   describe('yDomain', () => {

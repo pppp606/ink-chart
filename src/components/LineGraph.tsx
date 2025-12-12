@@ -71,16 +71,25 @@ export interface LineGraphProps {
   caption?: string;
 
   /**
-   * Whether to show Y-axis labels
+   * Whether to show Y-axis labels (shows min/max by default)
    * @default false
    */
   showYAxis?: boolean;
 
   /**
-   * X-axis labels for start and end points
-   * Accepts numbers or strings: ['Jan', 'Dec'] or [0, 100]
+   * Y-axis labels
+   * - Numbers: positioned at their actual Y values (e.g., [0, 50, 100])
+   * - Strings: distributed evenly across the axis
+   * When specified, showYAxis is automatically enabled
    */
-  xLabels?: [string | number, string | number];
+  yLabels?: (string | number)[];
+
+  /**
+   * X-axis labels
+   * - Strings: distributed evenly across the axis (e.g., ['Q1', 'Q2', 'Q3', 'Q4'])
+   * - Numbers: positioned at their actual data positions (e.g., [0, 25, 50, 75, 100])
+   */
+  xLabels?: (string | number)[];
 }
 
 /**
@@ -255,8 +264,12 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     yDomain = 'auto',
     caption,
     showYAxis = false,
+    yLabels: yLabelsProp,
     xLabels,
   } = props;
+
+  // Enable Y-axis if yLabels is provided
+  const hasYAxis = showYAxis || (yLabelsProp && yLabelsProp.length > 0);
 
   const autoWidth = useAutoWidth();
 
@@ -291,6 +304,24 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     [min, max] = yDomain;
   }
 
+  // Calculate Y-axis label width based on actual values or provided labels
+  let yAxisLabelWidth = 0;
+  if (hasYAxis) {
+    if (yLabelsProp && yLabelsProp.length > 0) {
+      // Use provided labels to calculate width
+      for (const label of yLabelsProp) {
+        const labelStr = typeof label === 'number' ? formatAxisLabel(label, 1) : String(label);
+        yAxisLabelWidth = Math.max(yAxisLabelWidth, labelStr.length);
+      }
+    } else {
+      // Use min/max for default labels
+      const maxLabel = formatAxisLabel(max, 1);
+      const minLabel = formatAxisLabel(min, 1);
+      yAxisLabelWidth = Math.max(maxLabel.length, minLabel.length);
+    }
+  }
+  const yAxisWidth = hasYAxis ? yAxisLabelWidth + 1 : 0; // +1 for │
+
   // Determine effective width (use longest series for 'auto')
   let effectiveWidth: number;
   if (width === 'auto') {
@@ -302,8 +333,6 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
       : Math.max(...validSeries.map(s => s.values.length));
   }
 
-  // Account for Y-axis width if shown
-  const yAxisWidth = showYAxis ? 6 : 0;
   const graphWidth = Math.max(1, effectiveWidth - yAxisWidth);
 
   // Create grid with cells that track character and color
@@ -335,29 +364,53 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
 
   // Calculate Y-axis labels
   const yLabels: string[] = [];
-  if (showYAxis) {
-    const maxLabel = formatAxisLabel(max, 5);
-    const minLabel = formatAxisLabel(min, 5);
-    const maxLabelWidth = Math.max(maxLabel.length, minLabel.length);
-
+  if (hasYAxis) {
+    // Initialize all rows with empty labels
     for (let row = 0; row < height; row++) {
-      if (row === 0) {
-        yLabels.push(formatAxisLabel(max, maxLabelWidth));
-      } else if (row === height - 1) {
-        yLabels.push(formatAxisLabel(min, maxLabelWidth));
+      yLabels.push(' '.repeat(yAxisLabelWidth));
+    }
+
+    if (yLabelsProp && yLabelsProp.length > 0) {
+      // Check if all labels are numbers
+      const allNumbers = yLabelsProp.every(l => typeof l === 'number');
+
+      if (allNumbers) {
+        // Position-based placement for numbers
+        for (const label of yLabelsProp) {
+          const value = label as number;
+          // Calculate which row this value corresponds to
+          const normalizedPos = max === min ? 0.5 : (value - min) / (max - min);
+          const clampedPos = Math.max(0, Math.min(1, normalizedPos));
+          const row = Math.round((1 - clampedPos) * (height - 1));
+          if (row >= 0 && row < height) {
+            yLabels[row] = formatAxisLabel(value, yAxisLabelWidth);
+          }
+        }
       } else {
-        yLabels.push(' '.repeat(maxLabelWidth));
+        // Even distribution for strings
+        for (let i = 0; i < yLabelsProp.length; i++) {
+          const row = yLabelsProp.length === 1
+            ? 0
+            : Math.round((i / (yLabelsProp.length - 1)) * (height - 1));
+          if (row >= 0 && row < height) {
+            const labelStr = String(yLabelsProp[i]);
+            yLabels[row] = labelStr.padStart(yAxisLabelWidth);
+          }
+        }
       }
+    } else {
+      // Default: show min/max only
+      yLabels[0] = formatAxisLabel(max, yAxisLabelWidth);
+      yLabels[height - 1] = formatAxisLabel(min, yAxisLabelWidth);
     }
   }
 
   for (let row = 0; row < height; row++) {
-    const yAxisLabel = showYAxis ? yLabels[row] + '│' : '';
     const coloredSegments = renderColoredRow(grid[row]!);
 
     lines.push(
       <Text key={row}>
-        {yAxisLabel}
+        {hasYAxis && <Text dimColor>{yLabels[row]}│</Text>}
         {coloredSegments}
       </Text>
     );
@@ -365,13 +418,9 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
 
   // Render X-axis line and labels
   const xAxisElements: React.ReactElement[] = [];
-  if (xLabels) {
-    const startLabel = String(xLabels[0]);
-    const endLabel = String(xLabels[1]);
-    const yAxisPadding = showYAxis ? ' '.repeat(yAxisWidth - 1) + '└' : '';
+  if (xLabels && xLabels.length > 0) {
+    const yAxisPadding = hasYAxis ? ' '.repeat(yAxisWidth - 1) + '└' : '';
     const axisLine = '─'.repeat(graphWidth);
-    const middleWidth = Math.max(0, graphWidth - startLabel.length - endLabel.length);
-    const middlePadding = ' '.repeat(middleWidth);
 
     // X-axis line
     xAxisElements.push(
@@ -379,11 +428,48 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
         {yAxisPadding}{axisLine}
       </Text>
     );
-    // X-axis labels
-    const labelPadding = showYAxis ? ' '.repeat(yAxisWidth) : '';
+
+    // Build label line with proper positioning
+    const labelLine = Array(graphWidth).fill(' ');
+    const labelCount = xLabels.length;
+
+    // Check if all labels are numbers (for position-based placement)
+    const allNumbers = xLabels.every(l => typeof l === 'number');
+
+    if (allNumbers && labelCount > 1) {
+      // Position-based placement for numbers
+      const numLabels = xLabels as number[];
+      const minLabel = Math.min(...numLabels);
+      const maxLabel = Math.max(...numLabels);
+      const range = maxLabel - minLabel;
+
+      for (const label of numLabels) {
+        const labelStr = String(label);
+        const normalizedPos = range > 0 ? (label - minLabel) / range : 0;
+        const pos = Math.round(normalizedPos * (graphWidth - 1));
+        const startPos = Math.max(0, Math.min(graphWidth - labelStr.length, pos - Math.floor(labelStr.length / 2)));
+        for (let i = 0; i < labelStr.length && startPos + i < graphWidth; i++) {
+          labelLine[startPos + i] = labelStr[i]!;
+        }
+      }
+    } else {
+      // Even distribution for strings (or single label)
+      for (let i = 0; i < labelCount; i++) {
+        const labelStr = String(xLabels[i]);
+        const pos = labelCount === 1
+          ? 0
+          : Math.round((i / (labelCount - 1)) * (graphWidth - 1));
+        const startPos = Math.max(0, Math.min(graphWidth - labelStr.length, pos - Math.floor(labelStr.length / 2)));
+        for (let j = 0; j < labelStr.length && startPos + j < graphWidth; j++) {
+          labelLine[startPos + j] = labelStr[j]!;
+        }
+      }
+    }
+
+    const labelPadding = hasYAxis ? ' '.repeat(yAxisWidth) : '';
     xAxisElements.push(
       <Text key="xaxis-labels" dimColor>
-        {labelPadding}{startLabel}{middlePadding}{endLabel}
+        {labelPadding}{labelLine.join('')}
       </Text>
     );
   }

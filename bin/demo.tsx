@@ -312,16 +312,16 @@ function StaticDemo(): React.ReactElement {
       {/* LineGraph with Multiple Series */}
       <Text bold color="yellow">📉 LineGraph: Multi-Series Comparison</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>Red: 2023, Blue: 2024 (overlapping areas show first series)</Text>
+        <Text dimColor>Red: 2023, Cyan: 2024 (overlapping areas show first series)</Text>
         <LineGraph
           data={[
-            { values: [100, 120, 115, 130, 125, 140, 135, 150, 145, 160], color: 'red' },
-            { values: [90, 110, 130, 120, 140, 130, 150, 140, 160, 155], color: 'blue' },
+            { values: [100, 105, 110, 120, 130, 125, 115, 110, 105, 100], color: 'red' },
+            { values: [120, 115, 110, 115, 120, 130, 140, 150, 155, 160], color: 'cyan' },
           ]}
           width={50}
           height={6}
-          showYAxis={true}
-          xLabels={['Q1', 'Q4']}
+          yLabels={[100, 140, 160]}
+          xLabels={['Q1', 'Q2', 'Q3', 'Q4']}
         />
       </Box>
     </Box>
