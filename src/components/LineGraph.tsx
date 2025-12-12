@@ -75,6 +75,12 @@ export interface LineGraphProps {
    * @default false
    */
   showYAxis?: boolean;
+
+  /**
+   * X-axis labels for start and end points
+   * Accepts numbers or strings: ['Jan', 'Dec'] or [0, 100]
+   */
+  xLabels?: [string | number, string | number];
 }
 
 /**
@@ -249,6 +255,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     yDomain = 'auto',
     caption,
     showYAxis = false,
+    xLabels,
   } = props;
 
   const autoWidth = useAutoWidth();
@@ -356,9 +363,25 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     );
   }
 
+  // Render X-axis labels
+  let xAxisLine: React.ReactElement | null = null;
+  if (xLabels) {
+    const startLabel = String(xLabels[0]);
+    const endLabel = String(xLabels[1]);
+    const yAxisPadding = showYAxis ? ' '.repeat(yAxisWidth) : '';
+    const middleWidth = Math.max(0, graphWidth - startLabel.length - endLabel.length);
+    const middlePadding = ' '.repeat(middleWidth);
+    xAxisLine = (
+      <Text dimColor>
+        {yAxisPadding}{startLabel}{middlePadding}{endLabel}
+      </Text>
+    );
+  }
+
   return (
     <Box flexDirection="column">
       {lines}
+      {xAxisLine}
       {caption && caption.trim() !== '' && <Text>{caption}</Text>}
     </Box>
   );

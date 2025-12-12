@@ -303,6 +303,7 @@ function StaticDemo(): React.ReactElement {
           data={[{ values: [15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18], color: 'cyan' }]}
           width={40}
           height={6}
+          xLabels={['Jan', 'Dec']}
           caption="Monthly temperature (°C)"
         />
       </Box>
@@ -320,6 +321,7 @@ function StaticDemo(): React.ReactElement {
           width={50}
           height={6}
           showYAxis={true}
+          xLabels={['Q1', 'Q4']}
         />
       </Box>
     </Box>
