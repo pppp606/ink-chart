@@ -9,17 +9,34 @@ import { calculateEffectiveWidth } from '../core/widthUtils.js';
 const LINE_CHARS: [string, string, string] = ['‾', '─', '_'];
 
 /**
+ * A single data series with values and optional color
+ */
+export interface LineGraphSeries {
+  /**
+   * Array of numeric values for this series
+   */
+  values: number[];
+
+  /**
+   * Color for this series (ink color name or hex)
+   */
+  color?: string;
+}
+
+/**
  * Props for the LineGraph component
  */
 export interface LineGraphProps {
   /**
-   * Array of numeric values to visualize
+   * Array of data series to visualize.
+   * Each series has values and an optional color.
+   * When lines overlap, earlier series take priority.
    */
-  data: number[];
+  data: LineGraphSeries[];
 
   /**
    * Width of the graph in characters.
-   * - 'auto': Uses the length of the data array
+   * - 'auto': Uses the length of the longest data array
    * - 'full': Uses full terminal width with margin
    * - number: Fixed width, data will be sampled/interpolated to fit
    */
@@ -35,15 +52,10 @@ export interface LineGraphProps {
 
   /**
    * Y-axis domain for value mapping
-   * - 'auto': Automatically scales to min/max of data
+   * - 'auto': Automatically scales to min/max of all data
    * - [min, max]: Fixed domain range for consistent scaling
    */
   yDomain?: 'auto' | [number, number];
-
-  /**
-   * Color for the graph (ink color name)
-   */
-  color?: string;
 
   /**
    * Optional caption to display below the graph
@@ -58,11 +70,19 @@ export interface LineGraphProps {
 }
 
 /**
- * Creates a 2D grid filled with spaces
+ * Grid cell containing character and color
  */
-function createGrid(width: number, height: number): string[][] {
+interface GridCell {
+  char: string;
+  color: string | undefined;
+}
+
+/**
+ * Creates a 2D grid filled with empty cells
+ */
+function createGrid(width: number, height: number): GridCell[][] {
   return Array.from({ length: height }, () =>
-    Array.from({ length: width }, () => ' ')
+    Array.from({ length: width }, () => ({ char: ' ', color: undefined }))
   );
 }
 
@@ -81,7 +101,6 @@ function valueToPosition(
   }
   const normalized = (value - min) / (max - min);
   const clamped = Math.max(0, Math.min(1, normalized));
-  // Map to [0, totalLevels-1]
   return Math.round(clamped * (totalLevels - 1));
 }
 
@@ -93,17 +112,11 @@ function positionToRowAndSub(
   position: number,
   height: number
 ): [number, number] {
-  // position 0 is bottom-most, position (height*3-1) is top-most
-  // Row 0 is top of display, row (height-1) is bottom
   const levelsPerRow = 3;
   const totalLevels = height * levelsPerRow;
-
-  // Invert: position 0 -> row (height-1), subPos 0
-  //         position (totalLevels-1) -> row 0, subPos 2
   const invertedPosition = totalLevels - 1 - position;
   const rowIndex = Math.floor(invertedPosition / levelsPerRow);
   const subPosition = levelsPerRow - 1 - (invertedPosition % levelsPerRow);
-
   return [rowIndex, subPosition];
 }
 
@@ -154,28 +167,67 @@ function formatAxisLabel(value: number, maxLabelWidth: number): string {
 }
 
 /**
- * A high-resolution line graph component that visualizes numeric trends.
+ * Renders a row with colored segments
+ */
+function renderColoredRow(cells: GridCell[]): React.ReactElement[] {
+  const segments: React.ReactElement[] = [];
+  let currentColor: string | undefined;
+  let currentText = '';
+  let segmentIndex = 0;
+
+  for (const cell of cells) {
+    if (cell.color !== currentColor) {
+      if (currentText) {
+        if (currentColor) {
+          segments.push(<Text key={segmentIndex++} color={currentColor}>{currentText}</Text>);
+        } else {
+          segments.push(<Text key={segmentIndex++}>{currentText}</Text>);
+        }
+      }
+      currentColor = cell.color;
+      currentText = cell.char;
+    } else {
+      currentText += cell.char;
+    }
+  }
+
+  // Push the last segment
+  if (currentText) {
+    if (currentColor) {
+      segments.push(<Text key={segmentIndex++} color={currentColor}>{currentText}</Text>);
+    } else {
+      segments.push(<Text key={segmentIndex++}>{currentText}</Text>);
+    }
+  }
+
+  return segments;
+}
+
+/**
+ * A high-resolution line graph component that visualizes multiple data series.
  *
  * Uses Unicode line characters (‾ ─ _) at different vertical positions
  * within each row to achieve 3x the vertical resolution.
  *
  * @example
  * ```tsx
- * // Basic usage
- * <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={5} />
+ * // Single series
+ * <LineGraph data={[{ values: [1, 3, 2, 5, 4], color: 'cyan' }]} height={5} />
  *
- * // With color and caption
+ * // Multiple series with different colors
  * <LineGraph
- *   data={[10, 20, 15, 30, 25]}
+ *   data={[
+ *     { values: [10, 20, 15, 30, 25], color: 'red' },
+ *     { values: [5, 15, 20, 10, 30], color: 'blue' },
+ *   ]}
  *   width={40}
  *   height={8}
- *   color="cyan"
- *   caption="Sales Trend"
+ *   caption="Comparison"
  * />
  *
  * // With Y-axis labels
  * <LineGraph
- *   data={[100, 200, 150, 300]}
+ *   data={[{ values: [100, 200, 150, 300] }]}
  *   height={6}
  *   showYAxis={true}
  * />
@@ -187,65 +239,79 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     width = 'auto',
     height = 10,
     yDomain = 'auto',
-    color,
     caption,
     showYAxis = false,
   } = props;
 
   const autoWidth = useAutoWidth();
 
-  // Handle empty or invalid data
+  // Handle empty data
   if (!data || data.length === 0) {
     return null;
   }
 
-  // Filter out non-finite values
-  const validData = data.filter(Number.isFinite);
-  if (validData.length === 0) {
+  // Collect all valid values from all series
+  const allValidValues: number[] = [];
+  const validSeries: Array<{ values: number[]; color: string | undefined }> = [];
+
+  for (const series of data) {
+    const validValues = series.values.filter(Number.isFinite);
+    if (validValues.length > 0) {
+      validSeries.push({ values: validValues, color: series.color });
+      allValidValues.push(...validValues);
+    }
+  }
+
+  if (validSeries.length === 0 || allValidValues.length === 0) {
     return null;
   }
 
-  // Calculate Y domain
+  // Calculate Y domain from all data
   let min: number;
   let max: number;
   if (yDomain === 'auto') {
-    min = Math.min(...validData);
-    max = Math.max(...validData);
+    min = Math.min(...allValidValues);
+    max = Math.max(...allValidValues);
   } else {
     [min, max] = yDomain;
   }
 
-  // Determine effective width
+  // Determine effective width (use longest series for 'auto')
   let effectiveWidth: number;
   if (width === 'auto') {
-    effectiveWidth = validData.length;
+    effectiveWidth = Math.max(...validSeries.map(s => s.values.length));
   } else {
     const calculated = calculateEffectiveWidth(width, autoWidth.width);
-    effectiveWidth = typeof calculated === 'number' ? calculated : validData.length;
+    effectiveWidth = typeof calculated === 'number'
+      ? calculated
+      : Math.max(...validSeries.map(s => s.values.length));
   }
 
   // Account for Y-axis width if shown
   const yAxisWidth = showYAxis ? 6 : 0;
   const graphWidth = Math.max(1, effectiveWidth - yAxisWidth);
 
-  // Scale data to fit width
-  const scaledData = scaleDataToWidth(validData, graphWidth);
-
-  // Create grid
+  // Create grid with cells that track character and color
   const grid = createGrid(graphWidth, height);
-
-  // Get line characters
   const totalLevels = height * 3;
 
-  // Place characters on grid
-  for (let x = 0; x < scaledData.length; x++) {
-    const value = scaledData[x]!;
-    const position = valueToPosition(value, min, max, totalLevels);
-    const [rowIndex, subPosition] = positionToRowAndSub(position, height);
+  // Place characters on grid for each series (first series has priority)
+  for (const series of validSeries) {
+    const scaledData = scaleDataToWidth(series.values, graphWidth);
 
-    if (rowIndex >= 0 && rowIndex < height) {
-      // subPosition: 0=bottom, 1=middle, 2=top -> LINE_CHARS[2-subPosition]
-      grid[rowIndex]![x] = LINE_CHARS[2 - subPosition]!;
+    for (let x = 0; x < scaledData.length; x++) {
+      const value = scaledData[x]!;
+      const position = valueToPosition(value, min, max, totalLevels);
+      const [rowIndex, subPosition] = positionToRowAndSub(position, height);
+
+      if (rowIndex >= 0 && rowIndex < height) {
+        const cell = grid[rowIndex]![x]!;
+        // Only place if cell is empty (first series wins)
+        if (cell.char === ' ') {
+          cell.char = LINE_CHARS[2 - subPosition]!;
+          cell.color = series.color;
+        }
+      }
     }
   }
 
@@ -271,19 +337,15 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
   }
 
   for (let row = 0; row < height; row++) {
-    const lineContent = grid[row]!.join('');
     const yAxisLabel = showYAxis ? yLabels[row] + '│' : '';
+    const coloredSegments = renderColoredRow(grid[row]!);
 
-    if (color) {
-      lines.push(
-        <Text key={row}>
-          {yAxisLabel}
-          <Text color={color}>{lineContent}</Text>
-        </Text>
-      );
-    } else {
-      lines.push(<Text key={row}>{yAxisLabel}{lineContent}</Text>);
-    }
+    lines.push(
+      <Text key={row}>
+        {yAxisLabel}
+        {coloredSegments}
+      </Text>
+    );
   }
 
   return (

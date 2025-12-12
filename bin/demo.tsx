@@ -300,24 +300,26 @@ function StaticDemo(): React.ReactElement {
       <Box flexDirection="column" marginLeft={2}>
         <Text dimColor>High-resolution with 3 vertical levels per row (‾ ─ _)</Text>
         <LineGraph
-          data={[15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18]}
+          data={[{ values: [15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18], color: 'cyan' }]}
           width={40}
           height={6}
-          color="cyan"
           caption="Monthly temperature (°C)"
         />
       </Box>
       <Text> </Text>
 
-      {/* LineGraph with Y-Axis */}
-      <Text bold color="yellow">📉 LineGraph with Y-Axis: Stock Price</Text>
+      {/* LineGraph with Multiple Series */}
+      <Text bold color="yellow">📉 LineGraph: Multi-Series Comparison</Text>
       <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>Red: 2023, Blue: 2024 (overlapping areas show first series)</Text>
         <LineGraph
-          data={[100, 105, 98, 110, 115, 108, 120, 125, 118, 130]}
+          data={[
+            { values: [100, 120, 115, 130, 125, 140, 135, 150, 145, 160], color: 'red' },
+            { values: [90, 110, 130, 120, 140, 130, 150, 140, 160, 155], color: 'blue' },
+          ]}
           width={50}
-          height={5}
+          height={6}
           showYAxis={true}
-          color="green"
         />
       </Box>
     </Box>
