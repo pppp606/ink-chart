@@ -11,6 +11,7 @@ Terminal visualization components for [Ink](https://github.com/vadimdemedes/ink)
 - **Sparkline** - Compact trend visualization with threshold highlighting and gradient colors
 - **BarChart** - Horizontal bar charts with individual row coloring and custom formatting
 - **StackedBarChart** - 100% stacked horizontal bar charts showing percentage distribution
+- **LineGraph** - High-resolution line graphs with multi-series support and axis labels
 - **TypeScript** - Full TypeScript support with comprehensive type definitions
 - **Auto-width** - Responsive charts that adapt to terminal width
 - **Gradient Colors** - 8-level smooth color gradients with automatic terminal compatibility
@@ -27,7 +28,7 @@ npm install @pppp606/ink-chart
 ```tsx
 import React from 'react';
 import { render, Text, Box } from 'ink';
-import { Sparkline, BarChart, StackedBarChart } from '@pppp606/ink-chart';
+import { Sparkline, BarChart, StackedBarChart, LineGraph } from '@pppp606/ink-chart';
 
 function App() {
   return (
@@ -51,6 +52,17 @@ function App() {
           { label: 'Complete', value: 75, color: '#4aaa1a' },
           { label: 'Remaining', value: 25, color: '#d89612' }
         ]}
+      />
+
+      {/* Line graph with multiple series */}
+      <LineGraph
+        data={[
+          { values: [10, 15, 12, 18, 14, 20], color: 'red' },
+          { values: [8, 12, 16, 14, 18, 16], color: 'blue' }
+        ]}
+        height={5}
+        showYAxis={true}
+        xLabels={['Jan', 'Jun']}
       />
     </Box>
   );
@@ -165,6 +177,52 @@ interface StackedBarSegment {
   value: number;
   color?: string; // Hex code or Ink color name
   char?: string;  // Custom character for this segment
+}
+```
+
+### LineGraph
+
+High-resolution line graph using Unicode scan line characters (⎺ ⎻ ─ ⎼ ⎽) for 5-level vertical resolution per row.
+
+```tsx
+<LineGraph
+  data={[
+    { values: [100, 120, 115, 130, 125, 140], color: 'red' },
+    { values: [90, 110, 130, 120, 140, 130], color: 'blue' }
+  ]}
+  width={50}
+  height={6}
+  showYAxis={true}
+  xLabels={['Q1', 'Q4']}
+/>
+```
+
+Output:
+```
+   140│            ⎽    ⎽─⎺
+      │    ⎼⎽  ⎽⎼⎽⎽─⎺ ⎽─⎻
+      │ ⎼⎼⎽ ⎽⎼⎼⎼⎽⎽⎽⎼─⎻
+      │⎼──⎼⎼⎼⎼─⎺⎺⎻⎺
+      │⎻⎺─⎺
+    90│⎺─⎻
+      └──────────────────────
+       Q1                  Q4
+```
+
+**Props:**
+- `data: LineGraphSeries[]` - Array of data series (each with `values` and optional `color`)
+- `width?: 'auto' | 'full' | number` - Chart width
+- `height?: number` - Chart height in rows (default: 10, each row = 5 vertical levels)
+- `yDomain?: 'auto' | [number, number]` - Y-axis range
+- `showYAxis?: boolean` - Show Y-axis labels (default: false)
+- `xLabels?: [string | number, string | number]` - X-axis start/end labels
+- `caption?: string` - Optional caption below chart
+
+**LineGraphSeries interface:**
+```tsx
+interface LineGraphSeries {
+  values: number[];
+  color?: string; // Ink color name or hex
 }
 ```
 
@@ -327,6 +385,32 @@ The demo showcases:
   ███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒
   45                         30              15
   ```
+
+**LineGraph Examples:**
+- **Temperature Trend**: High-resolution line with X-axis labels
+  ```
+                     ⎽⎼─⎺⎻⎻─⎼⎽
+                  ⎽─⎻         ⎻─⎼
+              ⎽⎼─⎺               ⎺─⎼
+          ⎽⎼─⎺                      ⎺⎻⎼
+       ⎽─⎻                             ⎺⎻⎼
+   ⎽⎼─⎺                                   ⎺
+   ────────────────────────────────────────
+   Jan                                  Dec
+  ```
+
+- **Multi-Series Comparison**: Multiple data series with Y-axis
+  ```
+     160│                             ⎽    ⎽ ⎽─⎺⎺⎽⎼⎻⎺
+        │                   ⎼⎽  ⎽⎼⎽⎽─⎺ ⎽─⎻⎺─⎺⎺⎻⎻⎺
+        │         ⎼⎼⎽ ⎽⎼⎼⎼⎽⎽⎽⎼─⎻──⎻ ⎺⎺⎺
+        │    ⎼──⎼⎼⎼⎼─⎺⎺⎻⎺
+        │ ⎼⎻⎺─⎺
+      90│⎺─⎻
+        └────────────────────────────────────────────
+         Q1                                        Q4
+  ```
+  *Red and blue lines show different series (colors not visible in plain text)*
 
 ## Advanced Features
 
