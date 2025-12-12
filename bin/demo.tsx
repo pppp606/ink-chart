@@ -325,12 +325,12 @@ function StaticDemo(): React.ReactElement {
       {/* LineGraph Different Dot Characters */}
       <Text bold color="yellow">📉 LineGraph: Dot Character Styles</Text>
       <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>. (dot, default):</Text>
+        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} />
         <Text dimColor>● (filled circle):</Text>
         <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="●" />
         <Text dimColor>○ (empty circle):</Text>
         <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="○" />
-        <Text dimColor>◆ (diamond):</Text>
-        <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="◆" />
         <Text dimColor>* (asterisk):</Text>
         <LineGraph data={[1, 3, 2, 5, 4, 6, 3]} height={4} width={20} dotChar="*" />
       </Box>

@@ -6,7 +6,7 @@ import { calculateEffectiveWidth } from '../core/widthUtils.js';
 /**
  * Dot character options for the line graph
  */
-export type DotChar = '●' | '○' | '◆' | '◇' | '•' | '*';
+export type DotChar = '.' | '●' | '○' | '◆' | '◇' | '•' | '*';
 
 /**
  * Props for the LineGraph component
@@ -40,7 +40,7 @@ export interface LineGraphProps {
 
   /**
    * Character used for data points
-   * @default '●'
+   * @default '.'
    */
   dotChar?: DotChar;
 
@@ -170,7 +170,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     width = 'auto',
     height = 10,
     yDomain = 'auto',
-    dotChar = '●',
+    dotChar = '.',
     emptyChar = ' ',
     color,
     caption,

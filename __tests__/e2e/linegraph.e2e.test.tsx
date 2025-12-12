@@ -19,7 +19,7 @@ describe('E2E: LineGraph', () => {
 
       expect(lines.length).toBe(5);
       // Check that dots appear in the output
-      expect(output).toContain('●');
+      expect(output).toContain('.');
     });
 
     it('renders descending data correctly', () => {
@@ -31,9 +31,9 @@ describe('E2E: LineGraph', () => {
 
       expect(lines.length).toBe(5);
       // First line should have a dot (highest value at start)
-      expect(lines[0]).toContain('●');
+      expect(lines[0]).toContain('.');
       // Last line should have a dot (lowest value at end)
-      expect(lines[4]).toContain('●');
+      expect(lines[4]).toContain('.');
     });
 
     it('renders constant data as horizontal line', () => {
@@ -44,10 +44,10 @@ describe('E2E: LineGraph', () => {
 
       // All dots should be on the same row (middle)
       const lines = output?.split('\n') || [];
-      const dotLines = lines.filter(line => line.includes('●'));
+      const dotLines = lines.filter(line => line.includes('.'));
       expect(dotLines.length).toBe(1);
       // The line with dots should have 4 dots
-      expect(dotLines[0]?.match(/●/g)?.length).toBe(4);
+      expect(dotLines[0]?.match(/\./g)?.length).toBe(4);
     });
 
     it('handles single data point', () => {
@@ -56,18 +56,18 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('●');
+      expect(output).toContain('.');
     });
   });
 
   describe('Dot characters', () => {
-    it('uses filled circle by default', () => {
+    it('uses dot by default', () => {
       const { lastFrame } = render(
         <LineGraph data={[1, 2, 3]} width={3} height={3} />
       );
       const output = lastFrame();
 
-      expect(output).toContain('●');
+      expect(output).toContain('.');
     });
 
     it('uses empty circle when specified', () => {
@@ -77,7 +77,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       expect(output).toContain('○');
-      expect(output).not.toContain('●');
+      expect(output).not.toContain('.');
     });
 
     it('uses diamond when specified', () => {
@@ -124,7 +124,7 @@ describe('E2E: LineGraph', () => {
       });
       // Total dots should equal width
       const totalDots = lines.reduce((count, line) => {
-        return count + (line.match(/●/g)?.length || 0);
+        return count + (line.match(/\./g)?.length || 0);
       }, 0);
       expect(totalDots).toBe(4);
     });
@@ -138,7 +138,7 @@ describe('E2E: LineGraph', () => {
 
       // Should have dots across the width
       const totalDots = lines.reduce((count, line) => {
-        return count + (line.match(/●/g)?.length || 0);
+        return count + (line.match(/\./g)?.length || 0);
       }, 0);
       expect(totalDots).toBe(10);
     });
@@ -209,7 +209,7 @@ describe('E2E: LineGraph', () => {
 
       // With fixed domain, 25 should be in lower rows, 75 in upper rows
       expect(lines.length).toBe(5);
-      expect(output).toContain('●');
+      expect(output).toContain('.');
     });
 
     it('auto-scales when yDomain is auto', () => {
@@ -223,7 +223,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('●');
+      expect(output).toContain('.');
     });
   });
 
@@ -244,7 +244,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       // Should render with only valid data points
-      expect(output).toContain('●');
+      expect(output).toContain('.');
     });
 
     it('handles negative values', () => {
@@ -255,7 +255,7 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       expect(lines.length).toBe(5);
-      expect(output).toContain('●');
+      expect(output).toContain('.');
     });
   });
 });
