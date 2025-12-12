@@ -364,7 +364,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
   }
 
   // Render X-axis line and labels
-  let xAxisElements: React.ReactElement[] = [];
+  const xAxisElements: React.ReactElement[] = [];
   if (xLabels) {
     const startLabel = String(xLabels[0]);
     const endLabel = String(xLabels[1]);
