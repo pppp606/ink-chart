@@ -8,8 +8,8 @@ import React from 'react';
 import { render } from 'ink-testing-library';
 import { LineGraph } from '../../src/components/LineGraph.js';
 
-// Line characters used for rendering (top, middle, bottom)
-const LINE_CHARS = ['‾', '─', '_'];
+// Line characters used for rendering (5 vertical levels: top to bottom)
+const LINE_CHARS = ['⎺', '⎻', '─', '⎼', '⎽'];
 
 describe('E2E: LineGraph', () => {
   describe('Basic rendering', () => {
@@ -149,12 +149,12 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('_');
-      expect(output).toContain('─');
-      expect(output).toContain('‾');
+      expect(output).toContain('⎽'); // bottom
+      expect(output).toContain('─'); // middle
+      expect(output).toContain('⎺'); // top
     });
 
-    it('achieves 3x resolution per row', () => {
+    it('achieves 5x resolution per row', () => {
       const { lastFrame } = render(
         <LineGraph
           data={[{ values: [0, 20, 40, 60, 80, 100] }]}

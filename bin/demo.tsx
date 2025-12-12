@@ -298,7 +298,7 @@ function StaticDemo(): React.ReactElement {
       {/* LineGraph Example */}
       <Text bold color="yellow">📉 LineGraph: Temperature Trend</Text>
       <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>High-resolution with 3 vertical levels per row (‾ ─ _)</Text>
+        <Text dimColor>High-resolution with 5 vertical levels per row (⎺ ⎻ ─ ⎼ ⎽)</Text>
         <LineGraph
           data={[{ values: [15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18], color: 'cyan' }]}
           width={40}

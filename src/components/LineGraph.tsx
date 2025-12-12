@@ -4,9 +4,17 @@ import { useAutoWidth } from '../core/useAutoWidth.js';
 import { calculateEffectiveWidth } from '../core/widthUtils.js';
 
 /**
- * Characters for line rendering (top, middle, bottom positions within a row)
+ * Characters for line rendering (5 vertical positions within a row)
+ * Using Unicode horizontal scan line characters for consistent width
+ * Position 0 = top (⎺), Position 4 = bottom (⎽)
  */
-const LINE_CHARS: [string, string, string] = ['‾', '─', '_'];
+const LINE_CHARS: [string, string, string, string, string] = [
+  '⎺', // U+23BA HORIZONTAL SCAN LINE-1 (top)
+  '⎻', // U+23BB HORIZONTAL SCAN LINE-3
+  '─', // U+2500 BOX DRAWINGS LIGHT HORIZONTAL (middle)
+  '⎼', // U+23BC HORIZONTAL SCAN LINE-7
+  '⎽', // U+23BD HORIZONTAL SCAN LINE-9 (bottom)
+];
 
 /**
  * A single data series with values and optional color
@@ -44,8 +52,8 @@ export interface LineGraphProps {
 
   /**
    * Height of the graph in rows (lines).
-   * Each row provides 3 levels of resolution (top/middle/bottom).
-   * So height=5 gives 15 vertical levels of resolution.
+   * Each row provides 5 levels of resolution using scan line characters.
+   * So height=5 gives 25 vertical levels of resolution.
    * @default 10
    */
   height?: number;
@@ -106,17 +114,17 @@ function valueToPosition(
 
 /**
  * Converts a position (0 = bottom, totalLevels-1 = top) to row and sub-position
- * @returns [rowIndex, subPosition] where subPosition is 0=bottom, 1=middle, 2=top within row
+ * @returns [rowIndex, subPosition] where subPosition is 0=top, 4=bottom within row
  */
 function positionToRowAndSub(
   position: number,
   height: number
 ): [number, number] {
-  const levelsPerRow = 3;
+  const levelsPerRow = 5;
   const totalLevels = height * levelsPerRow;
   const invertedPosition = totalLevels - 1 - position;
   const rowIndex = Math.floor(invertedPosition / levelsPerRow);
-  const subPosition = levelsPerRow - 1 - (invertedPosition % levelsPerRow);
+  const subPosition = invertedPosition % levelsPerRow;
   return [rowIndex, subPosition];
 }
 
@@ -206,8 +214,8 @@ function renderColoredRow(cells: GridCell[]): React.ReactElement[] {
 /**
  * A high-resolution line graph component that visualizes multiple data series.
  *
- * Uses Unicode line characters (‾ ─ _) at different vertical positions
- * within each row to achieve 3x the vertical resolution.
+ * Uses Unicode horizontal scan line characters (⎺ ⎻ ─ ⎼ ⎽) at different vertical positions
+ * within each row to achieve 5x the vertical resolution.
  *
  * @example
  * ```tsx
@@ -293,7 +301,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
 
   // Create grid with cells that track character and color
   const grid = createGrid(graphWidth, height);
-  const totalLevels = height * 3;
+  const totalLevels = height * 5;
 
   // Place characters on grid for each series (first series has priority)
   for (const series of validSeries) {
@@ -308,7 +316,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
         const cell = grid[rowIndex]![x]!;
         // Only place if cell is empty (first series wins)
         if (cell.char === ' ') {
-          cell.char = LINE_CHARS[2 - subPosition]!;
+          cell.char = LINE_CHARS[subPosition]!;
           cell.color = series.color;
         }
       }
