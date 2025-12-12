@@ -363,17 +363,27 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
     );
   }
 
-  // Render X-axis labels
-  let xAxisLine: React.ReactElement | null = null;
+  // Render X-axis line and labels
+  let xAxisElements: React.ReactElement[] = [];
   if (xLabels) {
     const startLabel = String(xLabels[0]);
     const endLabel = String(xLabels[1]);
-    const yAxisPadding = showYAxis ? ' '.repeat(yAxisWidth) : '';
+    const yAxisPadding = showYAxis ? ' '.repeat(yAxisWidth - 1) + '└' : '';
+    const axisLine = '─'.repeat(graphWidth);
     const middleWidth = Math.max(0, graphWidth - startLabel.length - endLabel.length);
     const middlePadding = ' '.repeat(middleWidth);
-    xAxisLine = (
-      <Text dimColor>
-        {yAxisPadding}{startLabel}{middlePadding}{endLabel}
+
+    // X-axis line
+    xAxisElements.push(
+      <Text key="xaxis-line" dimColor>
+        {yAxisPadding}{axisLine}
+      </Text>
+    );
+    // X-axis labels
+    const labelPadding = showYAxis ? ' '.repeat(yAxisWidth) : '';
+    xAxisElements.push(
+      <Text key="xaxis-labels" dimColor>
+        {labelPadding}{startLabel}{middlePadding}{endLabel}
       </Text>
     );
   }
@@ -381,7 +391,7 @@ export const LineGraph = React.memo<LineGraphProps>(function LineGraph(props) {
   return (
     <Box flexDirection="column">
       {lines}
-      {xAxisLine}
+      {xAxisElements}
       {caption && caption.trim() !== '' && <Text>{caption}</Text>}
     </Box>
   );
