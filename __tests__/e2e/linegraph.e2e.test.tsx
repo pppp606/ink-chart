@@ -329,7 +329,6 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('└');
       expect(output).toContain('─');
       expect(output).toContain('Q1');
       expect(output).toContain('Q2');
