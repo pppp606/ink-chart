@@ -10,7 +10,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { render, Box, Text } from 'ink';
-import { Sparkline, BarChart, BarChartData, StackedBarChart } from '../src/index.js';
+import { Sparkline, BarChart, BarChartData, StackedBarChart, LineGraph } from '../src/index.js';
 
 /**
  * Generate realistic RPS (Requests Per Second) data
@@ -154,51 +154,6 @@ function StaticDemo(): React.ReactElement {
       <Text dimColor>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
       <Text> </Text>
       
-      {/* Sparkline RPS Example */}
-      <Text bold color="yellow">📈 Sparkline Example: Server RPS Over 24 Hours</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Sparkline 
-          data={rpsData}
-          width={50}
-          mode="block"
-          caption="Requests per second (24h trend)"
-        />
-        <Text dimColor>Peak: {Math.max(...rpsData)} RPS | Average: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)} RPS</Text>
-      </Box>
-      <Text> </Text>
-
-      {/* Color Gradient Demo */}
-      <Text bold color="yellow">🎨 Sparkline Gradient Color Schemes</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text>8-level gradients (55, 62, 68, 74, 79, 84, 89, 94):</Text>
-        <Text> </Text>
-        <Text>Red:   </Text>
-        <Sparkline 
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="red"
-          mode="block"
-        />
-        <Text>Blue:  </Text>
-        <Sparkline 
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="blue"
-          mode="block"
-        />
-        <Text>Green: </Text>
-        <Sparkline 
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="green"
-          mode="block"
-        />
-      </Box>
-      <Text> </Text>
-
       {/* BarChart Category Example */}
       <Text bold color="yellow">📊 BarChart Example: Department Performance</Text>
       <Box flexDirection="column" marginLeft={2}>
@@ -293,6 +248,126 @@ function StaticDemo(): React.ReactElement {
           format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
         />
       </Box>
+      <Text> </Text>
+
+      {/* LineGraph Example */}
+      <Text bold color="yellow">📉 LineGraph: Temperature Trend</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>High-resolution with 5 vertical levels per row (⎺ ⎻ ─ ⎼ ⎽)</Text>
+        <LineGraph
+          data={[{ values: [15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18], color: 'cyan' }]}
+          width={40}
+          height={6}
+          xLabels={['Jan', 'Dec']}
+          caption="Monthly temperature (°C)"
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* LineGraph with Multiple Series */}
+      <Text bold color="yellow">📉 LineGraph: Multi-Series Comparison</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text dimColor>Red: 2023, Cyan: 2024 (overlapping areas show first series)</Text>
+        <LineGraph
+          data={[
+            { values: [100, 105, 110, 120, 130, 125, 115, 110, 105, 100], color: 'red' },
+            { values: [120, 115, 110, 115, 120, 130, 140, 150, 155, 160], color: 'cyan' },
+          ]}
+          width={50}
+          height={6}
+          yLabels={[100, 140, 160]}
+          xLabels={['Q1', 'Q2', 'Q3', 'Q4']}
+        />
+      </Box>
+      <Text> </Text>
+
+      {/* Sparkline RPS Example */}
+      <Text bold color="yellow">📈 Sparkline Example: Server RPS Over 24 Hours</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Sparkline
+          data={rpsData}
+          width={50}
+          mode="block"
+          caption="Requests per second (24h trend)"
+        />
+        <Text dimColor>Peak: {Math.max(...rpsData)} RPS | Average: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)} RPS</Text>
+      </Box>
+      <Text> </Text>
+
+      {/* Color Gradient Demo */}
+      <Text bold color="yellow">🎨 Sparkline Gradient Color Schemes</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <Text>8-level gradients (55, 62, 68, 74, 79, 84, 89, 94):</Text>
+        <Text> </Text>
+        <Text>Red:   </Text>
+        <Sparkline
+          data={thresholdData}
+          width={50}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="red"
+          mode="block"
+        />
+        <Text>Blue:  </Text>
+        <Sparkline
+          data={thresholdData}
+          width={50}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="blue"
+          mode="block"
+        />
+        <Text>Green: </Text>
+        <Sparkline
+          data={thresholdData}
+          width={50}
+          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
+          colorScheme="green"
+          mode="block"
+        />
+      </Box>
+    </Box>
+  );
+}
+
+/**
+ * Dynamic LineGraph demo with simulated stock prices
+ */
+function DynamicLineGraphDemo() {
+  const [stockA, setStockA] = useState<number[]>([100, 102, 98, 105, 103, 108, 106, 110, 107, 112, 109, 115, 112, 118, 115, 120]);
+  const [stockB, setStockB] = useState<number[]>([95, 97, 100, 96, 99, 102, 98, 105, 101, 108, 104, 110, 107, 112, 109, 114]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStockA(prev => {
+        const lastValue = prev[prev.length - 1] ?? 100;
+        const change = (Math.random() - 0.5) * 6;
+        const newValue = Math.max(80, Math.min(140, lastValue + change));
+        return [...prev.slice(1), newValue];
+      });
+      setStockB(prev => {
+        const lastValue = prev[prev.length - 1] ?? 95;
+        const change = (Math.random() - 0.5) * 5;
+        const newValue = Math.max(75, Math.min(135, lastValue + change));
+        return [...prev.slice(1), newValue];
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <Box flexDirection="column">
+      <Text dimColor>Red: Stock A, Blue: Stock B</Text>
+      <LineGraph
+        data={[
+          { values: stockA, color: 'red' },
+          { values: stockB, color: 'blue' },
+        ]}
+        width={50}
+        height={6}
+        yDomain={[70, 145]}
+        showYAxis={true}
+      />
+      <Text dimColor>A: ${stockA[stockA.length - 1]?.toFixed(1)} | B: ${stockB[stockB.length - 1]?.toFixed(1)}</Text>
     </Box>
   );
 }
@@ -317,6 +392,12 @@ function DynamicDemo(): React.ReactElement {
       <Text bold color="yellow">⚡ Live System Stats</Text>
       <Box flexDirection="column" marginLeft={2}>
         <DynamicSystemDemo />
+      </Box>
+
+      {/* Dynamic LineGraph */}
+      <Text bold color="yellow">📉 Live Stock Prices</Text>
+      <Box flexDirection="column" marginLeft={2}>
+        <DynamicLineGraphDemo />
       </Box>
     </Box>
   );
