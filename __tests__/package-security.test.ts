@@ -56,7 +56,7 @@ describe('Package Configuration Security', () => {
     test('should have engines specification', () => {
       expect(packageJson.engines).toBeDefined();
       expect(packageJson.engines.node).toBeDefined();
-      expect(packageJson.engines.node).toBe('>=18.0.0');
+      expect(packageJson.engines.node).toBe('>=20.0.0');
     });
 
     test('should have security-focused keywords', () => {
