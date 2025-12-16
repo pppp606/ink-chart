@@ -100,7 +100,7 @@
     "globals": "^16.2.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.33.2",
-    "ink": "^4.4.1",
+    "ink": "^6.5.1",
     "ink-testing-library": "^4.0.0",
     "jest": "^29.7.0",
     "js-yaml": "^4.1.0",
