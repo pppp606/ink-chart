@@ -2,14 +2,17 @@
 
 /**
  * Demo CLI application for ink-chart components
- * 
+ *
  * This demo showcases both Sparkline and BarChart components with realistic
  * data examples that demonstrate key features like auto-scaling, sorting,
  * threshold highlighting, and value positioning.
  */
 
 import React, { useState, useEffect } from 'react';
-import { render, Box, Text } from 'ink';
+import { render, Box, Text, Newline } from 'ink';
+
+// Prevent MaxListenersExceededWarning from ink's SIGWINCH handlers
+process.setMaxListeners(20);
 import { Sparkline, BarChart, BarChartData, StackedBarChart, LineGraph } from '../src/index.js';
 
 /**
@@ -19,12 +22,12 @@ import { Sparkline, BarChart, BarChartData, StackedBarChart, LineGraph } from '.
 function generateRpsData(): number[] {
   // Realistic RPS data showing daily server load pattern
   // Values represent requests per second throughout a day
-  return [45, 52, 48, 67, 71, 58, 63, 89, 94, 82, 76, 69, 55, 51, 
+  return [45, 52, 48, 67, 71, 58, 63, 89, 94, 82, 76, 69, 55, 51,
           48, 44, 39, 42, 38, 35, 41, 47, 52, 58];
 }
 
 /**
- * Generate realistic business category data  
+ * Generate realistic business category data
  * Represents different department performance metrics
  */
 function generateCategoryData(): BarChartData[] {
@@ -67,7 +70,7 @@ function DynamicSparklineDemo() {
   return (
     <Box flexDirection="column">
       <Text>Live RPS Trend (rolling window):</Text>
-      <Sparkline 
+      <Sparkline
         data={rpsHistory}
         width={50}
         mode="block"
@@ -104,7 +107,7 @@ function DynamicSystemDemo() {
       // Simulate realistic CPU usage changes
       setCpuData(prev => prev.map(process => ({
         ...process,
-        value: Math.max(0.1, Math.min(35, 
+        value: Math.max(0.1, Math.min(35,
           process.value + (Math.random() - 0.5) * 3
         ))
       })));
@@ -116,7 +119,7 @@ function DynamicSystemDemo() {
   return (
     <Box flexDirection="column" height={8}>
       <Text>Memory: {memoryUsage.toFixed(1)}%</Text>
-      <BarChart 
+      <BarChart
         data={[{ label: 'RAM Used', value: memoryUsage, color: '#d89612' }]}
         width={50}
         max={100}
@@ -126,7 +129,7 @@ function DynamicSystemDemo() {
       <Text> </Text>
       <Text>CPU by Process:</Text>
       <Box height={4}>
-        <BarChart 
+        <BarChart
           data={cpuData}
           width={50}
           showValue="right"
@@ -141,7 +144,56 @@ function DynamicSystemDemo() {
 
 
 /**
- * Static demo - all chart examples without updates
+ * Horizontal divider component
+ */
+function Divider(): React.ReactElement {
+  return (
+    <Box
+      borderStyle={{
+        topLeft: '',
+        top: '',
+        topRight: '',
+        left: '',
+        bottomLeft: '',
+        bottom: '─',
+        bottomRight: '',
+        right: ''
+      }}
+      borderDimColor
+      marginBottom={1}
+    />
+  );
+}
+
+/**
+ * Row header component
+ */
+function RowHeader({ children }: { children: string }): React.ReactElement {
+  return <Text bold color="cyan">◼ {children}</Text>;
+}
+
+/**
+ * Demo card component wrapper
+ */
+interface DemoCardProps {
+  feature: string;
+  description: string;
+  children: React.ReactNode;
+  width?: number;
+}
+
+function DemoCard({ feature, description, children, width = 45 }: DemoCardProps): React.ReactElement {
+  return (
+    <Box flexDirection="column" width={width} marginRight={2}>
+      <Text bold color="yellow">{feature}</Text>
+      <Text dimColor>{description}</Text>
+      {children}
+    </Box>
+  );
+}
+
+/**
+ * Static demo - all chart examples in a flex grid layout
  */
 function StaticDemo(): React.ReactElement {
   const rpsData = generateRpsData();
@@ -150,179 +202,145 @@ function StaticDemo(): React.ReactElement {
 
   return (
     <Box flexDirection="column" padding={1}>
-      <Text bold color="cyan">🚀 ink-chart Demo - Static Examples</Text>
-      <Text dimColor>Press &apos;q&apos; + Enter to quit or Ctrl+C</Text>
-      <Text> </Text>
-      
-      {/* BarChart Category Example */}
-      <Text bold color="yellow">📊 BarChart Example: Department Performance</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <BarChart 
-          data={categoryData}
-          sort="desc"
-          showValue="right"
-          width={50}
-          format={(value) => `${value}`}
-        />
-      </Box>
-      <Text> </Text>
+      <Text bold color="cyan">▄▄ ▄▄  ▄▄ ▄▄ ▄▄      ▄▄▄ ▄▄ ▄▄  ▄▄▄  ▄▄▄▄ ▄▄▄▄</Text>
+      <Text bold color="cyan">██ ███▄██ ██▄█▀ ▄▄▄ ██▀▀ ██▄██ ██▀██ ██▄█▄ ██</Text>
+      <Text bold color="cyan">██ ██ ▀██ ██ ██     ▀███ ██ ██ ██▀██ ██ ██ ██</Text>
+      <Newline />
 
-      {/* Colored BarChart Demo */}
-      <Text bold color="yellow">🎨 BarChart Multi-Color Example</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <BarChart
-          data={[
-            { label: 'Success', value: 22, color: '#4aaa1a' },
-            { label: 'Warnings', value: 8, color: '#d89612' },
-            { label: 'Errors', value: 15, color: '#a61d24' }
-          ]}
-          sort="none"
-          showValue="right"
-          width={50}
-        />
-      </Box>
-      <Text> </Text>
+      {/* Row 1: BarChart examples */}
+      <RowHeader>BarChart</RowHeader>
+      <Box flexDirection="row" flexWrap="wrap" marginLeft={2}>
+        <DemoCard feature="Sort & Format" description="Sorted descending with values">
+          <BarChart
+            data={categoryData}
+            sort="desc"
+            showValue="right"
+            width={40}
+            format={(value) => `${value}`}
+          />
+        </DemoCard>
 
-      {/* BarChart Character Styles */}
-      <Text bold color="yellow">📊 BarChart Character Styles</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>Different bar characters for visual variety</Text>
-        <BarChart
-          data={[
-            { label: 'API', value: 85, char: '▆' },
-            { label: 'DB', value: 65, char: '▓' },
-            { label: 'Cache', value: 92, char: '▒' }
-          ]}
-          sort="none"
-          showValue="right"
-          width={45}
-          max={100}
-        />
-      </Box>
-      <Text> </Text>
+        <DemoCard feature="Multi-Color" description="Per-bar color customization">
+          <BarChart
+            data={[
+              { label: 'Success', value: 22, color: '#4aaa1a' },
+              { label: 'Warnings', value: 8, color: '#d89612' },
+              { label: 'Errors', value: 15, color: '#a61d24' }
+            ]}
+            sort="none"
+            showValue="right"
+            width={40}
+          />
+        </DemoCard>
 
-      {/* StackedBarChart Example */}
-      <Text bold color="yellow">📊 StackedBarChart Example: Distribution</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>100% stacked bar showing percentage distribution</Text>
-        <StackedBarChart
-          data={[
-            { label: 'Sales', value: 30, color: '#4aaa1a' },
-            { label: 'Warning', value: 20, color: '#d89612' },
-            { label: 'Error', value: 50, color: '#a61d24' }
-          ]}
-          width={50}
-        />
+        <DemoCard feature="Character Styles" description="Custom bar characters">
+          <BarChart
+            data={[
+              { label: 'API', value: 85, char: '▆' },
+              { label: 'DB', value: 65, char: '▓' },
+              { label: 'Cache', value: 92, char: '▒' }
+            ]}
+            sort="none"
+            showValue="right"
+            width={35}
+            max={100}
+          />
+        </DemoCard>
       </Box>
-      <Text> </Text>
+      <Divider />
 
-      {/* StackedBarChart Example 2 */}
-      <Text bold color="yellow">🎯 StackedBarChart: Project Time Allocation</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <StackedBarChart
-          data={[
-            { label: 'Development', value: 45, color: '#1890ff' },
-            { label: 'Testing', value: 25, color: '#52c41a' },
-            { label: 'Planning', value: 15, color: '#faad14' },
-            { label: 'Meetings', value: 15, color: '#f5222d' }
-          ]}
-          width={60}
-          format={(v) => `${v.toFixed(0)}%`}
-        />
+      {/* Row 2: StackedBarChart examples */}
+      <RowHeader>StackedBarChart</RowHeader>
+      <Box flexDirection="row" flexWrap="wrap" marginLeft={2}>
+        <DemoCard feature="Percentage Mode" description="100% stacked bar">
+          <StackedBarChart
+            data={[
+              { label: 'Sales', value: 30, color: '#4aaa1a' },
+              { label: 'Warning', value: 20, color: '#d89612' },
+              { label: 'Error', value: 50, color: '#a61d24' }
+            ]}
+            width={40}
+          />
+        </DemoCard>
+
+        <DemoCard feature="Custom Format" description="Custom value formatter">
+          <StackedBarChart
+            data={[
+              { label: 'Development', value: 45, color: '#1890ff' },
+              { label: 'Testing', value: 25, color: '#52c41a' },
+              { label: 'Planning', value: 15, color: '#faad14' },
+              { label: 'Meetings', value: 15, color: '#f5222d' }
+            ]}
+            width={40}
+            format={(v) => `${v.toFixed(0)}%`}
+          />
+        </DemoCard>
+
+        <DemoCard feature="Absolute Mode" description="Absolute values (max 100)">
+          <StackedBarChart
+            data={[
+              { label: 'CPU', value: 45, color: '#1890ff' },
+              { label: 'Memory', value: 30, color: '#52c41a' },
+              { label: 'Disk', value: 15, color: '#faad14' }
+            ]}
+            mode="absolute"
+            max={100}
+            width={40}
+            format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
+          />
+        </DemoCard>
       </Box>
-      <Text> </Text>
+      <Divider />
 
-      {/* StackedBarChart Absolute Mode Example */}
-      <Text bold color="yellow">📈 StackedBarChart (Absolute Mode): Server Resources</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>Showing absolute values (out of 100 max)</Text>
-        <StackedBarChart
-          data={[
-            { label: 'CPU', value: 45, color: '#1890ff' },
-            { label: 'Memory', value: 30, color: '#52c41a' },
-            { label: 'Disk', value: 15, color: '#faad14' }
-          ]}
-          mode="absolute"
-          max={100}
-          width={60}
-          format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
-        />
+      {/* Row 3: LineGraph examples */}
+      <RowHeader>LineGraph</RowHeader>
+      <Box flexDirection="row" flexWrap="wrap" marginLeft={2}>
+        <DemoCard feature="X-Labels & Caption" description="High-res 5 levels/row">
+          <LineGraph
+            data={[{ values: [15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18], color: 'cyan' }]}
+            width={40}
+            height={6}
+            xLabels={['Jan', 'Dec']}
+            caption="Monthly temperature (C)"
+          />
+        </DemoCard>
+
+        <DemoCard feature="Multi-Series" description="Multiple data series overlay">
+          <LineGraph
+            data={[
+              { values: [100, 105, 110, 120, 120, 110, 115, 110, 105, 100], color: 'red' },
+              { values: [120, 115, 110, 110, 115, 130, 135, 140, 145, 150], color: 'cyan' },
+            ]}
+            width={40}
+            height={6}
+            yLabels={[100, 140, 160]}
+            xLabels={['Q1', 'Q2', 'Q3', 'Q4']}
+            caption="Red: 2023, Cyan: 2024"
+          />
+        </DemoCard>
       </Box>
-      <Text> </Text>
+      <Divider />
 
-      {/* LineGraph Example */}
-      <Text bold color="yellow">📉 LineGraph: Temperature Trend</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>High-resolution with 5 vertical levels per row (⎺ ⎻ ─ ⎼ ⎽)</Text>
-        <LineGraph
-          data={[{ values: [15, 18, 22, 25, 28, 32, 35, 33, 30, 26, 22, 18], color: 'cyan' }]}
-          width={40}
-          height={6}
-          xLabels={['Jan', 'Dec']}
-          caption="Monthly temperature (°C)"
-        />
-      </Box>
-      <Text> </Text>
+      {/* Row 4: Sparkline examples */}
+      <RowHeader>Sparkline</RowHeader>
+      <Box flexDirection="row" flexWrap="wrap" marginLeft={2}>
+        <DemoCard feature="Block Mode" description="Block character rendering">
+          <Sparkline
+            data={rpsData}
+            width={40}
+            mode="block"
+            caption="Requests per second"
+          />
+          <Text dimColor>Peak: {Math.max(...rpsData)} | Avg: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)}</Text>
+        </DemoCard>
 
-      {/* LineGraph with Multiple Series */}
-      <Text bold color="yellow">📉 LineGraph: Multi-Series Comparison</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text dimColor>Red: 2023, Cyan: 2024 (overlapping areas show first series)</Text>
-        <LineGraph
-          data={[
-            { values: [100, 105, 110, 120, 130, 125, 115, 110, 105, 100], color: 'red' },
-            { values: [120, 115, 110, 115, 120, 130, 140, 150, 155, 160], color: 'cyan' },
-          ]}
-          width={50}
-          height={6}
-          yLabels={[100, 140, 160]}
-          xLabels={['Q1', 'Q2', 'Q3', 'Q4']}
-        />
-      </Box>
-      <Text> </Text>
-
-      {/* Sparkline RPS Example */}
-      <Text bold color="yellow">📈 Sparkline Example: Server RPS Over 24 Hours</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Sparkline
-          data={rpsData}
-          width={50}
-          mode="block"
-          caption="Requests per second (24h trend)"
-        />
-        <Text dimColor>Peak: {Math.max(...rpsData)} RPS | Average: {Math.round(rpsData.reduce((a,b) => a+b) / rpsData.length)} RPS</Text>
-      </Box>
-      <Text> </Text>
-
-      {/* Color Gradient Demo */}
-      <Text bold color="yellow">🎨 Sparkline Gradient Color Schemes</Text>
-      <Box flexDirection="column" marginLeft={2}>
-        <Text>8-level gradients (55, 62, 68, 74, 79, 84, 89, 94):</Text>
-        <Text> </Text>
-        <Text>Red:   </Text>
-        <Sparkline
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="red"
-          mode="block"
-        />
-        <Text>Blue:  </Text>
-        <Sparkline
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="blue"
-          mode="block"
-        />
-        <Text>Green: </Text>
-        <Sparkline
-          data={thresholdData}
-          width={50}
-          threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-          colorScheme="green"
-          mode="block"
-        />
+        <DemoCard feature="Gradient Color Schemes" description="8-level threshold gradients" width={55}>
+          <Box flexDirection="column">
+            <Box><Text>Red:   </Text><Sparkline data={thresholdData} width={40} threshold={[55, 62, 68, 74, 79, 84, 89, 94]} colorScheme="red" mode="block" /></Box>
+            <Box><Text>Blue:  </Text><Sparkline data={thresholdData} width={40} threshold={[55, 62, 68, 74, 79, 84, 89, 94]} colorScheme="blue" mode="block" /></Box>
+            <Box><Text>Green: </Text><Sparkline data={thresholdData} width={40} threshold={[55, 62, 68, 74, 79, 84, 89, 94]} colorScheme="green" mode="block" /></Box>
+          </Box>
+        </DemoCard>
       </Box>
     </Box>
   );
@@ -431,7 +449,7 @@ function setupExitHandling(unmount: () => void) {
       }
     });
   }
-  
+
   // Handle Ctrl+C
   process.on('SIGINT', () => {
     unmount();
