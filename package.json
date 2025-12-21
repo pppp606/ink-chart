@@ -102,7 +102,6 @@
     "ink": "^6.5.1",
     "ink-testing-library": "^4.0.0",
     "jest": "^29.7.0",
-    "js-yaml": "^4.1.0",
     "license-checker": "^25.0.1",
     "prettier": "^3.2.5",
     "react": "^19.2.3",

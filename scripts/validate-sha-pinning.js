@@ -3,11 +3,12 @@
 /**
  * Validation script to check that GitHub Actions are pinned to specific SHAs
  * This script will fail if any action uses version tags instead of commit SHAs
+ *
+ * Note: Uses regex-based parsing to avoid external YAML dependencies
  */
 
 import fs from 'fs';
 import path from 'path';
-import yaml from 'js-yaml';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -23,40 +24,28 @@ const EXPECTED_ACTIONS = [
   'actions/create-release'
 ];
 
+// Regex to match "uses:" lines in workflow files
+const USES_PATTERN = /^\s*-?\s*uses:\s*['"]?([^@\s'"]+)@([^\s'"#]+)/gm;
+
 function validateWorkflowFile(filePath) {
   console.log(`\nValidating ${path.basename(filePath)}...`);
 
   const content = fs.readFileSync(filePath, 'utf8');
-  const workflow = yaml.load(content);
-
   const violations = [];
 
-  function checkSteps(steps, jobName = '') {
-    if (!steps) return;
+  let match;
+  while ((match = USES_PATTERN.exec(content)) !== null) {
+    const actionName = match[1];
+    const version = match[2];
 
-    steps.forEach((step, index) => {
-      if (step.uses) {
-        const [actionName, version] = step.uses.split('@');
-
-        if (EXPECTED_ACTIONS.includes(actionName)) {
-          if (!version || !SHA_PATTERN.test(version)) {
-            violations.push({
-              job: jobName,
-              step: index + 1,
-              action: step.uses,
-              issue: version ? `Using version tag "${version}" instead of SHA` : 'Missing version/SHA'
-            });
-          }
-        }
+    if (EXPECTED_ACTIONS.includes(actionName)) {
+      if (!version || !SHA_PATTERN.test(version)) {
+        violations.push({
+          action: `${actionName}@${version}`,
+          issue: version ? `Using version tag "${version}" instead of SHA` : 'Missing version/SHA'
+        });
       }
-    });
-  }
-
-  // Check all jobs
-  if (workflow.jobs) {
-    Object.entries(workflow.jobs).forEach(([jobName, job]) => {
-      checkSteps(job.steps, jobName);
-    });
+    }
   }
 
   return violations;
@@ -90,7 +79,7 @@ function main() {
     } else {
       console.log(`❌ Found ${violations.length} violations:`);
       violations.forEach(violation => {
-        console.log(`  - Job "${violation.job}", Step ${violation.step}: ${violation.action}`);
+        console.log(`  - ${violation.action}`);
         console.log(`    ${violation.issue}`);
       });
     }
