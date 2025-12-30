@@ -152,7 +152,7 @@ describe('Security Scanning', () => {
         // Test that workflows don't have excessive permissions
         expect(workflow).not.toMatch(/permissions:\s*write-all/);
         // Allow contents:write for release workflows and provenance
-        if (!workflow.includes('create-release') && !workflow.includes('provenance')) {
+        if (!workflow.includes('create-release') && !workflow.includes('provenance') && !workflow.includes('Release Drafter')) {
           expect(workflow).not.toMatch(/contents:\s*write/);
         }
       });
