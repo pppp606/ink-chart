@@ -1,6 +1,6 @@
 {
   "name": "@pppp606/ink-chart",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Small visualization components for ink CLI framework",
   "type": "module",
   "main": "dist/index.js",
