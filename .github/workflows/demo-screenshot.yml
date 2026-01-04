@@ -7,6 +7,13 @@ on:
       - 'src/**'
       - 'bin/**'
       - 'demo.tape'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'bin/**'
+      - 'demo.tape'
+      - '.github/workflows/demo-screenshot.yml'
   workflow_dispatch:
 
 jobs:
@@ -36,7 +43,16 @@ jobs:
         with:
           path: 'demo.tape'
 
+      - name: Upload screenshot as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-screenshots
+          path: |
+            assets/demo-preview.png
+            assets/demo-preview.gif
+
       - name: Commit and push if changed
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
