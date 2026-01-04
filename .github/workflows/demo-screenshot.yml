@@ -38,10 +38,22 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Install ffmpeg
+        run: sudo apt-get update && sudo apt-get install -y ffmpeg
+
+      - name: Install ttyd
+        run: |
+          curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o ttyd
+          chmod +x ttyd
+          sudo mv ttyd /usr/local/bin/
+
+      - name: Install VHS
+        run: |
+          curl -fsSL https://github.com/charmbracelet/vhs/releases/download/v0.8.0/vhs_0.8.0_linux_amd64.tar.gz | tar xz
+          sudo mv vhs /usr/local/bin/
+
       - name: Generate demo screenshot with VHS
-        uses: charmbracelet/vhs-action@v2
-        with:
-          path: 'demo.tape'
+        run: vhs demo.tape
 
       - name: Upload screenshot as artifact
         uses: actions/upload-artifact@v4
