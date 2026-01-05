@@ -90,7 +90,9 @@ jobs:
           vhs --version
 
       - name: Generate demo screenshot with VHS
-        run: /usr/local/bin/vhs demo.tape
+        run: |
+          rm -f assets/demo-preview.png
+          /usr/local/bin/vhs demo.tape
 
       - name: Debug - Check generated files
         run: |
