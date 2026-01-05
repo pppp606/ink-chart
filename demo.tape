@@ -11,4 +11,4 @@ Set Padding 20
 Type "node build/bin/demo.js"
 Enter
 Sleep 2s
-Screenshot assets/demo-preview.png
+Screenshot demo-preview.png
