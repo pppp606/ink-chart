@@ -91,7 +91,7 @@ jobs:
 
       - name: Generate demo screenshot with VHS
         run: |
-          rm -f assets/demo-preview.png
+          rm -rf assets/demo-preview.png
           /usr/local/bin/vhs demo.tape
 
       - name: Debug - Check generated files
