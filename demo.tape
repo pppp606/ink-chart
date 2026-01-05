@@ -5,8 +5,8 @@ Output assets/demo-preview.png
 
 Set Shell "bash"
 Set FontSize 14
-Set Width 1200
-Set Height 800
+Set Width 1000
+Set Height 700
 Set Padding 20
 
 # Run demo (build is done in CI beforehand)
