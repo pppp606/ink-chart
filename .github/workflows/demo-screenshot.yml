@@ -57,12 +57,7 @@ jobs:
           vhs --version
 
       - name: Generate demo screenshot with VHS
-        run: vhs demo.tape
-        env:
-          # Only expose minimal environment variables to VHS
-          PATH: ${{ env.PATH }}
-          HOME: ${{ env.HOME }}
-          NODE_VERSION: ${{ env.NODE_VERSION }}
+        run: /usr/local/bin/vhs demo.tape
 
       - name: Upload screenshot as artifact
         uses: actions/upload-artifact@v4
