@@ -71,8 +71,11 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Install screenshot dependencies
+        run: npm install ansi-to-image
+
       - name: Generate demo screenshot
-        run: node build/bin/demo.js | npx ansi-to-image --output assets/demo-preview.png
+        run: node scripts/generate-screenshot.js
 
       - name: Upload screenshot as artifact
         uses: actions/upload-artifact@v4
