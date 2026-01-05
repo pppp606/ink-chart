@@ -92,7 +92,9 @@ jobs:
       - name: Generate demo screenshot with VHS
         run: |
           /usr/local/bin/vhs demo.tape
-          mv demo-preview.png assets/demo-preview.png
+          # Extract last frame from GIF as PNG
+          ffmpeg -i demo-preview.gif -vf "select=eq(n\,$(ffprobe -v error -select_streams v -count_frames -show_entries stream=nb_read_frames -of csv=p=0 demo-preview.gif | tr -d ' ')-1)" -frames:v 1 assets/demo-preview.png -y
+          rm demo-preview.gif
 
       - name: Debug - Check generated files
         run: |

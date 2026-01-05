@@ -1,6 +1,8 @@
 # VHS tape file for generating demo screenshot
 # https://github.com/charmbracelet/vhs
 
+Output demo-preview.gif
+
 Set Shell "bash"
 Set FontSize 14
 Set Width 1000
@@ -11,4 +13,3 @@ Set Padding 20
 Type "node build/bin/demo.js"
 Enter
 Sleep 2s
-Screenshot demo-preview.png
