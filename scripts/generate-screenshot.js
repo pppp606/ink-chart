@@ -4,7 +4,6 @@
  */
 import { spawn } from 'child_process';
 import AnsiToImage from 'ansi-to-image';
-import { writeFileSync } from 'fs';
 
 // Capture demo output
 const demo = spawn('node', ['build/bin/demo.js'], {
@@ -27,7 +26,7 @@ demo.on('close', async (code) => {
   }
 
   try {
-    const result = await AnsiToImage(output, {
+    await AnsiToImage(output, {
       filename: 'assets/demo-preview.png',
       scale: 2,
       fontFamily: 'JetBrains Mono, monospace'
