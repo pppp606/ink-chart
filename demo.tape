@@ -12,4 +12,4 @@ Set Padding 20
 # Run demo (build is done in CI beforehand)
 Type "node bin/demo.js"
 Enter
-Sleep 3s
+Sleep 2s
