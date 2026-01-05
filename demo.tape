@@ -8,7 +8,7 @@ Set Height 700
 Set Padding 20
 
 # Run demo (build is done in CI beforehand)
-Type "node bin/demo.js"
+Type "node build/bin/demo.js"
 Enter
 Sleep 2s
 Screenshot assets/demo-preview.png
