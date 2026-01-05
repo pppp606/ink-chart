@@ -6,13 +6,11 @@ on:
     paths:
       - 'src/**'
       - 'bin/**'
-      - 'demo.tape'
   pull_request:
     branches: [main]
     paths:
       - 'src/**'
       - 'bin/**'
-      - 'demo.tape'
       - '.github/workflows/demo-screenshot.yml'
   workflow_dispatch:
 
@@ -73,41 +71,8 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Install ffmpeg
-        run: sudo apt-get update && sudo apt-get install -y ffmpeg
-
-      - name: Install ttyd
-        run: |
-          curl -fsSL https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.x86_64 -o ttyd
-          chmod +x ttyd
-          sudo mv ttyd /usr/local/bin/
-
-      - name: Install VHS
-        run: |
-          curl -fsSL https://github.com/charmbracelet/vhs/releases/download/v0.10.0/vhs_0.10.0_Linux_x86_64.tar.gz -o vhs.tar.gz
-          tar xzf vhs.tar.gz
-          sudo mv vhs_0.10.0_Linux_x86_64/vhs /usr/local/bin/ || sudo mv vhs /usr/local/bin/ || sudo find . -name 'vhs' -type f -exec mv {} /usr/local/bin/ \;
-          vhs --version
-
-      - name: Generate demo screenshot with VHS
-        run: |
-          /usr/local/bin/vhs demo.tape
-          # Extract last frame from GIF as PNG
-          ffmpeg -i demo-preview.gif -vf "select=eq(n\,$(ffprobe -v error -select_streams v -count_frames -show_entries stream=nb_read_frames -of csv=p=0 demo-preview.gif | tr -d ' ')-1)" -frames:v 1 assets/demo-preview.png -y
-          rm demo-preview.gif
-
-      - name: Debug - Check generated files
-        run: |
-          echo "=== Current directory ==="
-          pwd
-          echo "=== All PNG files ==="
-          find . -name "*.png" -type f 2>/dev/null || echo "No PNG files found"
-          echo "=== Assets directory ==="
-          ls -la assets/ || echo "assets directory not found"
-          echo "=== Root directory ==="
-          ls -la
-          echo "=== Git status ==="
-          git status
+      - name: Generate demo screenshot
+        run: node build/bin/demo.js | npx ansi-to-image --output assets/demo-preview.png
 
       - name: Upload screenshot as artifact
         uses: actions/upload-artifact@v4
