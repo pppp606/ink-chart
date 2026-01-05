@@ -98,12 +98,14 @@ jobs:
         run: |
           echo "=== Current directory ==="
           pwd
+          echo "=== All PNG files ==="
+          find . -name "*.png" -type f 2>/dev/null || echo "No PNG files found"
           echo "=== Assets directory ==="
           ls -la assets/ || echo "assets directory not found"
+          echo "=== Root directory ==="
+          ls -la
           echo "=== Git status ==="
           git status
-          echo "=== File hash ==="
-          md5sum assets/demo-preview.png || echo "PNG not found"
 
       - name: Upload screenshot as artifact
         uses: actions/upload-artifact@v4
