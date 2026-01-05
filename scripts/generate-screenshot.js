@@ -3,8 +3,8 @@
  * Generate demo screenshot from ANSI output
  */
 import { spawn } from 'child_process';
-import { mkdirSync } from 'fs';
-import AnsiToImage from 'ansi-to-image';
+import { mkdirSync, writeFileSync } from 'fs';
+import ansiToSVG from 'ansi-to-svg';
 
 // Ensure assets directory exists
 mkdirSync('assets', { recursive: true });
@@ -23,19 +23,21 @@ demo.stderr.on('data', (data) => {
   console.error(data.toString());
 });
 
-demo.on('close', async (code) => {
-  if (code !== 0) {
+demo.on('close', (code) => {
+  if (code !== 0 && code !== null) {
     console.error(`Demo exited with code ${code}`);
     process.exit(1);
   }
 
   try {
-    await AnsiToImage(output, {
-      filename: 'assets/demo-preview.png',
-      scale: 2,
-      fontFamily: 'JetBrains Mono, monospace'
+    const svg = ansiToSVG(output, {
+      paddingTop: 20,
+      paddingBottom: 20,
+      paddingLeft: 20,
+      paddingRight: 20
     });
-    console.log('Screenshot saved to assets/demo-preview.png');
+    writeFileSync('assets/demo-preview.svg', svg);
+    console.log('Screenshot saved to assets/demo-preview.svg');
   } catch (err) {
     console.error('Failed to generate image:', err);
     process.exit(1);
