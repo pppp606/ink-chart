@@ -3,7 +3,11 @@
  * Generate demo screenshot from ANSI output
  */
 import { spawn } from 'child_process';
+import { mkdirSync } from 'fs';
 import AnsiToImage from 'ansi-to-image';
+
+// Ensure assets directory exists
+mkdirSync('assets', { recursive: true });
 
 // Capture demo output
 const demo = spawn('node', ['build/bin/demo.js'], {
