@@ -72,7 +72,7 @@ jobs:
         run: npm run build
 
       - name: Install screenshot dependencies
-        run: npm install ansi-to-svg sharp
+        run: npm install ansi-to-svg
 
       - name: Generate demo screenshot
         run: node scripts/generate-screenshot.js
@@ -81,12 +81,12 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: demo-screenshots
-          path: assets/demo-preview.png
+          path: assets/demo-preview.svg
 
       - name: Commit and push if changed
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add assets/demo-preview.png
+          git add assets/demo-preview.svg
           git diff --staged --quiet || git commit -m "chore: update demo screenshot [skip ci]"
           git push
