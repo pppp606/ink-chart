@@ -11,7 +11,7 @@ mkdirSync('assets', { recursive: true });
 
 // Capture demo output with wider terminal for flex layout
 const demo = spawn('node', ['build/bin/demo.js'], {
-  env: { ...process.env, FORCE_COLOR: '1', COLUMNS: '300' }
+  env: { ...process.env, FORCE_COLOR: '1', COLUMNS: '150' }
 });
 
 let output = '';
