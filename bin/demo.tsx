@@ -464,5 +464,13 @@ export function main() {
   staticDemo();
 }
 
+// Force terminal columns from environment variable (for CI screenshot generation)
+if (process.env.COLUMNS) {
+  Object.defineProperty(process.stdout, 'columns', {
+    value: parseInt(process.env.COLUMNS, 10),
+    writable: true
+  });
+}
+
 // Auto-run when executed directly
 main();
