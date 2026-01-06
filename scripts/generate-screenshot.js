@@ -3,8 +3,9 @@
  * Generate demo screenshot from ANSI output
  */
 import { spawn } from 'child_process';
-import { mkdirSync, writeFileSync } from 'fs';
+import { mkdirSync } from 'fs';
 import ansiToSVG from 'ansi-to-svg';
+import sharp from 'sharp';
 
 // Ensure assets directory exists
 mkdirSync('assets', { recursive: true });
@@ -23,7 +24,7 @@ demo.stderr.on('data', (data) => {
   console.error(data.toString());
 });
 
-demo.on('close', (code) => {
+demo.on('close', async (code) => {
   if (code !== 0 && code !== null) {
     console.error(`Demo exited with code ${code}`);
     process.exit(1);
@@ -36,8 +37,13 @@ demo.on('close', (code) => {
       paddingLeft: 20,
       paddingRight: 20
     });
-    writeFileSync('assets/demo-preview.svg', svg);
-    console.log('Screenshot saved to assets/demo-preview.svg');
+
+    // Convert SVG to PNG
+    await sharp(Buffer.from(svg))
+      .png()
+      .toFile('assets/demo-preview.png');
+
+    console.log('Screenshot saved to assets/demo-preview.png');
   } catch (err) {
     console.error('Failed to generate image:', err);
     process.exit(1);
