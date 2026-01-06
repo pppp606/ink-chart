@@ -31,12 +31,12 @@ demo.on('close', (code) => {
 
   try {
     const svg = ansiToSVG(output, {
-      fontSize: 16,
-      lineHeight: 1.2,
-      paddingTop: 30,
-      paddingBottom: 30,
-      paddingLeft: 30,
-      paddingRight: 30
+      fontSize: 14,
+      lineHeight: 20,
+      paddingTop: 20,
+      paddingBottom: 20,
+      paddingLeft: 20,
+      paddingRight: 20
     });
     writeFileSync('assets/demo-preview.svg', svg);
     console.log('Screenshot saved to assets/demo-preview.svg');
