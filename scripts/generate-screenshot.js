@@ -9,9 +9,9 @@ import ansiToSVG from 'ansi-to-svg';
 // Ensure assets directory exists
 mkdirSync('assets', { recursive: true });
 
-// Capture demo output
+// Capture demo output with wider terminal
 const demo = spawn('node', ['build/bin/demo.js'], {
-  env: { ...process.env, FORCE_COLOR: '1' }
+  env: { ...process.env, FORCE_COLOR: '1', COLUMNS: '120' }
 });
 
 let output = '';
