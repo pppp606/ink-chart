@@ -9,9 +9,9 @@ import ansiToSVG from 'ansi-to-svg';
 // Ensure assets directory exists
 mkdirSync('assets', { recursive: true });
 
-// Capture demo output with wider terminal
+// Capture demo output with wider terminal for flex layout
 const demo = spawn('node', ['build/bin/demo.js'], {
-  env: { ...process.env, FORCE_COLOR: '1', COLUMNS: '150' }
+  env: { ...process.env, FORCE_COLOR: '1', COLUMNS: '200' }
 });
 
 let output = '';
