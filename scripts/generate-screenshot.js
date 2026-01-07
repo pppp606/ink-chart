@@ -50,7 +50,8 @@ function parseAnsi(ansi) {
     dim: false,
   };
 
-  // ANSI escape sequence regex
+  // ANSI escape sequence regex (ESC [ params m)
+  // eslint-disable-next-line no-control-regex
   const ansiRegex = /\x1b\[([0-9;]*)m/g;
 
   let lastIndex = 0;
