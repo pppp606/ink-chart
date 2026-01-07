@@ -269,14 +269,16 @@ function generateSvg(segments, options = {}) {
     const trimmedText = run.text.replace(/ +$/, ''); // Trim trailing spaces
     if (trimmedText) {
       const color = run.style.foreground || defaultColor;
-      let attrs = `x="${run.x.toFixed(2)}" y="${run.y.toFixed(2)}" fill="${color}"`;
+      // Use textLength to force exact character width positioning
+      const textWidth = trimmedText.length * charWidth;
+      let attrs = `x="${run.x.toFixed(2)}" y="${run.y.toFixed(2)}" fill="${color}" textLength="${textWidth.toFixed(2)}" lengthAdjust="spacingAndGlyphs"`;
       if (run.style.bold) {
         attrs += ' font-weight="bold"';
       }
       if (run.style.dim) {
         attrs += ' opacity="0.5"';
       }
-      svgContent += `<text ${attrs}>${escapeXml(run.text)}</text>`;
+      svgContent += `<text ${attrs}>${escapeXml(trimmedText)}</text>`;
     }
   }
 
