@@ -290,7 +290,12 @@ function generateSvg(segments, options = {}) {
 // Use wrapper script to set stdout.columns BEFORE importing demo (ESM hoists imports)
 const COLUMNS = 150;
 const demo = spawn('node', ['scripts/demo-wrapper.js'], {
-  env: { ...process.env, FORCE_COLOR: '3', COLUMNS: String(COLUMNS) }
+  env: {
+    ...process.env,
+    FORCE_COLOR: '3',
+    COLORTERM: 'truecolor',
+    COLUMNS: String(COLUMNS)
+  }
 });
 
 let output = '';
