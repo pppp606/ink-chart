@@ -287,8 +287,15 @@ function generateSvg(segments, options = {}) {
 }
 
 // Capture demo output with wider terminal for flex layout
-const demo = spawn('node', ['build/bin/demo.js'], {
-  env: { ...process.env, FORCE_COLOR: '3', COLUMNS: '150' }
+// Use inline script to set stdout.columns BEFORE importing demo (ESM hoists imports)
+const COLUMNS = 150;
+const wrapperCode = `
+  Object.defineProperty(process.stdout, 'columns', { value: ${COLUMNS}, writable: true });
+  import('./build/bin/demo.js');
+`;
+const demo = spawn('node', ['--input-type=module', '-e', wrapperCode], {
+  env: { ...process.env, FORCE_COLOR: '3', COLUMNS: String(COLUMNS) },
+  cwd: process.cwd()
 });
 
 let output = '';
