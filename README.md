@@ -4,7 +4,7 @@ Terminal visualization components for [Ink](https://github.com/vadimdemedes/ink)
 
 ## Preview
 
-<img src="./assets/demo-preview.png" alt="Demo Screenshot" width="532" />
+<img src="./assets/demo-preview.svg" alt="Demo Screenshot" width="730" />
 
 ## Features
 
