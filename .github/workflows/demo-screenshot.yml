@@ -71,9 +71,6 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Install screenshot dependencies
-        run: npm install ansi-to-svg
-
       - name: Generate demo screenshot
         run: node scripts/generate-screenshot.js
 
