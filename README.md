@@ -90,6 +90,13 @@ Horizontal bar charts with customizable appearance and individual row colors.
 />
 ```
 
+Output:
+```
+Success  ████████████████████████████████████████████████████████████████████ 22%
+Errors   ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 15%
+Warnings ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒ 8%
+```
+
 **Props:**
 - `data: BarChartData[]` - Array of data points
 - `sort?: 'none' | 'asc' | 'desc'` - Sort order
@@ -114,7 +121,6 @@ interface BarChartData {
 Stacked horizontal bar chart with two modes: 100% percentage distribution or absolute values.
 
 ```tsx
-// Percentage mode (default) - 100% stacked
 <StackedBarChart
   data={[
     { label: 'Sales', value: 30, color: '#4aaa1a' },
@@ -123,18 +129,13 @@ Stacked horizontal bar chart with two modes: 100% percentage distribution or abs
   ]}
   width={50}
 />
+```
 
-// Absolute mode - showing actual values
-<StackedBarChart
-  data={[
-    { label: 'Downloads', value: 1250 },
-    { label: 'Uploads', value: 450 }
-  ]}
-  mode="absolute"
-  max={5000}
-  format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v}`}
-  width={50}
-/>
+Output:
+```
+Sales          Warning   Error
+███████████████▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+30.0%          20.0%     50.0%
 ```
 
 **Props:**
@@ -165,8 +166,7 @@ High-resolution line graph using Unicode scan line characters (⎺ ⎻ ─ ⎼ �
 ```tsx
 <LineGraph
   data={[
-    { values: [100, 120, 115, 130, 125, 140], color: 'red' },
-    { values: [90, 110, 130, 120, 140, 130], color: 'blue' }
+    { values: [100, 120, 115, 130, 125, 140], color: 'red' }
   ]}
   width={50}
   height={6}
@@ -177,12 +177,12 @@ High-resolution line graph using Unicode scan line characters (⎺ ⎻ ─ ⎼ �
 
 Output:
 ```
-   140│            ⎽    ⎽─⎺
-      │    ⎼⎽  ⎽⎼⎽⎽─⎺ ⎽─⎻
-      │ ⎼⎼⎽ ⎽⎼⎼⎼⎽⎽⎽⎼─⎻
-      │⎼──⎼⎼⎼⎼─⎺⎺⎻⎺
-      │⎻⎺─⎺
-    90│⎺─⎻
+   140│                    ⎽─⎺
+      │              ⎽─⎺⎻─⎻
+      │          ⎽⎼─⎺
+      │    ⎽─⎺⎻─⎻
+      │⎽⎼─⎺
+   100│⎺
       └──────────────────────
        Q1                  Q4
 ```
@@ -219,6 +219,12 @@ Compact trend visualization perfect for displaying time series data.
 />
 ```
 
+Output:
+```
+▂▄▃█▅
+Sales Trend
+```
+
 **Props:**
 - `data: number[]` - Array of numeric values
 - `width?: 'auto' | 'full' | number` - Chart width (`'auto'`: data length, `'full'`: terminal width, `number`: fixed width)
@@ -226,192 +232,6 @@ Compact trend visualization perfect for displaying time series data.
 - `colorScheme?: 'red' | 'blue' | 'green'` - Color scheme for gradient highlighting
 - `mode?: 'block' | 'braille'` - Rendering mode
 - `caption?: string` - Optional caption below chart
-
-## Examples
-
-### Gradient Highlighting
-
-```tsx
-// 8-level smooth gradient
-<Sparkline 
-  data={[45, 55, 65, 75, 85, 95, 85, 75]}
-  threshold={[55, 62, 68, 74, 79, 84, 89, 94]}
-  colorScheme="red"
-/>
-```
-
-### Custom Formatting
-
-```tsx
-<BarChart 
-  data={[
-    { label: 'Q1', value: 125000 },
-    { label: 'Q2', value: 180000 }
-  ]}
-  format={(v) => `$${(v/1000)}K`}
-  showValue="right"
-/>
-```
-
-### Individual Colors
-
-```tsx
-<BarChart
-  data={[
-    { label: 'Success', value: 85, color: '#4aaa1a' },
-    { label: 'Warning', value: 12, color: '#d89612' },
-    { label: 'Error', value: 3, color: '#a61d24' }
-  ]}
-/>
-```
-
-### Different Bar Characters
-
-```tsx
-// Full Block (█)
-<BarChart
-  data={[{ label: 'Progress', value: 75 }]}
-  barChar="█"
-  max={100}
-/>
-
-// Dark Shade (▓)
-<BarChart
-  data={[{ label: 'Progress', value: 75 }]}
-  barChar="▓"
-  max={100}
-/>
-
-// Medium Shade (▒)
-<BarChart
-  data={[{ label: 'Progress', value: 75 }]}
-  barChar="▒"
-  max={100}
-/>
-
-// Light Shade (░)
-<BarChart
-  data={[{ label: 'Progress', value: 75 }]}
-  barChar="░"
-  max={100}
-/>
-```
-
-### Stacked Distribution (Percentage Mode)
-
-```tsx
-<StackedBarChart
-  data={[
-    { label: 'Development', value: 45, color: '#1890ff' },
-    { label: 'Testing', value: 25, color: '#52c41a' },
-    { label: 'Planning', value: 15, color: '#faad14' },
-    { label: 'Meetings', value: 15, color: '#f5222d' }
-  ]}
-  width={60}
-  format={(v) => `${v.toFixed(0)}%`}
-/>
-```
-
-Output:
-```
-Development                Testing        Planning Meetings
-████████████████████████████████████████████████████████████
-45%                        25%            15%      15%
-```
-*Colors differentiate segments (not visible in plain text)*
-
-### Stacked Distribution (Absolute Mode)
-
-```tsx
-<StackedBarChart
-  data={[
-    { label: 'CPU', value: 45, color: '#1890ff' },
-    { label: 'Memory', value: 30, color: '#52c41a' },
-    { label: 'Disk', value: 15, color: '#faad14' }
-  ]}
-  mode="absolute"
-  max={100}
-  width={60}
-  format={(v, mode) => mode === 'percentage' ? `${v.toFixed(1)}%` : `${v.toFixed(0)}`}
-/>
-```
-
-Output:
-```
-CPU                        Memory          Disk
-███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒
-45                         30              15
-```
-
-## Demo
-
-Try the interactive demo to see all features in action:
-
-```bash
-# Static examples - all chart features
-npm run demo
-```
-
-The demo showcases:
-
-**BarChart Examples:**
-- Department performance comparison with sorting
-- Multi-color status indicators (Success, Warnings, Errors)
-- Different bar character styles (█, ▓, ▒, ░)
-
-**StackedBarChart Examples:**
-- **Percentage Mode**: 100% stacked bar showing percentage distribution
-  ```
-  Sales          Warning   Error
-  ███████████████▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-  30.0%          20.0%     50.0%
-  ```
-
-- **Project Time Allocation**: Color-coded segments
-  ```
-  Development                Testing        Planning Meetings
-  ████████████████████████████████████████████████████████████
-  45%                        25%            15%      15%
-  ```
-  *Each segment uses the same character (█) but different colors*
-
-- **Absolute Mode**: Server resource usage with actual values
-  ```
-  CPU                        Memory          Disk
-  ███████████████████████████▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▒▒▒
-  45                         30              15
-  ```
-
-**LineGraph Examples:**
-- **Temperature Trend**: High-resolution line with X-axis labels
-  ```
-                     ⎽⎼─⎺⎻⎻─⎼⎽
-                  ⎽─⎻         ⎻─⎼
-              ⎽⎼─⎺               ⎺─⎼
-          ⎽⎼─⎺                      ⎺⎻⎼
-       ⎽─⎻                             ⎺⎻⎼
-   ⎽⎼─⎺                                   ⎺
-   ────────────────────────────────────────
-   Jan                                  Dec
-  ```
-
-- **Multi-Series Comparison**: Multiple data series with Y-axis
-  ```
-     160│                             ⎽    ⎽ ⎽─⎺⎺⎽⎼⎻⎺
-        │                   ⎼⎽  ⎽⎼⎽⎽─⎺ ⎽─⎻⎺─⎺⎺⎻⎻⎺
-        │         ⎼⎼⎽ ⎽⎼⎼⎼⎽⎽⎽⎼─⎻──⎻ ⎺⎺⎺
-        │    ⎼──⎼⎼⎼⎼─⎺⎺⎻⎺
-        │ ⎼⎻⎺─⎺
-      90│⎺─⎻
-        └────────────────────────────────────────────
-         Q1                                        Q4
-  ```
-  *Red and blue lines show different series (colors not visible in plain text)*
-
-**Sparkline Examples:**
-- Server RPS (Requests Per Second) trend over 24 hours
-- 8-level smooth color gradients (red, blue, green)
-- Threshold highlighting with multiple gradient levels
 
 ## Advanced Features
 
