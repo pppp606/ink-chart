@@ -15,6 +15,10 @@ jobs:
   lockfile_guard:
     name: Lockfile guard
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
 
     # Only target Dependabot PRs (check both actor and PR author)
     if: >-
