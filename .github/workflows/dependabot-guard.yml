@@ -26,7 +26,7 @@ jobs:
       DEPENDENCY_THRESHOLD: 50
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
           # Need history for diff
           fetch-depth: 0
@@ -101,7 +101,7 @@ jobs:
 
       - name: Add safe label
         if: success()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const label = process.env.SAFE_LABEL;
@@ -117,7 +117,7 @@ jobs:
 
       - name: Remove safe label on failure
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
             const label = process.env.SAFE_LABEL;
