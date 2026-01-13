@@ -1,0 +1,135 @@
+name: Dependabot supply-chain guard (lockfile)
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'package-lock.json'
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write # Required for label operations
+
+jobs:
+  lockfile_guard:
+    name: Lockfile guard
+    runs-on: ubuntu-latest
+
+    # Only target Dependabot PRs (check both actor and PR author)
+    if: >-
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.user.login == 'dependabot[bot]'
+
+    env:
+      SAFE_LABEL: safe-to-merge
+      DEPENDENCY_THRESHOLD: 50
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Need history for diff
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: files
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          git diff --name-only "$BASE...$HEAD" > /tmp/changed_files.txt
+
+          echo "Changed files:"
+          cat /tmp/changed_files.txt
+
+          # Check if lockfile-only (properly terminate regex)
+          if grep -qvE '^package-lock\.json$' /tmp/changed_files.txt; then
+            echo "lockfile_only=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "lockfile_only=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Gate: allow only lockfile-only PRs
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.files.outputs.lockfile_only }}" != "true" ]; then
+            echo "::error::Not a lockfile-only PR (files other than package-lock.json were changed)"
+            exit 1
+          fi
+
+      - name: Gate: registry must be npmjs.org
+        shell: bash
+        run: |
+          set -euo pipefail
+          SAFE_REGISTRIES='registry\.npmjs\.org|registry\.yarnpkg\.com'
+
+          # Check resolved field (detect non-allowlisted registries)
+          UNSAFE=$(grep '"resolved":' package-lock.json | grep -vE "https://(${SAFE_REGISTRIES})" || true)
+
+          if [ -n "$UNSAFE" ]; then
+            echo "::error::Non-npm registry dependency detected"
+            echo "$UNSAFE"
+            exit 1
+          fi
+
+      - name: Gate: block install scripts (hasInstallScript)
+        shell: bash
+        run: |
+          set -euo pipefail
+          if grep '"hasInstallScript": true' package-lock.json; then
+            echo "::error::Dependency with install-time script detected"
+            exit 1
+          fi
+
+      - name: Gate: dependency explosion (diff-based)
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+
+          ADDED=$(git diff "$BASE...$HEAD" -- package-lock.json \
+            | grep -cE '^\+\s*"node_modules/' || echo "0")
+          echo "Added node_modules entries: $ADDED"
+
+          if [ "$ADDED" -gt "${{ env.DEPENDENCY_THRESHOLD }}" ]; then
+            echo "::error::Too many new dependencies: $ADDED (threshold: ${{ env.DEPENDENCY_THRESHOLD }})"
+            exit 1
+          fi
+
+      - name: Add safe label
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = process.env.SAFE_LABEL;
+            const pr = context.payload.pull_request.number;
+
+            // Idempotent - OK if label already exists
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr,
+              labels: [label],
+            });
+
+      - name: Remove safe label on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const label = process.env.SAFE_LABEL;
+            const pr = context.payload.pull_request.number;
+
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr,
+                name: label,
+              });
+            } catch (e) {
+              // Ignore if label doesn't exist
+            }
