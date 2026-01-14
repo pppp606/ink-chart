@@ -75,7 +75,7 @@ jobs:
         run: node scripts/generate-screenshot.js
 
       - name: Upload screenshot as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: demo-screenshots
           path: assets/demo-preview.svg
