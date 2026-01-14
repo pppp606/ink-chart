@@ -1,4 +1,4 @@
-name: Dependabot supply-chain guard (lockfile)
+name: Dependabot supply-chain guard
 
 on:
   pull_request:
@@ -245,7 +245,7 @@ jobs:
               continue
             fi
 
-            if rg -n -P '^\s*uses:\s*(?!actions/)' "$file"; then
+            if grep -nP '^\s*uses:\s*(?!actions/)' "$file"; then
               UNSAFE=1
             fi
           done < /tmp/changed_files.txt
