@@ -1,10 +1,12 @@
-name: Dependabot supply-chain guard (lockfile)
+name: Dependabot supply-chain guard
 
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - 'package-lock.json'
+      - '.github/workflows/*.yml'
+      - '.github/workflows/*.yaml'
 
 permissions:
   contents: read
@@ -47,14 +49,31 @@ jobs:
           echo "Changed files:"
           cat /tmp/changed_files.txt
 
-          # Check if lockfile-only (properly terminate regex)
-          if grep -qvE '^package-lock\.json$' /tmp/changed_files.txt; then
-            echo "lockfile_only=false" >> "$GITHUB_OUTPUT"
+          if grep -qE '^package-lock\.json$' /tmp/changed_files.txt; then
+            lockfile_changed=true
           else
-            echo "lockfile_only=true" >> "$GITHUB_OUTPUT"
+            lockfile_changed=false
           fi
 
+          # Check if lockfile-only (properly terminate regex)
+          if grep -qvE '^package-lock\.json$' /tmp/changed_files.txt; then
+            lockfile_only=false
+          else
+            lockfile_only=true
+          fi
+
+          if [ "$lockfile_only" = "true" ] && [ "$lockfile_changed" = "true" ]; then
+            lockfile_guard=true
+          else
+            lockfile_guard=false
+          fi
+
+          echo "lockfile_changed=$lockfile_changed" >> "$GITHUB_OUTPUT"
+          echo "lockfile_only=$lockfile_only" >> "$GITHUB_OUTPUT"
+          echo "lockfile_guard=$lockfile_guard" >> "$GITHUB_OUTPUT"
+
       - name: Gate: allow only lockfile-only PRs
+        if: steps.files.outputs.lockfile_guard == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -64,6 +83,7 @@ jobs:
           fi
 
       - name: Gate: registry must be npmjs.org
+        if: steps.files.outputs.lockfile_guard == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -79,6 +99,7 @@ jobs:
           fi
 
       - name: Gate: block install scripts (hasInstallScript)
+        if: steps.files.outputs.lockfile_guard == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -88,6 +109,7 @@ jobs:
           fi
 
       - name: Gate: dependency explosion (diff-based)
+        if: steps.files.outputs.lockfile_guard == 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -104,7 +126,7 @@ jobs:
           fi
 
       - name: Add safe label
-        if: success()
+        if: success() && steps.files.outputs.lockfile_guard == 'true'
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
@@ -120,7 +142,137 @@ jobs:
             });
 
       - name: Remove safe label on failure
-        if: failure()
+        if: failure() && steps.files.outputs.lockfile_guard == 'true'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const label = process.env.SAFE_LABEL;
+            const pr = context.payload.pull_request.number;
+
+            try {
+              await github.rest.issues.removeLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr,
+                name: label,
+              });
+            } catch (e) {
+              // Ignore if label doesn't exist
+            }
+
+  workflow_guard:
+    name: GitHub Actions guard
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+
+    # Only target Dependabot PRs (check both actor and PR author)
+    if: >-
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.user.login == 'dependabot[bot]'
+
+    env:
+      SAFE_LABEL: safe-to-merge
+
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          # Need history for diff
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: files
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE="${{ github.event.pull_request.base.sha }}"
+          HEAD="${{ github.event.pull_request.head.sha }}"
+          git diff --name-only "$BASE...$HEAD" > /tmp/changed_files.txt
+
+          echo "Changed files:"
+          cat /tmp/changed_files.txt
+
+          if [ ! -s /tmp/changed_files.txt ]; then
+            echo "workflow_changed=false" >> "$GITHUB_OUTPUT"
+            echo "workflow_only=false" >> "$GITHUB_OUTPUT"
+            echo "workflow_guard=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          WORKFLOW_ONLY=true
+          WORKFLOW_CHANGED=false
+
+          while read -r file; do
+            [ -z "$file" ] && continue
+            if [[ "$file" == .github/workflows/*.yml || "$file" == .github/workflows/*.yaml ]]; then
+              WORKFLOW_CHANGED=true
+            else
+              WORKFLOW_ONLY=false
+            fi
+          done < /tmp/changed_files.txt
+
+          if [ "$WORKFLOW_ONLY" = "true" ] && [ "$WORKFLOW_CHANGED" = "true" ]; then
+            WORKFLOW_GUARD=true
+          else
+            WORKFLOW_GUARD=false
+          fi
+
+          echo "workflow_only=$WORKFLOW_ONLY" >> "$GITHUB_OUTPUT"
+          echo "workflow_changed=$WORKFLOW_CHANGED" >> "$GITHUB_OUTPUT"
+          echo "workflow_guard=$WORKFLOW_GUARD" >> "$GITHUB_OUTPUT"
+
+      - name: Gate: allow only workflow-only PRs
+        if: steps.files.outputs.workflow_guard == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ steps.files.outputs.workflow_only }}" != "true" ]; then
+            echo "::error::Not a workflow-only PR (files other than .github/workflows were changed)"
+            exit 1
+          fi
+
+      - name: Gate: allow only GitHub official actions
+        if: steps.files.outputs.workflow_guard == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          UNSAFE=0
+          while read -r file; do
+            [ -z "$file" ] && continue
+            if ! [[ "$file" == .github/workflows/*.yml || "$file" == .github/workflows/*.yaml ]]; then
+              continue
+            fi
+
+            if grep -nP '^\s*uses:\s*(?!actions/)' "$file"; then
+              UNSAFE=1
+            fi
+          done < /tmp/changed_files.txt
+
+          if [ "$UNSAFE" -ne 0 ]; then
+            echo "::error::Non-actions/* GitHub Action detected"
+            exit 1
+          fi
+
+      - name: Add safe label
+        if: success() && steps.files.outputs.workflow_guard == 'true'
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
+        with:
+          script: |
+            const label = process.env.SAFE_LABEL;
+            const pr = context.payload.pull_request.number;
+
+            // Idempotent - OK if label already exists
+            await github.rest.issues.addLabels({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr,
+              labels: [label],
+            });
+
+      - name: Remove safe label on failure
+        if: failure() && steps.files.outputs.workflow_guard == 'true'
         uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7.1.0
         with:
           script: |
