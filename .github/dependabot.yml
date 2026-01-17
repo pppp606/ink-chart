@@ -32,6 +32,10 @@ updates:
         update-types:
           - "patch"
           - "minor"
+    # Ignore major version updates for @types/node
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   # Enable version updates for GitHub Actions
   - package-ecosystem: "github-actions"
