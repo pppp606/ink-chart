@@ -23,6 +23,8 @@ categories:
 
 exclude-labels:
   - "skip-changelog"
+  - "ci"
+  - "github-actions"
 
 change-template: "- $TITLE @$AUTHOR (#$NUMBER)"
 change-title-escapes: '\<*_&'
