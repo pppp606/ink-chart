@@ -86,7 +86,7 @@
     "react": ">=19"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.2",
+    "@eslint/js": "^10.0.1",
     "@secretlint/secretlint-rule-no-homedir": "^11.2.4",
     "@secretlint/secretlint-rule-preset-recommend": "^11.2.4",
     "@types/jest": "^29.5.12",
