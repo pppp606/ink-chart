@@ -21,7 +21,8 @@ const SHA_PATTERN = /^[a-f0-9]{40}$/; // Full 40-character SHA
 const EXPECTED_ACTIONS = [
   'actions/checkout',
   'actions/setup-node',
-  'actions/create-release'
+  'actions/create-release',
+  'bcoe/conventional-release-labels'
 ];
 
 // Regex to match "uses:" lines in workflow files
