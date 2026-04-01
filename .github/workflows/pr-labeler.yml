@@ -21,4 +21,4 @@ jobs:
               "ci": "ci",
               "chore": "chore"
             }
-          ignored_types: ""
+          ignored_types: "[]"
