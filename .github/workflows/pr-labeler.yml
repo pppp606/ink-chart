@@ -9,8 +9,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: bcoe/conventional-release-labels@v1
+      # bcoe/conventional-release-labels@v1.3.1
+      - uses: bcoe/conventional-release-labels@886f696738527c7be444262c327c89436dfb95a8
         with:
           type_labels: |
             {
