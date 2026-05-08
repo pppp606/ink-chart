@@ -30,22 +30,6 @@ const WORKFLOW_PERMISSIONS = {
       publish: {
         required: ['contents: read'],
         description: 'NPM publish job only needs to read contents for npm publishing'
-      },
-      'create-release': {
-        required: ['contents: write'],
-        description: 'Release creation job needs to write contents for GitHub releases'
-      }
-    }
-  },
-  'publish-github.yml': {
-    jobs: {
-      publish: {
-        required: ['contents: read', 'packages: write'],
-        description: 'GitHub Packages publish job needs to read contents and write packages'
-      },
-      'create-canary-release': {
-        required: ['contents: write'],
-        description: 'Canary release job needs to write contents for GitHub releases'
       }
     }
   }

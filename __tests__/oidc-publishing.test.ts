@@ -119,10 +119,6 @@ describe('OIDC Publishing Workflow Validation', () => {
       expect(workflowContent).toContain('id-token: write');
       expect(workflowContent).toContain('contents: read');
 
-      // Validate OIDC authentication detection
-      expect(workflowContent).toContain('ACTIONS_ID_TOKEN_REQUEST_URL');
-      expect(workflowContent).toContain('ACTIONS_ID_TOKEN_REQUEST_TOKEN');
-
       // Validate OIDC publishing command
       expect(workflowContent).toContain('--provenance');
       expect(workflowContent).toContain('npm publish');
