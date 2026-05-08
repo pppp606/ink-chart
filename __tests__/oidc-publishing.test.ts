@@ -329,7 +329,9 @@ async function validateRegistryConnectivity(registryUrl: string): Promise<boolea
   try {
     // In a real implementation, this would make an HTTP request
     // For testing, we'll simulate a successful check
-    return registryUrl.includes('registry.npmjs.org');
+    const hostname = new URL(registryUrl).hostname;
+    return hostname === 'registry.npmjs.org' ||
+      hostname.endsWith('.registry.npmjs.org');
   } catch {
     return false;
   }
