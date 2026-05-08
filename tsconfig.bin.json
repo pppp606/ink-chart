@@ -7,5 +7,5 @@
     "declarationMap": false
   },
   "include": ["bin/**/*", "src/**/*"],
-  "exclude": ["node_modules", "dist", "__tests__"]
+  "exclude": ["node_modules", "dist", "__tests__", "src/**/__tests__/**"]
 }
