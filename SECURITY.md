@@ -82,7 +82,6 @@ This repository implements comprehensive workflow protection to prevent supply c
 - Required status checks for all security validations
 - Pull request reviews mandatory for all changes
 - Workflow changes require additional security review
-- See [Branch Protection Documentation](docs/BRANCH-PROTECTION.md) for details
 
 #### CI/CD Security
 - All GitHub Actions use SHA-pinned versions for reproducibility
