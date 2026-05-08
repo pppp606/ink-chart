@@ -329,7 +329,9 @@ async function validateRegistryConnectivity(registryUrl: string): Promise<boolea
   try {
     // In a real implementation, this would make an HTTP request
     // For testing, we'll simulate a successful check
-    return registryUrl.includes('registry.npmjs.org');
+    const hostname = new URL(registryUrl).hostname;
+    return hostname === 'registry.npmjs.org' ||
+      hostname.endsWith('.registry.npmjs.org');
   } catch {
     return false;
   }
@@ -361,7 +363,19 @@ function validatePublicationReadiness(): {
 function validateOidcTokenRequest(): void {
   const url = process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
 
-  if (!url || !url.includes('actions.githubusercontent.com')) {
+  if (!url) {
+    throw new Error('OIDC token request failed: Invalid token request URL');
+  }
+
+  let hostname: string;
+  try {
+    hostname = new URL(url).hostname;
+  } catch {
+    throw new Error('OIDC token request failed: Invalid token request URL');
+  }
+
+  if (hostname !== 'actions.githubusercontent.com' &&
+      !hostname.endsWith('.actions.githubusercontent.com')) {
     throw new Error('OIDC token request failed: Invalid token request URL');
   }
 }
