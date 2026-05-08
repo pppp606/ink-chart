@@ -334,8 +334,9 @@ function validateOidcEnvironment(): boolean {
   // Validate URL format - should be GitHub Actions OIDC endpoint
   try {
     const parsedUrl = new URL(url);
-    if (!parsedUrl.hostname.includes('actions.githubusercontent.com') &&
-        !parsedUrl.hostname.includes('vstoken.actions.githubusercontent.com')) {
+    const hostname = parsedUrl.hostname;
+    if (hostname !== 'actions.githubusercontent.com' &&
+        !hostname.endsWith('.actions.githubusercontent.com')) {
       return false;
     }
   } catch {
