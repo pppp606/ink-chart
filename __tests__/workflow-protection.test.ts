@@ -90,8 +90,8 @@ describe('Workflow Protection', () => {
 
       const content = readFileSync(codeownersPath, 'utf8');
 
-      // Check for docs protection
-      expect(content).toMatch(/\/docs\/.*@pppp606/);
+      // Check for documentation ownership (README)
+      expect(content).toMatch(/\/README\.md.*@pppp606/);
     });
   });
 

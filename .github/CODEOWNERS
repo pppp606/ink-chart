@@ -35,12 +35,11 @@
 
 # Documentation
 # Documentation and guides require maintainer review
-/docs/ @pppp606
 /README.md @pppp606
 
 # Configuration files
 # Important configuration files require review
-/.eslintrc.cjs @pppp606
+/eslint.config.js @pppp606
 /.prettierrc @pppp606
 /tsconfig.json @pppp606
 /jest.config.js @pppp606

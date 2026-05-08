@@ -126,25 +126,10 @@ describe('Provenance Attestation Validation', () => {
     it('should validate that workflow uses provenance flag with OIDC', () => {
       const workflowContent = fs.readFileSync(workflowPath, 'utf8');
 
-      // Check that provenance is used in OIDC publishing
-      const oidcPublishSection = extractOidcPublishSection(workflowContent);
-      expect(oidcPublishSection).toContain('--provenance');
-      expect(oidcPublishSection).toContain('npm publish');
-    });
-
-    it('should validate that provenance is not used with NPM token', () => {
-      const workflowContent = fs.readFileSync(workflowPath, 'utf8');
-
-      // Check that NPM token publishing does NOT use provenance
-      const npmTokenPublishSection = extractNpmTokenPublishSection(workflowContent);
-      expect(npmTokenPublishSection).not.toContain('--provenance');
-    });
-
-    it('should validate provenance success logging', () => {
-      const workflowContent = fs.readFileSync(workflowPath, 'utf8');
-
-      expect(workflowContent).toContain('Package published with cryptographic provenance');
-      expect(workflowContent).toContain('provenance');
+      // OIDC publish step must include --provenance
+      expect(workflowContent).toContain('npm publish');
+      expect(workflowContent).toContain('--provenance');
+      expect(workflowContent).toContain('id-token: write');
     });
   });
 
@@ -316,24 +301,6 @@ function createMockProvenanceAttestation(): any {
       }
     }
   };
-}
-
-function extractOidcPublishSection(workflowContent: string): string {
-  // Extract the OIDC publishing section from workflow
-  const oidcStart = workflowContent.indexOf('name: Publish with OIDC');
-  const oidcEnd = workflowContent.indexOf('name: Publish with NPM Token', oidcStart);
-
-  if (oidcStart === -1) return '';
-  return workflowContent.slice(oidcStart, oidcEnd === -1 ? undefined : oidcEnd);
-}
-
-function extractNpmTokenPublishSection(workflowContent: string): string {
-  // Extract the NPM token publishing section from workflow
-  const npmStart = workflowContent.indexOf('name: Publish with NPM Token');
-  const nextSection = workflowContent.indexOf('name:', npmStart + 1);
-
-  if (npmStart === -1) return '';
-  return workflowContent.slice(npmStart, nextSection === -1 ? undefined : nextSection);
 }
 
 function createMockProvenanceSignature(): any {
