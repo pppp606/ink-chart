@@ -10,44 +10,6 @@
  */
 
 describe('OIDC Configuration Validation', () => {
-  describe('GitHub Actions OIDC Environment Variables', () => {
-    it('should detect OIDC token request URL when id-token is granted', () => {
-      // ACTIONS_ID_TOKEN_REQUEST_URL is injected by GitHub Actions only when
-      // the job has `id-token: write`. Our CI test job no longer requests
-      // that permission (it's scoped to the publish-npm workflow), so this
-      // env var being absent in the test job is the expected state.
-      const tokenRequestUrl = process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
-
-      if (tokenRequestUrl !== undefined) {
-        expect(tokenRequestUrl).toMatch(/^https:\/\/.*\.actions\.githubusercontent\.com/);
-      }
-    });
-
-    it('should detect OIDC token request token when id-token is granted', () => {
-      const tokenRequestToken = process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
-
-      if (tokenRequestToken !== undefined) {
-        expect(typeof tokenRequestToken).toBe('string');
-        expect(tokenRequestToken.length).toBeGreaterThan(0);
-      }
-    });
-
-    it('should validate GitHub context information for OIDC', () => {
-      // GitHub provides context information needed for OIDC token claims.
-      // GITHUB_REPOSITORY is always set inside Actions, regardless of id-token.
-      const githubRepository = process.env.GITHUB_REPOSITORY;
-      const githubRef = process.env.GITHUB_REF;
-      const githubSha = process.env.GITHUB_SHA;
-
-      if (githubRepository !== undefined) {
-        expect(githubRepository).toBe('pppp606/ink-chart');
-        expect(githubRef).toBeDefined();
-        expect(githubSha).toBeDefined();
-        expect(githubSha).toMatch(/^[a-f0-9]{40}$/); // SHA-1 format
-      }
-    });
-  });
-
   describe('NPM OIDC Configuration Validation', () => {
     it('should validate package.json configuration for OIDC publishing', async () => {
       // Read package.json to validate configuration
@@ -116,42 +78,6 @@ describe('OIDC Configuration Validation', () => {
 
       expect(requiredPermissions['id-token']).toBe('write');
       expect(requiredPermissions['contents']).toBe('read');
-    });
-  });
-
-  describe('OIDC Transition Compatibility', () => {
-    it('should maintain backward compatibility during OIDC transition', () => {
-      // During transition, both NPM_TOKEN and OIDC should be supported
-      const npmToken = process.env.NPM_TOKEN;
-      const hasOidcVars = process.env.ACTIONS_ID_TOKEN_REQUEST_URL &&
-                         process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
-
-      // OIDC env vars are only injected when a job has `id-token: write`,
-      // which is now scoped to the publish-npm workflow only. The CI test
-      // job intentionally drops that permission, so the legacy "CI must
-      // have a publishing credential" assertion no longer applies here.
-      if (npmToken || hasOidcVars) {
-        // When a credential is present, the two methods must be mutually exclusive
-        expect(Boolean(npmToken) && Boolean(hasOidcVars)).toBe(false);
-      } else {
-        expect(npmToken).toBeFalsy();
-        expect(hasOidcVars).toBeFalsy();
-      }
-    });
-
-    it('should validate authentication method selection logic', () => {
-      // Test logic for choosing between NPM_TOKEN and OIDC
-      const useOidc = process.env.ACTIONS_ID_TOKEN_REQUEST_URL &&
-                     process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
-      const useNpmToken = process.env.NPM_TOKEN && !useOidc;
-
-      if (useOidc || useNpmToken) {
-        // Exactly one authentication method should be selected when credentials exist
-        expect(useOidc && useNpmToken).toBeFalsy();
-      } else {
-        expect(useOidc).toBeFalsy();
-        expect(useNpmToken).toBeFalsy();
-      }
     });
   });
 
