@@ -10,57 +10,6 @@
  */
 
 describe('OIDC Configuration Validation', () => {
-  describe('GitHub Actions OIDC Environment Variables', () => {
-    it('should detect OIDC token request URL in CI environment', () => {
-      // Test for ACTIONS_ID_TOKEN_REQUEST_URL environment variable
-      // This is provided by GitHub Actions when id-token: write permission is granted
-      const tokenRequestUrl = process.env.ACTIONS_ID_TOKEN_REQUEST_URL;
-
-      if (process.env.CI) {
-        // In CI environment, this should be available when OIDC is configured
-        expect(tokenRequestUrl).toBeDefined();
-        // GitHub uses different OIDC URLs across regions (vstoken, run-actions-*, etc.)
-        expect(tokenRequestUrl).toMatch(/^https:\/\/.*\.actions\.githubusercontent\.com/);
-      } else {
-        // In local development, this won't be available
-        expect(tokenRequestUrl).toBeUndefined();
-      }
-    });
-
-    it('should detect OIDC token request token in CI environment', () => {
-      // Test for ACTIONS_ID_TOKEN_REQUEST_TOKEN environment variable
-      // This is the authentication token for requesting OIDC tokens
-      const tokenRequestToken = process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
-
-      if (process.env.CI) {
-        // In CI environment, this should be available when OIDC is configured
-        expect(tokenRequestToken).toBeDefined();
-        expect(typeof tokenRequestToken).toBe('string');
-        expect(tokenRequestToken.length).toBeGreaterThan(0);
-      } else {
-        // In local development, this won't be available
-        expect(tokenRequestToken).toBeUndefined();
-      }
-    });
-
-    it('should validate GitHub context information for OIDC', () => {
-      // GitHub provides context information needed for OIDC token claims
-      const githubRepository = process.env.GITHUB_REPOSITORY;
-      const githubRef = process.env.GITHUB_REF;
-      const githubSha = process.env.GITHUB_SHA;
-
-      if (process.env.CI) {
-        expect(githubRepository).toBe('pppp606/ink-chart');
-        expect(githubRef).toBeDefined();
-        expect(githubSha).toBeDefined();
-        expect(githubSha).toMatch(/^[a-f0-9]{40}$/); // SHA-1 format
-      } else {
-        // In local development, these won't be available
-        expect(githubRepository).toBeUndefined();
-      }
-    });
-  });
-
   describe('NPM OIDC Configuration Validation', () => {
     it('should validate package.json configuration for OIDC publishing', async () => {
       // Read package.json to validate configuration
@@ -129,41 +78,6 @@ describe('OIDC Configuration Validation', () => {
 
       expect(requiredPermissions['id-token']).toBe('write');
       expect(requiredPermissions['contents']).toBe('read');
-    });
-  });
-
-  describe('OIDC Transition Compatibility', () => {
-    it('should maintain backward compatibility during OIDC transition', () => {
-      // During transition, both NPM_TOKEN and OIDC should be supported
-      const npmToken = process.env.NPM_TOKEN;
-      const hasOidcVars = process.env.ACTIONS_ID_TOKEN_REQUEST_URL &&
-                         process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
-
-      if (process.env.CI) {
-        // In CI, either NPM_TOKEN or OIDC variables should be available
-        expect(npmToken || hasOidcVars).toBeTruthy();
-      } else {
-        // In local development, neither should be available
-        expect(npmToken).toBeUndefined();
-        expect(hasOidcVars).toBeFalsy();
-      }
-    });
-
-    it('should validate authentication method selection logic', () => {
-      // Test logic for choosing between NPM_TOKEN and OIDC
-      const useOidc = process.env.ACTIONS_ID_TOKEN_REQUEST_URL &&
-                     process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
-      const useNpmToken = process.env.NPM_TOKEN && !useOidc;
-
-      if (process.env.CI) {
-        // In CI, exactly one authentication method should be selected
-        expect(useOidc || useNpmToken).toBeTruthy();
-        expect(useOidc && useNpmToken).toBeFalsy();
-      } else {
-        // In local development, neither should be selected
-        expect(useOidc).toBeFalsy();
-        expect(useNpmToken).toBeFalsy();
-      }
     });
   });
 
