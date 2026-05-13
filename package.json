@@ -96,7 +96,7 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "globals": "^17.0.0",
     "ink": "^6.5.1",
     "ink-testing-library": "^4.0.0",
