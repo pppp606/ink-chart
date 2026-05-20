@@ -151,10 +151,7 @@ describe('Security Scanning', () => {
 
         // Test that workflows don't have excessive permissions
         expect(workflow).not.toMatch(/permissions:\s*write-all/);
-        // Allow contents:write for demo-screenshot
-        if (!workflow.includes('Demo Screenshot')) {
-          expect(workflow).not.toMatch(/contents:\s*write/);
-        }
+        expect(workflow).not.toMatch(/contents:\s*write/);
       });
     });
   });

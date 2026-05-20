@@ -1,10 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Validation script to check that GitHub Actions are pinned to specific SHAs
- * This script will fail if any action uses version tags instead of commit SHAs
- *
- * Note: Uses regex-based parsing to avoid external YAML dependencies
+ * Validates that every third-party GitHub Action used in workflow files is
+ * pinned to a full 40-character commit SHA. Local actions (./...) and Docker
+ * actions (docker://...) are skipped.
  */
 
 import fs from 'fs';
@@ -15,20 +14,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const WORKFLOW_DIR = path.join(__dirname, '..', '.github', 'workflows');
-const SHA_PATTERN = /^[a-f0-9]{40}$/; // Full 40-character SHA
-
-// Expected actions that should be SHA-pinned
-const EXPECTED_ACTIONS = [
-  'actions/checkout',
-  'actions/setup-node'
-];
-
-// Regex to match "uses:" lines in workflow files
+const SHA_PATTERN = /^[a-f0-9]{40}$/;
 const USES_PATTERN = /^\s*-?\s*uses:\s*['"]?([^@\s'"]+)@([^\s'"#]+)/gm;
 
-function validateWorkflowFile(filePath) {
-  console.log(`\nValidating ${path.basename(filePath)}...`);
+function isPinnable(actionName) {
+  if (actionName.startsWith('./')) return false;
+  if (actionName.startsWith('docker://')) return false;
+  return true;
+}
 
+function validateWorkflowFile(filePath) {
   const content = fs.readFileSync(filePath, 'utf8');
   const violations = [];
 
@@ -37,13 +32,13 @@ function validateWorkflowFile(filePath) {
     const actionName = match[1];
     const version = match[2];
 
-    if (EXPECTED_ACTIONS.includes(actionName)) {
-      if (!version || !SHA_PATTERN.test(version)) {
-        violations.push({
-          action: `${actionName}@${version}`,
-          issue: version ? `Using version tag "${version}" instead of SHA` : 'Missing version/SHA'
-        });
-      }
+    if (!isPinnable(actionName)) continue;
+
+    if (!SHA_PATTERN.test(version)) {
+      violations.push({
+        action: `${actionName}@${version}`,
+        issue: `Using mutable ref "${version}" instead of a 40-character commit SHA`,
+      });
     }
   }
 
@@ -58,9 +53,10 @@ function main() {
     process.exit(1);
   }
 
-  const workflowFiles = fs.readdirSync(WORKFLOW_DIR)
-    .filter(file => file.endsWith('.yml') || file.endsWith('.yaml'))
-    .map(file => path.join(WORKFLOW_DIR, file));
+  const workflowFiles = fs
+    .readdirSync(WORKFLOW_DIR)
+    .filter((file) => file.endsWith('.yml') || file.endsWith('.yaml'))
+    .map((file) => path.join(WORKFLOW_DIR, file));
 
   if (workflowFiles.length === 0) {
     console.error('❌ No workflow files found');
@@ -69,34 +65,34 @@ function main() {
 
   let totalViolations = 0;
 
-  workflowFiles.forEach(filePath => {
+  workflowFiles.forEach((filePath) => {
+    console.log(`\nValidating ${path.basename(filePath)}...`);
     const violations = validateWorkflowFile(filePath);
     totalViolations += violations.length;
 
     if (violations.length === 0) {
       console.log('✅ All actions properly SHA-pinned');
     } else {
-      console.log(`❌ Found ${violations.length} violations:`);
-      violations.forEach(violation => {
+      console.log(`❌ Found ${violations.length} violation(s):`);
+      violations.forEach((violation) => {
         console.log(`  - ${violation.action}`);
         console.log(`    ${violation.issue}`);
       });
     }
   });
 
-  console.log(`\n📊 Summary: ${totalViolations} total violations found`);
+  console.log(`\n📊 Summary: ${totalViolations} total violation(s) found`);
 
   if (totalViolations > 0) {
     console.log('\n❌ SHA pinning validation failed');
-    console.log('All GitHub Actions should use specific commit SHAs instead of version tags for security.');
+    console.log('All third-party GitHub Actions must use a full 40-character commit SHA.');
     process.exit(1);
-  } else {
-    console.log('\n✅ All GitHub Actions are properly SHA-pinned');
-    process.exit(0);
   }
+
+  console.log('\n✅ All GitHub Actions are properly SHA-pinned');
+  process.exit(0);
 }
 
-// Run main function if this file is executed directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
