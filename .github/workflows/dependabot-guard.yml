@@ -10,8 +10,6 @@ on:
 
 permissions:
   contents: read
-  pull-requests: write
-  issues: write # Required for label operations
 
 jobs:
   lockfile_guard:
