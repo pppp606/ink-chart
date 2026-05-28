@@ -1,4 +1,5 @@
 import React from 'react';
+// Design intent: terminal readability over precision. Keep defaults narrow-width-safe and low-density.
 import { Text, Box } from 'ink';
 import { useAutoWidth } from '../core/useAutoWidth.js';
 import { calculateEffectiveWidth } from '../core/widthUtils.js';

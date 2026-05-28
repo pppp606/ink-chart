@@ -1,4 +1,5 @@
 import React from 'react';
+// Design intent: terminal readability over precision. Keep defaults narrow-width-safe and low-density.
 import { Text, Box } from 'ink';
 import { valuesToSymbols } from '../core/symbols.js';
 import { ThresholdColorizer, type ColorScheme } from '../core/thresholdColorizer.js';
