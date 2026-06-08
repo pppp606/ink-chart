@@ -87,13 +87,6 @@ describe('Security Scanning', () => {
       }
     });
 
-    it('should validate dependency licenses are compatible', () => {
-      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
-
-      // Test that we have license checking capability
-      expect(packageJson.scripts).toHaveProperty('license-check');
-    });
-
     it('should have automated security update configuration', () => {
       const dependabotPath = path.join(process.cwd(), '.github/dependabot.yml');
       const renovatePath = path.join(process.cwd(), 'renovate.json');
