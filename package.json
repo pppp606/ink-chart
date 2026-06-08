@@ -36,7 +36,6 @@
     "demo": "npm run build && node bin/demo.js",
     "audit": "npm audit --audit-level high",
     "audit:fix": "npm audit fix --dry-run",
-    "license-check": "npx license-checker --summary",
     "validate:sha-pinning": "node scripts/validate-sha-pinning.js",
     "validate:permissions": "node scripts/validate-permissions.js",
     "prepublishOnly": "npm run build"

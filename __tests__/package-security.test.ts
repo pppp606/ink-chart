@@ -122,10 +122,6 @@ describe('Package Configuration Security', () => {
       expect(packageJson.scripts['lint:secrets']).toBeDefined();
     });
 
-    test('should have license checking script', () => {
-      expect(packageJson.scripts['license-check']).toBeDefined();
-    });
-
     test('should have validation scripts', () => {
       expect(packageJson.scripts['validate:sha-pinning']).toBeDefined();
       expect(packageJson.scripts['validate:permissions']).toBeDefined();
