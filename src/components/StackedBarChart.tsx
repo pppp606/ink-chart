@@ -212,6 +212,11 @@ function renderValueLine(
 }
 
 /**
+ * Design intent:
+ * - Use as a composition indicator, not a dense multi-category dashboard.
+ * - Keep segment counts low so labels/values remain readable in narrow terminals.
+ * - Ensure meaning survives without color by pairing segments with text labels/values.
+ *
  * A horizontal stacked bar chart component showing percentage distribution or absolute values.
  *
  * Displays data as a single bar divided into colored segments. In percentage mode,
