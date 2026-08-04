@@ -33,4 +33,8 @@ jobs:
 
       - run: npm ci
 
+      # .npmrc sets ignore-scripts=true, which also skips prepublishOnly,
+      # so the build must run explicitly before publishing.
+      - run: npm run build
+
       - run: npm publish --provenance --access public
