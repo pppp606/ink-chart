@@ -13,7 +13,7 @@ export default {
         useESM: true,
         tsconfig: {
           jsx: 'react-jsx',
-          moduleResolution: 'node',
+          moduleResolution: 'bundler',
         },
       },
     ],
