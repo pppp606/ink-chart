@@ -38,6 +38,6 @@ export class FakeStdout extends EventEmitter {
     return true;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
+   
   end() {}
 }
