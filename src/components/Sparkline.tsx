@@ -63,6 +63,11 @@ export interface SparklineProps {
 }
 
 /**
+ * Design intent:
+ * - Provide compact ambient trend signals that fit inline with text summaries.
+ * - Favor quick scanning over detailed axis-based interpretation.
+ * - Keep width conservative and pair with short text/caption for context.
+ *
  * A compact sparkline component for visualizing numeric trends in terminal applications.
  * 
  * Sparklines are small, high-resolution graphics embedded in text that provide 
