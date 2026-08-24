@@ -104,6 +104,6 @@
     "react": "^19.2.3",
     "secretlint": "^13.0.0",
     "ts-jest": "^29.4.12",
-    "typescript": "^6.0.3"
+    "typescript": "^7.0.2"
   }
 }
