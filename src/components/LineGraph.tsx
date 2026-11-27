@@ -17,6 +17,12 @@ const LINE_CHARS: [string, string, string, string, string] = [
 ];
 
 /**
+ * Design intent:
+ * - Show trend shape and turning points, not BI-grade precision analytics.
+ * - Keep series count low and labels sparse to avoid overlap noise.
+ * - Preserve terminal-native readability with moderate height in narrow widths.
+ */
+/**
  * A single data series with values and optional color
  */
 export interface LineGraphSeries {
@@ -227,6 +233,11 @@ function renderColoredRow(cells: GridCell[]): React.ReactElement[] {
 }
 
 /**
+ * Design intent:
+ * - Show trend shape and turning points, not BI-grade precision analytics.
+ * - Keep series count low and labels sparse to avoid overlap noise.
+ * - Preserve terminal-native readability with moderate height in narrow widths.
+ *
  * A high-resolution line graph component that visualizes multiple data series.
  *
  * Uses Unicode horizontal scan line characters (⎺ ⎻ ─ ⎼ ⎽) at different vertical positions

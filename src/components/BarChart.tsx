@@ -215,6 +215,11 @@ export interface BarChartProps {
 
 
 /**
+ * Design intent:
+ * - Prioritize ranked comparison readability over exact visual precision.
+ * - Keep labels/values scannable in narrow terminals (~80 cols) with stable row layout.
+ * - Prefer low-density output (Top-N) rather than long category lists.
+ *
  * A horizontal bar chart component for terminal applications.
  * 
  * Renders data as horizontal bars with customizable appearance, sorting,
