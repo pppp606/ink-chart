@@ -1,4 +1,6 @@
-import { calculateLayout } from '../src/barChartLayout';
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { calculateLayout } from '../src/barChartLayout.js';
 
 describe('barchart layout functions', () => {
   describe('calculateLayout', () => {
@@ -10,10 +12,10 @@ describe('barchart layout functions', () => {
         minBarWidth: 2
       });
       
-      expect(result.labelWidth).toBe(6);
-      expect(result.valueWidth).toBe(4);
-      expect(result.barWidth).toBe(10); // 20 - 6 - 4 = 10
-      expect(result.labelWidth + result.barWidth + result.valueWidth).toBe(20);
+      assert.equal(result.labelWidth, 6);
+      assert.equal(result.valueWidth, 4);
+      assert.equal(result.barWidth, 10); // 20 - 6 - 4 = 10
+      assert.equal(result.labelWidth + result.barWidth + result.valueWidth, 20);
     });
 
     it('should ensure non-negative width guarantees', () => {
@@ -24,10 +26,10 @@ describe('barchart layout functions', () => {
         minBarWidth: 1
       });
       
-      expect(result.labelWidth).toBeGreaterThanOrEqual(0);
-      expect(result.barWidth).toBeGreaterThanOrEqual(1); // Should respect minBarWidth
-      expect(result.valueWidth).toBeGreaterThanOrEqual(0);
-      expect(result.labelWidth + result.barWidth + result.valueWidth).toBeLessThanOrEqual(10);
+      assert.ok(result.labelWidth >= 0);
+      assert.ok(result.barWidth >= 1); // Should respect minBarWidth
+      assert.ok(result.valueWidth >= 0);
+      assert.ok(result.labelWidth + result.barWidth + result.valueWidth <= 10);
     });
 
     it('should respect minimum bar width requirement', () => {
@@ -38,8 +40,8 @@ describe('barchart layout functions', () => {
         minBarWidth: 3
       });
       
-      expect(result.barWidth).toBeGreaterThanOrEqual(3);
-      expect(result.labelWidth + result.barWidth + result.valueWidth).toBeLessThanOrEqual(8);
+      assert.ok(result.barWidth >= 3);
+      assert.ok(result.labelWidth + result.barWidth + result.valueWidth <= 8);
     });
 
     it('should handle case when content exceeds available width gracefully', () => {
@@ -51,10 +53,10 @@ describe('barchart layout functions', () => {
       });
       
       // Should still produce valid layout
-      expect(result.labelWidth).toBeGreaterThanOrEqual(0);
-      expect(result.barWidth).toBeGreaterThanOrEqual(2);
-      expect(result.valueWidth).toBeGreaterThanOrEqual(0);
-      expect(result.labelWidth + result.barWidth + result.valueWidth).toBeLessThanOrEqual(5);
+      assert.ok(result.labelWidth >= 0);
+      assert.ok(result.barWidth >= 2);
+      assert.ok(result.valueWidth >= 0);
+      assert.ok(result.labelWidth + result.barWidth + result.valueWidth <= 5);
     });
 
     it('should prioritize bar width over label and value when space is tight', () => {
@@ -66,10 +68,10 @@ describe('barchart layout functions', () => {
       });
       
       // Bar should get its minimum, then remaining space allocated to label/value
-      expect(result.barWidth).toBe(4);
-      expect(result.labelWidth + result.valueWidth).toBe(6); // 10 - 4 = 6
-      expect(result.labelWidth).toBeGreaterThan(0);
-      expect(result.valueWidth).toBeGreaterThan(0);
+      assert.equal(result.barWidth, 4);
+      assert.equal(result.labelWidth + result.valueWidth, 6); // 10 - 4 = 6
+      assert.ok(result.labelWidth > 0);
+      assert.ok(result.valueWidth > 0);
     });
 
     it('should provide consistent behavior across different data sets', () => {
@@ -81,14 +83,14 @@ describe('barchart layout functions', () => {
       
       // All should use full width
       layouts.forEach(layout => {
-        expect(layout.labelWidth + layout.barWidth + layout.valueWidth).toBe(30);
-        expect(layout.barWidth).toBeGreaterThanOrEqual(3);
+        assert.equal(layout.labelWidth + layout.barWidth + layout.valueWidth, 30);
+        assert.ok(layout.barWidth >= 3);
       });
       
       // Bar widths should be reasonable (more space = bigger bars)
-      expect(layouts[0].barWidth).toBe(16); // 30 - 8 - 6 = 16
-      expect(layouts[1].barWidth).toBe(16); // 30 - 10 - 4 = 16
-      expect(layouts[2].barWidth).toBe(17); // 30 - 5 - 8 = 17
+      assert.equal(layouts[0]?.barWidth, 16); // 30 - 8 - 6 = 16
+      assert.equal(layouts[1]?.barWidth, 16); // 30 - 10 - 4 = 16
+      assert.equal(layouts[2]?.barWidth, 17); // 30 - 5 - 8 = 17
     });
 
     it('should handle edge case of very small total width', () => {
@@ -99,8 +101,8 @@ describe('barchart layout functions', () => {
         minBarWidth: 1
       });
       
-      expect(result.labelWidth + result.barWidth + result.valueWidth).toBeLessThanOrEqual(3);
-      expect(result.barWidth).toBeGreaterThanOrEqual(1);
+      assert.ok(result.labelWidth + result.barWidth + result.valueWidth <= 3);
+      assert.ok(result.barWidth >= 1);
     });
 
     it('should handle zero and negative inputs gracefully', () => {
@@ -111,9 +113,9 @@ describe('barchart layout functions', () => {
         minBarWidth: 1
       });
       
-      expect(result.labelWidth).toBe(0);
-      expect(result.barWidth).toBe(0); // Can't satisfy minBarWidth with 0 total width
-      expect(result.valueWidth).toBe(0);
+      assert.equal(result.labelWidth, 0);
+      assert.equal(result.barWidth, 0); // Can't satisfy minBarWidth with 0 total width
+      assert.equal(result.valueWidth, 0);
     });
 
     it('should allocate remaining space proportionally when possible', () => {
@@ -125,9 +127,9 @@ describe('barchart layout functions', () => {
       });
       
       // Should get: label=6, value=4, bar=14 (24-6-4=14, which is > minBarWidth=8)
-      expect(result.labelWidth).toBe(6);
-      expect(result.valueWidth).toBe(4);
-      expect(result.barWidth).toBe(14);
+      assert.equal(result.labelWidth, 6);
+      assert.equal(result.valueWidth, 4);
+      assert.equal(result.barWidth, 14);
     });
 
     it('should scale down label and value proportionally when bar needs more space', () => {
@@ -138,13 +140,13 @@ describe('barchart layout functions', () => {
         minBarWidth: 5 // Needs 5, leaving 7 for label+value
       });
       
-      expect(result.barWidth).toBe(5);
-      expect(result.labelWidth + result.valueWidth).toBe(7);
+      assert.equal(result.barWidth, 5);
+      assert.equal(result.labelWidth + result.valueWidth, 7);
       
       // Should scale proportionally: 8:6 ratio maintained roughly
       // 7 * (8/14) ≈ 4, 7 * (6/14) ≈ 3
-      expect(result.labelWidth).toBeCloseTo(4, 0);
-      expect(result.valueWidth).toBeCloseTo(3, 0);
+      assert.ok(Math.abs(result.labelWidth - 4) < 10 ** -0 / 2);
+      assert.ok(Math.abs(result.valueWidth - 3) < 10 ** -0 / 2);
     });
   });
 });

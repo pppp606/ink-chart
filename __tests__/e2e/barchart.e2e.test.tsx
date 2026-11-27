@@ -4,6 +4,9 @@
  * These tests use ink-testing-library to capture actual terminal output
  * and verify the rendered bars, labels, values, and colors.
  */
+import { after, before, describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains } from '../helpers/assertions.js';
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { BarChart } from '../../src/components/BarChart.js';
@@ -21,8 +24,8 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Test');
-      expect(output).toContain('▆');
+      assertContains(output, 'Test');
+      assertContains(output, '▆');
     });
 
     it('renders multiple bars', () => {
@@ -38,8 +41,8 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('A');
-      expect(output).toContain('B');
+      assertContains(output, 'A');
+      assertContains(output, 'B');
     });
 
     it('renders proportional bar lengths', () => {
@@ -57,7 +60,7 @@ describe('E2E: BarChart', () => {
 
       // Extract bar portions by counting bar characters per line
       const lines = (output || '').split('\n');
-      expect(lines.length).toBeGreaterThanOrEqual(2);
+      assert.ok(lines.length >= 2);
     });
   });
 
@@ -72,7 +75,7 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('42');
+      assertContains(output, '42');
     });
 
     it('shows value inside bar when configured', () => {
@@ -87,7 +90,7 @@ describe('E2E: BarChart', () => {
 
       // Value may or may not be shown inside depending on bar width
       // Just verify the component renders without error
-      expect(output).toContain('Test');
+      assertContains(output, 'Test');
     });
 
     it('hides value when set to none', () => {
@@ -102,7 +105,7 @@ describe('E2E: BarChart', () => {
       const cleanOutput = stripAnsi(frame || '');
 
       // Value should not appear as standalone number
-      expect(cleanOutput).toContain('Test');
+      assertContains(cleanOutput, 'Test');
     });
 
     it('uses custom format function', () => {
@@ -116,7 +119,7 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('75%');
+      assertContains(output, '75%');
     });
   });
 
@@ -138,7 +141,7 @@ describe('E2E: BarChart', () => {
       const lines = (output || '').split('\n').filter((l) => l.trim());
 
       // First line should contain the largest value
-      expect(lines[0]).toContain('Large');
+      assertContains(lines[0], 'Large');
     });
 
     it('sorts ascending when configured', () => {
@@ -158,7 +161,7 @@ describe('E2E: BarChart', () => {
       const lines = (output || '').split('\n').filter((l) => l.trim());
 
       // First line should contain the smallest value
-      expect(lines[0]).toContain('Small');
+      assertContains(lines[0], 'Small');
     });
 
     it('preserves order when sort is none', () => {
@@ -177,17 +180,17 @@ describe('E2E: BarChart', () => {
       const output = lastFrame();
       const lines = (output || '').split('\n').filter((l) => l.trim());
 
-      expect(lines[0]).toContain('First');
+      assertContains(lines[0], 'First');
     });
   });
 
   describe('Colors', () => {
-    beforeAll(() => {
+    before(() => {
       // Force 24-bit color depth for color tests
       process.env.FORCE_COLOR_DEPTH = '8';
     });
 
-    afterAll(() => {
+    after(() => {
       delete process.env.FORCE_COLOR_DEPTH;
     });
 
@@ -202,7 +205,7 @@ describe('E2E: BarChart', () => {
 
       // Color may or may not be applied depending on terminal capabilities
       // Just verify the component renders
-      expect(output).toContain('Colored');
+      assertContains(output, 'Colored');
     });
 
     it('applies different colors to different bars', () => {
@@ -218,8 +221,8 @@ describe('E2E: BarChart', () => {
       const output = lastFrame();
 
       // Verify both bars are rendered
-      expect(output).toContain('Red');
-      expect(output).toContain('Green');
+      assertContains(output, 'Red');
+      assertContains(output, 'Green');
     });
   });
 
@@ -230,7 +233,7 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('▆');
+      assertContains(output, '▆');
     });
 
     it('uses custom bar character when specified in data', () => {
@@ -242,7 +245,7 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('█');
+      assertContains(output, '█');
     });
   });
 
@@ -259,7 +262,7 @@ describe('E2E: BarChart', () => {
       const output = lastFrame();
 
       // Bar should be half width since value is 50 out of max 100
-      expect(output).toContain('▆');
+      assertContains(output, '▆');
     });
   });
 
@@ -276,8 +279,8 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Zero');
-      expect(output).toContain('Some');
+      assertContains(output, 'Zero');
+      assertContains(output, 'Some');
     });
 
     it('handles single bar', () => {
@@ -286,7 +289,7 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Only');
+      assertContains(output, 'Only');
     });
 
     it('handles long labels', () => {
@@ -298,7 +301,7 @@ describe('E2E: BarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 });

@@ -1,237 +1,151 @@
+import { afterEach, beforeEach, describe, it, mock } from 'node:test';
+import assert from 'node:assert/strict';
+import React from 'react';
+import { Text } from 'ink';
+import { render } from 'ink-testing-library';
 import { useAutoWidth } from '../src/core/useAutoWidth.js';
 
-// Mock React hooks at the module level
-jest.mock('react', () => {
-  const actualReact = jest.requireActual('react');
-  return {
-    ...actualReact,
-    useState: jest.fn(),
-    useEffect: jest.fn(),
-    useCallback: jest.fn(),
-  };
-});
+const DEBOUNCE_MS = 120;
 
-// Get references to the mocked functions
-import React from 'react';
-const mockUseState = jest.mocked(React.useState);
-const mockUseEffect = jest.mocked(React.useEffect);
-const mockUseCallback = jest.mocked(React.useCallback);
+let renderCount = 0;
+
+/** Renders the hook's result as text so tests can read it from the frame. */
+function Probe() {
+  const { width, isAutoWidth } = useAutoWidth();
+  renderCount++;
+  return <Text>{`width=${width} auto=${isAutoWidth}`}</Text>;
+}
+
+const originalColumns = Object.getOwnPropertyDescriptor(process.stdout, 'columns');
+
+function setColumns(value: number | undefined) {
+  Object.defineProperty(process.stdout, 'columns', {
+    value,
+    writable: true,
+    configurable: true,
+  });
+}
+
+/**
+ * Lets React commit a pending state update. React schedules the re-render with
+ * setImmediate, which the fake timers leave alone, and needs two turns to commit.
+ */
+const flush = async () => {
+  for (let turn = 0; turn < 2; turn++) {
+    await new Promise<void>((resolve) => setImmediate(resolve));
+  }
+};
 
 describe('useAutoWidth Hook', () => {
+  let unmount: (() => void) | undefined;
+
+  const mount = () => {
+    const instance = render(<Probe />);
+    unmount = instance.unmount;
+    return instance;
+  };
+
   beforeEach(() => {
-    // Reset process.stdout.columns to default
-    Object.defineProperty(process.stdout, 'columns', {
-      value: 80,
-      writable: true,
-      configurable: true,
-    });
-
-    // Reset all mocks
-    jest.clearAllMocks();
-    
-    // Default mock implementations
-    mockUseState.mockImplementation((initial) => [initial, jest.fn()]);
-    mockUseEffect.mockImplementation((effect) => effect());
-    mockUseCallback.mockImplementation((callback) => callback);
+    setColumns(80);
+    renderCount = 0;
   });
 
-  // GREEN PHASE TESTS - Basic functionality tests
+  afterEach(() => {
+    unmount?.();
+    unmount = undefined;
+    mock.timers.reset();
+    if (originalColumns) {
+      Object.defineProperty(process.stdout, 'columns', originalColumns);
+    } else {
+      delete (process.stdout as { columns?: number }).columns;
+    }
+  });
+
   it('should be defined and exportable', () => {
-    expect(typeof useAutoWidth).toBe('function');
+    assert.equal(typeof useAutoWidth, 'function');
   });
 
-  it('should return correct API shape when called directly', () => {
-    // Mock useState to return a specific width value
-    const mockSetState = jest.fn();
-    mockUseState.mockReturnValue([80, mockSetState]);
-    
-    const result = useAutoWidth();
-    
-    expect(result).toHaveProperty('width');
-    expect(result).toHaveProperty('isAutoWidth');
-    expect(typeof result.width).toBe('number');
-    expect(typeof result.isAutoWidth).toBe('boolean');
-    expect(result.isAutoWidth).toBe(true);
+  it('should return the terminal width minus the safety margin', () => {
+    const { lastFrame } = mount();
+
+    assert.equal(lastFrame(), 'width=78 auto=true');
   });
 
   it('should provide fallback width when columns is undefined', () => {
-    // Set columns to undefined
-    Object.defineProperty(process.stdout, 'columns', {
-      value: undefined,
-      writable: true,
-      configurable: true,
-    });
-    
-    const mockSetState = jest.fn();
-    mockUseState.mockReturnValue([78, mockSetState]); // Fallback value with margin applied
-    
-    const result = useAutoWidth();
-    
-    expect(result.width).toBe(78); // Expected fallback (80 - 2 margin)
-    expect(result.isAutoWidth).toBe(true);
+    setColumns(undefined);
+
+    const { lastFrame } = mount();
+
+    assert.equal(lastFrame(), 'width=78 auto=true');
   });
 
-  it('should register and cleanup SIGWINCH event listener', () => {
-    const originalOn = process.on;
-    const originalRemoveListener = process.removeListener;
-    
-    const mockOn = jest.fn();
-    const mockRemoveListener = jest.fn();
-    process.on = mockOn;
-    process.removeListener = mockRemoveListener;
+  it('should register and cleanup SIGWINCH event listener', async () => {
+    const before = process.listenerCount('SIGWINCH');
 
-    // Mock useEffect to capture the cleanup function
-    let cleanupFunction: (() => void) | undefined;
-    const mockSetState = jest.fn();
-    mockUseState.mockReturnValue([80, mockSetState]);
-    mockUseEffect.mockImplementation((effectFn) => {
-      cleanupFunction = effectFn();
-    });
+    mount();
+    await flush();
+    assert.equal(process.listenerCount('SIGWINCH'), before + 1);
 
-    // Call the hook
-    useAutoWidth();
-    
-    // Verify event listener was registered
-    expect(mockOn).toHaveBeenCalledWith('SIGWINCH', expect.any(Function));
-    
-    // Call cleanup function
-    if (cleanupFunction) {
-      cleanupFunction();
-      expect(mockRemoveListener).toHaveBeenCalledWith('SIGWINCH', expect.any(Function));
-    }
-    
-    // Restore
-    process.on = originalOn;
-    process.removeListener = originalRemoveListener;
+    unmount?.();
+    unmount = undefined;
+    await flush();
+    assert.equal(process.listenerCount('SIGWINCH'), before);
   });
 
-  // DEBOUNCING TESTS - Test the specific 40→80→40 scenario with 120ms debouncing
-  it('should debounce rapid terminal resize events (40→80→40 = 1 redraw in 120ms)', (done) => {
-    jest.useFakeTimers();
-    
-    const originalOn = process.on;
-    const originalRemoveListener = process.removeListener;
-    
-    let resizeHandler: (() => void) | undefined;
-    const mockOn = jest.fn((event, handler) => {
-      if (event === 'SIGWINCH') {
-        resizeHandler = handler as () => void;
-      }
-    });
-    const mockRemoveListener = jest.fn();
-    process.on = mockOn;
-    process.removeListener = mockRemoveListener;
+  it('should debounce rapid terminal resize events (40→80→100 = 1 redraw in 120ms)', async () => {
+    setColumns(40);
+    const { lastFrame } = mount();
+    await flush();
+    assert.equal(lastFrame(), 'width=38 auto=true');
 
-    // Track state changes
-    const stateChanges: number[] = [];
-    const mockSetState = jest.fn((newWidth) => {
-      stateChanges.push(newWidth);
-    });
-    
-    const currentWidth = 40;
-    mockUseState.mockReturnValue([currentWidth, mockSetState]);
-    mockUseEffect.mockImplementation((effectFn) => effectFn());
+    mock.timers.enable({ apis: ['setTimeout'] });
+    const rendersBefore = renderCount;
 
-    // Start with 40 columns
-    Object.defineProperty(process.stdout, 'columns', {
-      value: 40,
-      writable: true,
-      configurable: true,
-    });
+    setColumns(80);
+    process.emit('SIGWINCH');
+    setColumns(100);
+    process.emit('SIGWINCH');
 
-    // Initialize the hook
-    useAutoWidth();
-    
-    // Simulate rapid resize events: 40→80→40
-    if (resizeHandler) {
-      // Change to 80
-      Object.defineProperty(process.stdout, 'columns', {
-        value: 80,
-        writable: true,
-        configurable: true,
-      });
-      resizeHandler();
-      
-      // Immediately change to 40 (before 120ms timeout)
-      Object.defineProperty(process.stdout, 'columns', {
-        value: 40,
-        writable: true,
-        configurable: true,
-      });
-      resizeHandler();
-      
-      // Fast forward time by less than 120ms - should not trigger updates yet
-      jest.advanceTimersByTime(100);
-      expect(stateChanges).toHaveLength(0);
-      
-      // Fast forward past 120ms - should trigger only one update (the final state)
-      jest.advanceTimersByTime(25); // Total: 125ms
-      expect(stateChanges).toHaveLength(1);
-      expect(stateChanges[0]).toBe(38); // Final width should be 38 (40 - 2 margin)
-    }
-    
-    // Restore everything
-    jest.useRealTimers();
-    process.on = originalOn;
-    process.removeListener = originalRemoveListener;
-    
-    done();
+    mock.timers.tick(100);
+    await flush();
+    assert.equal(renderCount, rendersBefore, 'no redraw inside the debounce window');
+    assert.equal(lastFrame(), 'width=38 auto=true');
+
+    mock.timers.tick(25);
+    await flush();
+    assert.equal(renderCount, rendersBefore + 1, 'exactly one redraw after the window');
+    assert.equal(lastFrame(), 'width=98 auto=true');
   });
 
-  it('should properly handle multiple debounced events', (done) => {
-    jest.useFakeTimers();
-    
-    const originalOn = process.on;
-    let resizeHandler: (() => void) | undefined;
-    const mockOn = jest.fn((event, handler) => {
-      if (event === 'SIGWINCH') {
-        resizeHandler = handler as () => void;
-      }
-    });
-    process.on = mockOn;
+  it('should properly handle multiple debounced events', async () => {
+    const { lastFrame } = mount();
+    await flush();
 
-    // Track all state updates
-    const stateUpdates: number[] = [];
-    const mockSetState = jest.fn((newWidth) => {
-      stateUpdates.push(newWidth);
-    });
-    
-    mockUseState.mockReturnValue([80, mockSetState]);
-    mockUseEffect.mockImplementation((effectFn) => effectFn());
+    mock.timers.enable({ apis: ['setTimeout'] });
+    const rendersBefore = renderCount;
 
-    // Initialize hook
-    useAutoWidth();
-    
-    if (resizeHandler) {
-      // Simulate multiple rapid changes
-      Object.defineProperty(process.stdout, 'columns', { value: 100, writable: true });
-      resizeHandler();
-      
-      jest.advanceTimersByTime(50);
-      
-      Object.defineProperty(process.stdout, 'columns', { value: 120, writable: true });
-      resizeHandler();
-      
-      jest.advanceTimersByTime(50);
-      
-      Object.defineProperty(process.stdout, 'columns', { value: 90, writable: true });
-      resizeHandler();
-      
-      // At this point 100ms passed, still within debounce window
-      expect(stateUpdates).toHaveLength(0);
-      
-      // Fast forward past 120ms from last change
-      jest.advanceTimersByTime(125);
-      
-      // Should have exactly one update with the final value
-      expect(stateUpdates).toHaveLength(1);
-      expect(stateUpdates[0]).toBe(88); // 90 - 2 margin
-    }
-    
-    // Restore
-    jest.useRealTimers();
-    process.on = originalOn;
-    
-    done();
+    setColumns(100);
+    process.emit('SIGWINCH');
+    mock.timers.tick(50);
+
+    setColumns(120);
+    process.emit('SIGWINCH');
+    mock.timers.tick(50);
+
+    setColumns(90);
+    process.emit('SIGWINCH');
+
+    await flush();
+    assert.equal(renderCount, rendersBefore, 'each event restarts the debounce window');
+    assert.equal(lastFrame(), 'width=78 auto=true');
+
+    mock.timers.tick(DEBOUNCE_MS - 1);
+    await flush();
+    assert.equal(renderCount, rendersBefore, 'still waiting 1ms before the window closes');
+
+    mock.timers.tick(1);
+    await flush();
+    assert.equal(renderCount, rendersBefore + 1);
+    assert.equal(lastFrame(), 'width=88 auto=true');
   });
 });

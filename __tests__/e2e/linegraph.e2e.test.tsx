@@ -4,6 +4,9 @@
  * These tests use ink-testing-library to capture actual terminal output
  * and verify the rendered characters and layout.
  */
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains, assertNotContains } from '../helpers/assertions.js';
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { LineGraph } from '../../src/components/LineGraph.js';
@@ -24,9 +27,9 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(5);
+      assert.equal(lines.length, 5);
       const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasLineChar).toBe(true);
+      assert.equal(hasLineChar, true);
     });
 
     it('renders series with color', () => {
@@ -40,7 +43,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasLineChar).toBe(true);
+      assert.equal(hasLineChar, true);
     });
 
     it('renders constant data as horizontal line', () => {
@@ -57,7 +60,7 @@ describe('E2E: LineGraph', () => {
       const rowsWithChars = lines.filter(line =>
         LINE_CHARS.some(char => line.includes(char))
       );
-      expect(rowsWithChars.length).toBe(1);
+      assert.equal(rowsWithChars.length, 1);
     });
 
     it('handles single data point', () => {
@@ -71,7 +74,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasLineChar).toBe(true);
+      assert.equal(hasLineChar, true);
     });
   });
 
@@ -90,9 +93,9 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(3);
+      assert.equal(lines.length, 3);
       const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasLineChar).toBe(true);
+      assert.equal(hasLineChar, true);
     });
 
     it('first series takes priority on overlap', () => {
@@ -113,7 +116,7 @@ describe('E2E: LineGraph', () => {
 
       // Should render something (exact color testing is complex)
       const hasLineChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasLineChar).toBe(true);
+      assert.equal(hasLineChar, true);
     });
 
     it('uses longest series for auto width', () => {
@@ -133,7 +136,7 @@ describe('E2E: LineGraph', () => {
       const totalChars = LINE_CHARS.reduce((count, char) => {
         return count + (output?.split(char).length ?? 1) - 1;
       }, 0);
-      expect(totalChars).toBeGreaterThanOrEqual(5);
+      assert.ok(totalChars >= 5);
     });
   });
 
@@ -149,9 +152,9 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('⎽'); // bottom
-      expect(output).toContain('─'); // middle
-      expect(output).toContain('⎺'); // top
+      assertContains(output, '⎽'); // bottom
+      assertContains(output, '─'); // middle
+      assertContains(output, '⎺'); // top
     });
 
     it('achieves 5x resolution per row', () => {
@@ -166,11 +169,11 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(2);
+      assert.equal(lines.length, 2);
       const row0HasChar = LINE_CHARS.some(char => lines[0]?.includes(char));
       const row1HasChar = LINE_CHARS.some(char => lines[1]?.includes(char));
-      expect(row0HasChar).toBe(true);
-      expect(row1HasChar).toBe(true);
+      assert.equal(row0HasChar, true);
+      assert.equal(row1HasChar, true);
     });
   });
 
@@ -186,7 +189,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(10);
+      assert.equal(lines.length, 10);
     });
 
     it('respects width setting', () => {
@@ -201,7 +204,7 @@ describe('E2E: LineGraph', () => {
       const lines = output?.split('\n') || [];
 
       lines.forEach(line => {
-        expect(line.length).toBeLessThanOrEqual(4);
+        assert.ok(line.length <= 4);
       });
     });
   });
@@ -218,7 +221,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Test Caption');
+      assertContains(output, 'Test Caption');
     });
 
     it('does not render caption when empty', () => {
@@ -233,7 +236,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(3);
+      assert.equal(lines.length, 3);
     });
   });
 
@@ -249,9 +252,9 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('│');
-      expect(output).toContain('100');
-      expect(output).toContain('10');
+      assertContains(output, '│');
+      assertContains(output, '100');
+      assertContains(output, '10');
     });
 
     it('does not show Y-axis by default', () => {
@@ -264,7 +267,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).not.toContain('│');
+      assertNotContains(output, '│');
     });
 
     it('shows multiple numeric Y-axis labels at correct positions', () => {
@@ -278,10 +281,10 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('│');
-      expect(output).toContain('100');
-      expect(output).toContain('50');
-      expect(output).toContain('0');
+      assertContains(output, '│');
+      assertContains(output, '100');
+      assertContains(output, '50');
+      assertContains(output, '0');
     });
 
     it('enables Y-axis automatically when yLabels is provided', () => {
@@ -295,7 +298,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('│');
+      assertContains(output, '│');
     });
 
     it('shows string Y-axis labels distributed evenly', () => {
@@ -310,10 +313,10 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(output).toContain('│');
-      expect(lines[0]).toContain('High');
-      expect(lines[2]).toContain('Mid');
-      expect(lines[4]).toContain('Low');
+      assertContains(output, '│');
+      assertContains(lines[0], 'High');
+      assertContains(lines[2], 'Mid');
+      assertContains(lines[4], 'Low');
     });
   });
 
@@ -329,11 +332,11 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('─');
-      expect(output).toContain('Q1');
-      expect(output).toContain('Q2');
-      expect(output).toContain('Q3');
-      expect(output).toContain('Q4');
+      assertContains(output, '─');
+      assertContains(output, 'Q1');
+      assertContains(output, 'Q2');
+      assertContains(output, 'Q3');
+      assertContains(output, 'Q4');
     });
 
     it('shows numeric X-axis labels at correct positions', () => {
@@ -348,9 +351,9 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('0');
-      expect(output).toContain('50');
-      expect(output).toContain('100');
+      assertContains(output, '0');
+      assertContains(output, '50');
+      assertContains(output, '100');
     });
 
     it('shows single X-axis label', () => {
@@ -364,7 +367,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Start');
+      assertContains(output, 'Start');
     });
 
     it('renders X-axis line with Y-axis corner when both are shown', () => {
@@ -379,8 +382,8 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('└');
-      expect(output).toContain('─');
+      assertContains(output, '└');
+      assertContains(output, '─');
     });
   });
 
@@ -397,9 +400,9 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(5);
+      assert.equal(lines.length, 5);
       const hasChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasChar).toBe(true);
+      assert.equal(hasChar, true);
     });
 
     it('auto-scales from all series when yDomain is auto', () => {
@@ -417,7 +420,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       const hasChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasChar).toBe(true);
+      assert.equal(hasChar, true);
     });
   });
 
@@ -428,7 +431,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBe('');
+      assert.equal(output, '');
     });
 
     it('returns null for series with no valid values', () => {
@@ -441,7 +444,7 @@ describe('E2E: LineGraph', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBe('');
+      assert.equal(output, '');
     });
 
     it('filters out non-finite values within series', () => {
@@ -455,7 +458,7 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
 
       const hasChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasChar).toBe(true);
+      assert.equal(hasChar, true);
     });
 
     it('handles negative values', () => {
@@ -469,9 +472,9 @@ describe('E2E: LineGraph', () => {
       const output = lastFrame();
       const lines = output?.split('\n') || [];
 
-      expect(lines.length).toBe(5);
+      assert.equal(lines.length, 5);
       const hasChar = LINE_CHARS.some(char => output?.includes(char));
-      expect(hasChar).toBe(true);
+      assert.equal(hasChar, true);
     });
   });
 });

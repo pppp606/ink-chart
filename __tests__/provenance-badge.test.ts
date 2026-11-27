@@ -11,6 +11,9 @@
  * - Consumer verification workflows
  */
 
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains } from './helpers/assertions.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -22,14 +25,14 @@ describe('Provenance Badge Validation', () => {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
       // Validate package.json fields required for provenance
-      expect(packageJson.name).toBe('@pppp606/ink-chart');
-      expect(packageJson.repository).toBeDefined();
-      expect(packageJson.repository.url).toContain('github.com/pppp606/ink-chart');
+      assert.equal(packageJson.name, '@pppp606/ink-chart');
+      assert.notEqual(packageJson.repository, undefined);
+      assertContains(packageJson.repository.url, 'github.com/pppp606/ink-chart');
 
       const provenanceReadiness = validatePackageProvenanceReadiness(packageJson);
-      expect(provenanceReadiness.hasRepository).toBe(true);
-      expect(provenanceReadiness.hasValidScope).toBe(true);
-      expect(provenanceReadiness.isPublic).toBe(true);
+      assert.equal(provenanceReadiness.hasRepository, true);
+      assert.equal(provenanceReadiness.hasValidScope, true);
+      assert.equal(provenanceReadiness.isPublic, true);
     });
 
     it('should validate provenance badge display criteria', () => {
@@ -40,20 +43,20 @@ describe('Provenance Badge Validation', () => {
         repositoryVerified: true
       });
 
-      expect(badgeCriteria.badgeVisible).toBe(true);
-      expect(badgeCriteria.verificationLevel).toBe('verified');
-      expect(badgeCriteria.badgeText).toContain('Provenance');
+      assert.equal(badgeCriteria.badgeVisible, true);
+      assert.equal(badgeCriteria.verificationLevel, 'verified');
+      assertContains(badgeCriteria.badgeText, 'Provenance');
     });
 
     it('should simulate npm package page provenance section', () => {
       const mockPackageData = createMockNpmPackageData();
       const provenanceSection = renderProvenanceSection(mockPackageData);
 
-      expect(provenanceSection).toHaveProperty('badge');
-      expect(provenanceSection).toHaveProperty('details');
-      expect(provenanceSection.badge.text).toContain('Provenance');
-      expect(provenanceSection.badge.verified).toBe(true);
-      expect(provenanceSection.details.sourceRepository).toBe('pppp606/ink-chart');
+      assert.ok('badge' in provenanceSection);
+      assert.ok('details' in provenanceSection);
+      assertContains(provenanceSection.badge.text, 'Provenance');
+      assert.equal(provenanceSection.badge.verified, true);
+      assert.equal(provenanceSection.details.sourceRepository, 'pppp606/ink-chart');
     });
 
     it('should validate provenance information completeness', () => {
@@ -63,15 +66,15 @@ describe('Provenance Badge Validation', () => {
         attestation: createMockAttestation()
       });
 
-      expect(provenanceInfo).toHaveProperty('sourceRepository');
-      expect(provenanceInfo).toHaveProperty('buildWorkflow');
-      expect(provenanceInfo).toHaveProperty('commitHash');
-      expect(provenanceInfo).toHaveProperty('buildTimestamp');
-      expect(provenanceInfo).toHaveProperty('signatureValidation');
+      assert.ok('sourceRepository' in provenanceInfo);
+      assert.ok('buildWorkflow' in provenanceInfo);
+      assert.ok('commitHash' in provenanceInfo);
+      assert.ok('buildTimestamp' in provenanceInfo);
+      assert.ok('signatureValidation' in provenanceInfo);
 
-      expect(provenanceInfo.sourceRepository).toBe('pppp606/ink-chart');
-      expect(provenanceInfo.buildWorkflow).toContain('publish-npm.yml');
-      expect(provenanceInfo.signatureValidation.valid).toBe(true);
+      assert.equal(provenanceInfo.sourceRepository, 'pppp606/ink-chart');
+      assertContains(provenanceInfo.buildWorkflow, 'publish-npm.yml');
+      assert.equal(provenanceInfo.signatureValidation.valid, true);
     });
   });
 
@@ -79,18 +82,18 @@ describe('Provenance Badge Validation', () => {
     it('should validate npm CLI provenance verification command', () => {
       const verificationCommand = generateProvenanceVerificationCommand('@pppp606/ink-chart');
 
-      expect(verificationCommand).toContain('npm audit signatures');
-      expect(verificationCommand).toContain('@pppp606/ink-chart');
+      assertContains(verificationCommand, 'npm audit signatures');
+      assertContains(verificationCommand, '@pppp606/ink-chart');
     });
 
     it('should simulate provenance verification output', () => {
       const verificationOutput = simulateProvenanceVerification('@pppp606/ink-chart@1.0.0');
 
-      expect(verificationOutput.verified).toBe(true);
-      expect(verificationOutput.attestations).toHaveLength(1);
-      expect(verificationOutput.attestations[0]).toHaveProperty('signature');
-      expect(verificationOutput.attestations[0]).toHaveProperty('certificate');
-      expect(verificationOutput.sourceRepository).toBe('pppp606/ink-chart');
+      assert.equal(verificationOutput.verified, true);
+      assert.equal(verificationOutput.attestations.length, 1);
+      assert.ok('signature' in verificationOutput.attestations[0]);
+      assert.ok('certificate' in verificationOutput.attestations[0]);
+      assert.equal(verificationOutput.sourceRepository, 'pppp606/ink-chart');
     });
 
     it('should validate provenance chain of trust', () => {
@@ -101,23 +104,23 @@ describe('Provenance Badge Validation', () => {
         oidcIssuer: 'https://token.actions.githubusercontent.com'
       });
 
-      expect(trustChain.packageMatches).toBe(true);
-      expect(trustChain.repositoryVerified).toBe(true);
-      expect(trustChain.workflowTrusted).toBe(true);
-      expect(trustChain.issuerValid).toBe(true);
-      expect(trustChain.overallTrust).toBe('high');
+      assert.equal(trustChain.packageMatches, true);
+      assert.equal(trustChain.repositoryVerified, true);
+      assert.equal(trustChain.workflowTrusted, true);
+      assert.equal(trustChain.issuerValid, true);
+      assert.equal(trustChain.overallTrust, 'high');
     });
 
     it('should handle provenance verification failures', () => {
       const verificationError = simulateProvenanceVerificationFailure('@pppp606/ink-chart@1.0.0');
 
-      expect(verificationError).toHaveProperty('code');
-      expect(verificationError).toHaveProperty('message');
-      expect(verificationError).toHaveProperty('recommendation');
+      assert.ok('code' in verificationError);
+      assert.ok('message' in verificationError);
+      assert.ok('recommendation' in verificationError);
 
-      expect(verificationError.code).toBe('SIGNATURE_INVALID');
-      expect(verificationError.message).toContain('signature verification failed');
-      expect(verificationError.recommendation).toContain('contact package maintainer');
+      assert.equal(verificationError.code, 'SIGNATURE_INVALID');
+      assertContains(verificationError.message, 'signature verification failed');
+      assertContains(verificationError.recommendation, 'contact package maintainer');
     });
   });
 
@@ -129,17 +132,17 @@ describe('Provenance Badge Validation', () => {
         attestationCount: 1
       });
 
-      expect(badgeHtml).toContain('Provenance');
-      expect(badgeHtml).toContain('verified');
-      expect(badgeHtml).toContain('pppp606/ink-chart');
+      assertContains(badgeHtml, 'Provenance');
+      assertContains(badgeHtml, 'verified');
+      assertContains(badgeHtml, 'pppp606/ink-chart');
     });
 
     it('should validate badge states for different verification levels', () => {
       const verifiedBadge = renderProvenanceBadge({ verified: true, sourceRepository: 'pppp606/ink-chart' });
       const unverifiedBadge = renderProvenanceBadge({ verified: false, sourceRepository: '' });
 
-      expect(verifiedBadge).toContain('verified');
-      expect(unverifiedBadge).toContain('unverified');
+      assertContains(verifiedBadge, 'verified');
+      assertContains(unverifiedBadge, 'unverified');
     });
 
     it('should validate badge interaction and details expansion', () => {
@@ -149,10 +152,10 @@ describe('Provenance Badge Validation', () => {
         hasProvenance: true
       });
 
-      expect(badgeInteraction.detailsExpanded).toBe(true);
-      expect(badgeInteraction.details).toHaveProperty('attestations');
-      expect(badgeInteraction.details).toHaveProperty('buildInfo');
-      expect(badgeInteraction.details).toHaveProperty('verificationSteps');
+      assert.equal(badgeInteraction.detailsExpanded, true);
+      assert.ok('attestations' in badgeInteraction.details);
+      assert.ok('buildInfo' in badgeInteraction.details);
+      assert.ok('verificationSteps' in badgeInteraction.details);
     });
   });
 
@@ -166,10 +169,10 @@ describe('Provenance Badge Validation', () => {
         certificateChainValid: true
       });
 
-      expect(securityLevel.level).toBe('high');
-      expect(securityLevel.score).toBeGreaterThan(80);
-      expect(securityLevel.indicators).toContain('provenance-verified');
-      expect(securityLevel.indicators).toContain('trusted-workflow');
+      assert.equal(securityLevel.level, 'high');
+      assert.ok(securityLevel.score > 80);
+      assertContains(securityLevel.indicators, 'provenance-verified');
+      assertContains(securityLevel.indicators, 'trusted-workflow');
     });
 
     it('should validate trust warnings for packages without provenance', () => {
@@ -178,9 +181,9 @@ describe('Provenance Badge Validation', () => {
         publishMethod: 'npm-token'
       });
 
-      expect(trustWarning.level).toBe('medium');
-      expect(trustWarning.message).toContain('provenance');
-      expect(trustWarning.recommendation).toContain('OIDC');
+      assert.equal(trustWarning.level, 'medium');
+      assertContains(trustWarning.message, 'provenance');
+      assertContains(trustWarning.recommendation, 'OIDC');
     });
 
     it('should validate provenance comparison between versions', () => {
@@ -190,9 +193,9 @@ describe('Provenance Badge Validation', () => {
         { version: '0.8.0', hasProvenance: false, repository: 'pppp606/ink-chart' }
       ]);
 
-      expect(comparison.provenanceIntroduced).toBe('1.0.0');
-      expect(comparison.consistentRepository).toBe(true);
-      expect(comparison.securityImprovement).toBe(true);
+      assert.equal(comparison.provenanceIntroduced, '1.0.0');
+      assert.equal(comparison.consistentRepository, true);
+      assert.equal(comparison.securityImprovement, true);
     });
   });
 
@@ -207,9 +210,9 @@ describe('Provenance Badge Validation', () => {
 
       const validation = validateProvenanceData(malformedProvenance);
 
-      expect(validation.valid).toBe(false);
-      expect(validation.errors).toContain('missing subject');
-      expect(validation.recommendation).toContain('republish');
+      assert.equal(validation.valid, false);
+      assertContains(validation.errors, 'missing subject');
+      assertContains(validation.recommendation, 'republish');
     });
 
     it('should handle repository mismatch in provenance', () => {
@@ -222,17 +225,17 @@ describe('Provenance Badge Validation', () => {
         mismatchedProvenance
       );
 
-      expect(repositoryValidation.matches).toBe(false);
-      expect(repositoryValidation.warning).toContain('Repository in provenance does not match package');
-      expect(repositoryValidation.trustLevel).toBe('low');
+      assert.equal(repositoryValidation.matches, false);
+      assertContains(repositoryValidation.warning, 'Repository in provenance does not match package');
+      assert.equal(repositoryValidation.trustLevel, 'low');
     });
 
     it('should handle network failures during provenance verification', () => {
       const networkError = simulateNetworkFailureDuringVerification();
 
-      expect(networkError.code).toBe('NETWORK_ERROR');
-      expect(networkError.retryable).toBe(true);
-      expect(networkError.fallbackAvailable).toBe(true);
+      assert.equal(networkError.code, 'NETWORK_ERROR');
+      assert.equal(networkError.retryable, true);
+      assert.equal(networkError.fallbackAvailable, true);
     });
   });
 });

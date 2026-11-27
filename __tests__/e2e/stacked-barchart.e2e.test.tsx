@@ -4,6 +4,9 @@
  * These tests use ink-testing-library to capture actual terminal output
  * and verify the rendered stacked segments, labels, values, and colors.
  */
+import { after, before, describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains, assertNotContains } from '../helpers/assertions.js';
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { StackedBarChart } from '../../src/components/StackedBarChart.js';
@@ -23,8 +26,8 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
-      expect((output || '').length).toBeGreaterThan(0);
+      assert.notEqual(output, undefined);
+      assert.ok((output || '').length > 0);
     });
 
     it('renders with multiple segments', () => {
@@ -40,7 +43,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 
@@ -58,7 +61,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
 
     it('normalizes values to percentage', () => {
@@ -76,7 +79,7 @@ describe('E2E: StackedBarChart', () => {
       const output = lastFrame();
 
       // Each segment should take roughly 1/3 of the bar
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 
@@ -95,7 +98,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
 
     it('respects max value in absolute mode', () => {
@@ -109,17 +112,17 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 
   describe('Colors', () => {
-    beforeAll(() => {
+    before(() => {
       // Force 24-bit color depth for color tests
       process.env.FORCE_COLOR_DEPTH = '8';
     });
 
-    afterAll(() => {
+    after(() => {
       delete process.env.FORCE_COLOR_DEPTH;
     });
 
@@ -136,8 +139,8 @@ describe('E2E: StackedBarChart', () => {
       const output = lastFrame();
 
       // Verify segments are rendered
-      expect(output).toBeDefined();
-      expect((output || '').length).toBeGreaterThan(0);
+      assert.notEqual(output, undefined);
+      assert.ok((output || '').length > 0);
     });
 
     it('applies different colors to each segment', () => {
@@ -154,7 +157,7 @@ describe('E2E: StackedBarChart', () => {
       const output = lastFrame();
 
       // Verify the chart renders
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 
@@ -172,8 +175,8 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Sales');
-      expect(output).toContain('Cost');
+      assertContains(output, 'Sales');
+      assertContains(output, 'Cost');
     });
 
     it('hides labels when disabled', () => {
@@ -190,7 +193,7 @@ describe('E2E: StackedBarChart', () => {
       const frame = lastFrame();
       const cleanOutput = stripAnsi(frame || '');
 
-      expect(cleanOutput).not.toContain('Hidden');
+      assertNotContains(cleanOutput, 'Hidden');
     });
 
     it('shows values when enabled', () => {
@@ -206,7 +209,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 
@@ -225,7 +228,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
 
     it('format receives mode parameter', () => {
@@ -247,8 +250,8 @@ describe('E2E: StackedBarChart', () => {
         />
       );
 
-      expect(formatCalled).toBe(true);
-      expect(receivedMode).toBeDefined();
+      assert.equal(formatCalled, true);
+      assert.notEqual(receivedMode, undefined);
     });
   });
 
@@ -265,7 +268,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 
@@ -276,7 +279,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
 
     it('handles many segments', () => {
@@ -294,7 +297,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
 
     it('handles small values', () => {
@@ -309,7 +312,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
 
     it('handles zero values gracefully', () => {
@@ -324,7 +327,7 @@ describe('E2E: StackedBarChart', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBeDefined();
+      assert.notEqual(output, undefined);
     });
   });
 });

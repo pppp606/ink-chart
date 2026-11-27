@@ -8,6 +8,9 @@
  * - Workflow security configuration
  */
 
+import { describe, test } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertMatch } from './helpers/assertions.js';
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 
@@ -19,7 +22,7 @@ describe('Workflow Protection', () => {
     const codeownersPath = join(githubDir, 'CODEOWNERS');
 
     test('should exist in .github directory', () => {
-      expect(existsSync(codeownersPath)).toBe(true);
+      assert.equal(existsSync(codeownersPath), true);
     });
 
     test('should have valid syntax and structure', () => {
@@ -30,10 +33,10 @@ describe('Workflow Protection', () => {
       const content = readFileSync(codeownersPath, 'utf8');
 
       // Check for basic structure
-      expect(content).toMatch(/# Global ownership/);
-      expect(content).toMatch(/# Workflow security/);
-      expect(content).toMatch(/# Security configuration/);
-      expect(content).toMatch(/# Documentation/);
+      assertMatch(content, /# Global ownership/);
+      assertMatch(content, /# Workflow security/);
+      assertMatch(content, /# Security configuration/);
+      assertMatch(content, /# Documentation/);
     });
 
     test('should protect critical workflow files', () => {
@@ -44,8 +47,8 @@ describe('Workflow Protection', () => {
       const content = readFileSync(codeownersPath, 'utf8');
 
       // Check for workflow protection
-      expect(content).toMatch(/\/\.github\/workflows\/.*@pppp606/);
-      expect(content).toMatch(/\/\.github\/dependabot\.yml.*@pppp606/);
+      assertMatch(content, /\/\.github\/workflows\/.*@pppp606/);
+      assertMatch(content, /\/\.github\/dependabot\.yml.*@pppp606/);
     });
 
     test('should protect security configuration files', () => {
@@ -56,9 +59,9 @@ describe('Workflow Protection', () => {
       const content = readFileSync(codeownersPath, 'utf8');
 
       // Check for security file protection
-      expect(content).toMatch(/\/SECURITY\.md.*@pppp606/);
-      expect(content).toMatch(/\/\.secretlintrc\.json.*@pppp606/);
-      expect(content).toMatch(/\/package\.json.*@pppp606/);
+      assertMatch(content, /\/SECURITY\.md.*@pppp606/);
+      assertMatch(content, /\/\.secretlintrc\.json.*@pppp606/);
+      assertMatch(content, /\/package\.json.*@pppp606/);
     });
 
     test('should protect validation scripts', () => {
@@ -69,7 +72,7 @@ describe('Workflow Protection', () => {
       const content = readFileSync(codeownersPath, 'utf8');
 
       // Check for script protection
-      expect(content).toMatch(/\/scripts\/validate-.*@pppp606/);
+      assertMatch(content, /\/scripts\/validate-.*@pppp606/);
     });
 
     test('should have global ownership defined', () => {
@@ -80,7 +83,7 @@ describe('Workflow Protection', () => {
       const content = readFileSync(codeownersPath, 'utf8');
 
       // Check for global ownership
-      expect(content).toMatch(/^\*\s+@pppp606/m);
+      assertMatch(content, /^\*\s+@pppp606/m);
     });
 
     test('should have documentation ownership', () => {
@@ -91,7 +94,7 @@ describe('Workflow Protection', () => {
       const content = readFileSync(codeownersPath, 'utf8');
 
       // Check for documentation ownership (README)
-      expect(content).toMatch(/\/README\.md.*@pppp606/);
+      assertMatch(content, /\/README\.md.*@pppp606/);
     });
   });
 
@@ -106,9 +109,9 @@ describe('Workflow Protection', () => {
       const content = readFileSync(securityPath, 'utf8');
 
       // Check for workflow protection content
-      expect(content).toMatch(/Workflow Protection/i);
-      expect(content).toMatch(/CODEOWNERS/);
-      expect(content).toMatch(/Branch Protection/i);
+      assertMatch(content, /Workflow Protection/i);
+      assertMatch(content, /CODEOWNERS/);
+      assertMatch(content, /Branch Protection/i);
     });
 
     test('should document security contact procedures', () => {
@@ -119,9 +122,9 @@ describe('Workflow Protection', () => {
       const content = readFileSync(securityPath, 'utf8');
 
       // Check for contact procedures
-      expect(content).toMatch(/Security Contact/i);
-      expect(content).toMatch(/Reporting.*Vulnerability/i);
-      expect(content).toMatch(/Response.*Time/i);
+      assertMatch(content, /Security Contact/i);
+      assertMatch(content, /Reporting.*Vulnerability/i);
+      assertMatch(content, /Response.*Time/i);
     });
 
     test('should include security response process', () => {
@@ -132,11 +135,11 @@ describe('Workflow Protection', () => {
       const content = readFileSync(securityPath, 'utf8');
 
       // Check for response process
-      expect(content).toMatch(/Security Response Process/i);
-      expect(content).toMatch(/Acknowledgment/i);
-      expect(content).toMatch(/Assessment/i);
-      expect(content).toMatch(/Resolution/i);
-      expect(content).toMatch(/Disclosure/i);
+      assertMatch(content, /Security Response Process/i);
+      assertMatch(content, /Acknowledgment/i);
+      assertMatch(content, /Assessment/i);
+      assertMatch(content, /Resolution/i);
+      assertMatch(content, /Disclosure/i);
     });
 
     test('should document workflow security measures', () => {
@@ -147,9 +150,9 @@ describe('Workflow Protection', () => {
       const content = readFileSync(securityPath, 'utf8');
 
       // Check for workflow security measures
-      expect(content).toMatch(/Workflow.*Security/i);
-      expect(content).toMatch(/Supply Chain.*Protection/i);
-      expect(content).toMatch(/CI\/CD.*Security/i);
+      assertMatch(content, /Workflow.*Security/i);
+      assertMatch(content, /Supply Chain.*Protection/i);
+      assertMatch(content, /CI\/CD.*Security/i);
     });
   });
 
@@ -164,8 +167,8 @@ describe('Workflow Protection', () => {
       const content = readFileSync(readmePath, 'utf8');
 
       // Check for security section
-      expect(content).toMatch(/Security.*Practices/i);
-      expect(content).toMatch(/security/i);
+      assertMatch(content, /Security.*Practices/i);
+      assertMatch(content, /security/i);
     });
 
     test('should reference security documentation', () => {
@@ -176,8 +179,8 @@ describe('Workflow Protection', () => {
       const content = readFileSync(readmePath, 'utf8');
 
       // Check for security documentation references
-      expect(content).toMatch(/SECURITY\.md/);
-      expect(content).toMatch(/security.*policy/i);
+      assertMatch(content, /SECURITY\.md/);
+      assertMatch(content, /security.*policy/i);
     });
 
     test('should mention security features', () => {
@@ -188,51 +191,51 @@ describe('Workflow Protection', () => {
       const content = readFileSync(readmePath, 'utf8');
 
       // Check for security features
-      expect(content).toMatch(/secure/i);
-      expect(content).toMatch(/SHA-pinned/i);
-      expect(content).toMatch(/provenance/i);
+      assertMatch(content, /secure/i);
+      assertMatch(content, /SHA-pinned/i);
+      assertMatch(content, /provenance/i);
     });
   });
 
   describe('Workflow Security Configuration', () => {
     test('should have secretlint configuration protecting workflows', () => {
       const secretlintPath = join(rootDir, '.secretlintrc.json');
-      expect(existsSync(secretlintPath)).toBe(true);
+      assert.equal(existsSync(secretlintPath), true);
 
       if (existsSync(secretlintPath)) {
         const content = readFileSync(secretlintPath, 'utf8');
         const config = JSON.parse(content);
 
         // Check for workflow file scanning
-        expect(config.rules).toBeDefined();
-        expect(Array.isArray(config.rules)).toBe(true);
+        assert.notEqual(config.rules, undefined);
+        assert.equal(Array.isArray(config.rules), true);
       }
     });
 
     test('should have validation scripts for workflow security', () => {
       const scriptsDir = join(rootDir, 'scripts');
-      expect(existsSync(scriptsDir)).toBe(true);
+      assert.equal(existsSync(scriptsDir), true);
 
       // Check for validation scripts
       const shaValidationPath = join(scriptsDir, 'validate-sha-pinning.js');
       const permissionsValidationPath = join(scriptsDir, 'validate-permissions.js');
 
-      expect(existsSync(shaValidationPath)).toBe(true);
-      expect(existsSync(permissionsValidationPath)).toBe(true);
+      assert.equal(existsSync(shaValidationPath), true);
+      assert.equal(existsSync(permissionsValidationPath), true);
     });
 
     test('should protect package.json scripts from unauthorized changes', () => {
       const packagePath = join(rootDir, 'package.json');
-      expect(existsSync(packagePath)).toBe(true);
+      assert.equal(existsSync(packagePath), true);
 
       if (existsSync(packagePath)) {
         const content = readFileSync(packagePath, 'utf8');
         const pkg = JSON.parse(content);
 
         // Check for security-related scripts
-        expect(pkg.scripts).toHaveProperty('lint:secrets');
-        expect(pkg.scripts).toHaveProperty('validate:sha-pinning');
-        expect(pkg.scripts).toHaveProperty('validate:permissions');
+        assert.ok('lint:secrets' in pkg.scripts);
+        assert.ok('validate:sha-pinning' in pkg.scripts);
+        assert.ok('validate:permissions' in pkg.scripts);
       }
     });
   });
@@ -245,8 +248,8 @@ describe('Workflow Protection', () => {
         const content = readFileSync(securityPath, 'utf8');
 
         // Check for contact information
-        expect(content).toMatch(/Contact.*Information/i);
-        expect(content).toMatch(/Email|GitHub/i);
+        assertMatch(content, /Contact.*Information/i);
+        assertMatch(content, /Email|GitHub/i);
       }
     });
 
@@ -257,8 +260,8 @@ describe('Workflow Protection', () => {
         const content = readFileSync(securityPath, 'utf8');
 
         // Check for response times
-        expect(content).toMatch(/48.*hours/i);
-        expect(content).toMatch(/7.*days/i);
+        assertMatch(content, /48.*hours/i);
+        assertMatch(content, /7.*days/i);
       }
     });
 
@@ -269,9 +272,9 @@ describe('Workflow Protection', () => {
         const content = readFileSync(securityPath, 'utf8');
 
         // Check for reporting guidelines
-        expect(content).toMatch(/What to Include/i);
-        expect(content).toMatch(/Step-by-step/i);
-        expect(content).toMatch(/Proof-of-concept/i);
+        assertMatch(content, /What to Include/i);
+        assertMatch(content, /Step-by-step/i);
+        assertMatch(content, /Proof-of-concept/i);
       }
     });
   });

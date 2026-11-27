@@ -4,6 +4,9 @@
  * Following TDD methodology - RED phase (tests that will initially fail)
  */
 
+import { describe, test } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains, assertNotContains, assertMatch } from './helpers/assertions.js';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 
@@ -14,117 +17,117 @@ const packageJson = JSON.parse(readFileSync(packageJsonPath, 'utf-8'));
 describe('Package Configuration Security', () => {
   describe('publishConfig validation', () => {
     test('should have publishConfig defined', () => {
-      expect(packageJson.publishConfig).toBeDefined();
-      expect(typeof packageJson.publishConfig).toBe('object');
+      assert.notEqual(packageJson.publishConfig, undefined);
+      assert.equal(typeof packageJson.publishConfig, 'object');
     });
 
     test('should have explicit registry configuration', () => {
-      expect(packageJson.publishConfig.registry).toBe('https://registry.npmjs.org/');
+      assert.equal(packageJson.publishConfig.registry, 'https://registry.npmjs.org/');
     });
 
     test('should have public access for scoped package', () => {
-      expect(packageJson.publishConfig.access).toBe('public');
+      assert.equal(packageJson.publishConfig.access, 'public');
     });
 
     test('should have tag configuration', () => {
-      expect(packageJson.publishConfig.tag).toBeDefined();
-      expect(packageJson.publishConfig.tag).toBe('latest');
+      assert.notEqual(packageJson.publishConfig.tag, undefined);
+      assert.equal(packageJson.publishConfig.tag, 'latest');
     });
 
     test('should prevent provenance bypass', () => {
-      expect(packageJson.publishConfig.provenance).toBe(true);
+      assert.equal(packageJson.publishConfig.provenance, true);
     });
   });
 
   describe('Security metadata validation', () => {
     test('should have bugs reporting URL', () => {
-      expect(packageJson.bugs).toBeDefined();
-      expect(packageJson.bugs.url).toBe('https://github.com/pppp606/ink-chart/issues');
+      assert.notEqual(packageJson.bugs, undefined);
+      assert.equal(packageJson.bugs.url, 'https://github.com/pppp606/ink-chart/issues');
     });
 
     test('should have homepage URL', () => {
-      expect(packageJson.homepage).toBeDefined();
-      expect(packageJson.homepage).toBe('https://github.com/pppp606/ink-chart#readme');
+      assert.notEqual(packageJson.homepage, undefined);
+      assert.equal(packageJson.homepage, 'https://github.com/pppp606/ink-chart#readme');
     });
 
     test('should have funding information', () => {
-      expect(packageJson.funding).toBeDefined();
-      expect(packageJson.funding.type).toBe('github');
-      expect(packageJson.funding.url).toBe('https://github.com/sponsors/pppp606');
+      assert.notEqual(packageJson.funding, undefined);
+      assert.equal(packageJson.funding.type, 'github');
+      assert.equal(packageJson.funding.url, 'https://github.com/sponsors/pppp606');
     });
 
     test('should have engines specification', () => {
-      expect(packageJson.engines).toBeDefined();
-      expect(packageJson.engines.node).toBeDefined();
-      expect(packageJson.engines.node).toBe('>=20.0.0');
+      assert.notEqual(packageJson.engines, undefined);
+      assert.notEqual(packageJson.engines.node, undefined);
+      assert.equal(packageJson.engines.node, '>=20.0.0');
     });
 
     test('should have security-focused keywords', () => {
-      expect(packageJson.keywords).toContain('secure');
-      expect(packageJson.keywords).toContain('typescript');
-      expect(packageJson.keywords).toContain('provenance');
+      assertContains(packageJson.keywords, 'secure');
+      assertContains(packageJson.keywords, 'typescript');
+      assertContains(packageJson.keywords, 'provenance');
     });
   });
 
   describe('Repository security configuration', () => {
     test('should have complete repository information', () => {
-      expect(packageJson.repository).toBeDefined();
-      expect(packageJson.repository.type).toBe('git');
-      expect(packageJson.repository.url).toBe('https://github.com/pppp606/ink-chart.git');
+      assert.notEqual(packageJson.repository, undefined);
+      assert.equal(packageJson.repository.type, 'git');
+      assert.equal(packageJson.repository.url, 'https://github.com/pppp606/ink-chart.git');
     });
 
     test('should have repository directory for monorepo support', () => {
       // This test is optional for single-repo packages
       if (packageJson.repository.directory) {
-        expect(typeof packageJson.repository.directory).toBe('string');
+        assert.equal(typeof packageJson.repository.directory, 'string');
       }
     });
   });
 
   describe('Package integrity validation', () => {
     test('should have files array for explicit inclusion', () => {
-      expect(packageJson.files).toBeDefined();
-      expect(Array.isArray(packageJson.files)).toBe(true);
-      expect(packageJson.files).toContain('dist');
+      assert.notEqual(packageJson.files, undefined);
+      assert.equal(Array.isArray(packageJson.files), true);
+      assertContains(packageJson.files, 'dist');
     });
 
     test('should have sideEffects configuration', () => {
-      expect(packageJson.sideEffects).toBeDefined();
-      expect(packageJson.sideEffects).toBe(false);
+      assert.notEqual(packageJson.sideEffects, undefined);
+      assert.equal(packageJson.sideEffects, false);
     });
 
     test('should have audit configuration', () => {
-      expect(packageJson.config).toBeDefined();
-      expect(packageJson.config['audit-level']).toBe('high');
+      assert.notEqual(packageJson.config, undefined);
+      assert.equal(packageJson.config['audit-level'], 'high');
     });
   });
 
   describe('Author and license validation', () => {
     test('should have complete author information', () => {
-      expect(packageJson.author).toBeDefined();
-      expect(packageJson.author.name).toBeDefined();
-      expect(packageJson.author.url).toBeDefined();
-      expect(packageJson.author.email).toBeDefined();
+      assert.notEqual(packageJson.author, undefined);
+      assert.notEqual(packageJson.author.name, undefined);
+      assert.notEqual(packageJson.author.url, undefined);
+      assert.notEqual(packageJson.author.email, undefined);
     });
 
     test('should have MIT license', () => {
-      expect(packageJson.license).toBe('MIT');
+      assert.equal(packageJson.license, 'MIT');
     });
   });
 
   describe('Security scripts validation', () => {
     test('should have audit scripts', () => {
-      expect(packageJson.scripts.audit).toBeDefined();
-      expect(packageJson.scripts['audit:fix']).toBeDefined();
+      assert.notEqual(packageJson.scripts.audit, undefined);
+      assert.notEqual(packageJson.scripts['audit:fix'], undefined);
     });
 
     test('should have secret scanning script', () => {
-      expect(packageJson.scripts['lint:secrets']).toBeDefined();
+      assert.notEqual(packageJson.scripts['lint:secrets'], undefined);
     });
 
     test('should have validation scripts', () => {
-      expect(packageJson.scripts['validate:sha-pinning']).toBeDefined();
-      expect(packageJson.scripts['validate:permissions']).toBeDefined();
+      assert.notEqual(packageJson.scripts['validate:sha-pinning'], undefined);
+      assert.notEqual(packageJson.scripts['validate:permissions'], undefined);
     });
   });
 
@@ -133,25 +136,25 @@ describe('Package Configuration Security', () => {
       // This is a meta-test to ensure we're not accidentally bypassing
       // our security configurations through .npmrc files
       const packageName = packageJson.name;
-      expect(packageName).toMatch(/^@pppp606\//);
+      assertMatch(packageName, /^@pppp606\//);
     });
 
     test('should have provenance attestation enabled', () => {
       // Verify that publishing will generate provenance attestation
-      expect(packageJson.publishConfig?.provenance).toBe(true);
+      assert.equal(packageJson.publishConfig?.provenance, true);
     });
   });
 
   describe('Dependency security validation', () => {
     test('should have peer dependencies properly specified', () => {
-      expect(packageJson.peerDependencies).toBeDefined();
-      expect(packageJson.peerDependencies.ink).toBeDefined();
-      expect(packageJson.peerDependencies.react).toBeDefined();
+      assert.notEqual(packageJson.peerDependencies, undefined);
+      assert.notEqual(packageJson.peerDependencies.ink, undefined);
+      assert.notEqual(packageJson.peerDependencies.react, undefined);
     });
 
     test('should have proper version constraints', () => {
-      expect(packageJson.peerDependencies.ink).toMatch(/>=\d+/);
-      expect(packageJson.peerDependencies.react).toMatch(/>=\d+/);
+      assertMatch(packageJson.peerDependencies.ink, />=\d+/);
+      assertMatch(packageJson.peerDependencies.react, />=\d+/);
     });
   });
 });
@@ -171,26 +174,26 @@ describe('Package Security Integration Tests', () => {
     ];
 
     requiredFields.forEach(field => {
-      expect(packageJson[field]).toBeDefined();
+      assert.notEqual(packageJson[field], undefined);
     });
   });
 
   test('should be ready for secure publishing', () => {
     // Comprehensive test that validates the package is ready for secure publishing
-    expect(packageJson.publishConfig?.access).toBe('public');
-    expect(packageJson.publishConfig?.registry).toBe('https://registry.npmjs.org/');
-    expect(packageJson.publishConfig?.provenance).toBe(true);
-    expect(packageJson.files).toContain('dist');
-    expect(packageJson.license).toBe('MIT');
+    assert.equal(packageJson.publishConfig?.access, 'public');
+    assert.equal(packageJson.publishConfig?.registry, 'https://registry.npmjs.org/');
+    assert.equal(packageJson.publishConfig?.provenance, true);
+    assertContains(packageJson.files, 'dist');
+    assert.equal(packageJson.license, 'MIT');
   });
 
   test('should have security-conscious package metadata', () => {
     // Test that the package has metadata that helps with security assessment
-    expect(packageJson.keywords).toContain('secure');
-    expect(packageJson.keywords).toContain('typescript');
-    expect(packageJson.keywords).toContain('provenance');
-    expect(packageJson.engines?.node).toBeDefined();
-    expect(packageJson.funding).toBeDefined();
+    assertContains(packageJson.keywords, 'secure');
+    assertContains(packageJson.keywords, 'typescript');
+    assertContains(packageJson.keywords, 'provenance');
+    assert.notEqual(packageJson.engines?.node, undefined);
+    assert.notEqual(packageJson.funding, undefined);
   });
 
   test('should have proper URL formats', () => {
@@ -205,33 +208,33 @@ describe('Package Security Integration Tests', () => {
     ].filter(Boolean);
 
     urls.forEach(url => {
-      expect(url).toMatch(/^https:\/\//);
+      assertMatch(url, /^https:\/\//);
     });
   });
 
   test('should have consistent naming and versioning', () => {
     // Validate package naming conventions and version constraints
-    expect(packageJson.name).toMatch(/^@pppp606\/[a-z-]+$/);
-    expect(packageJson.version).toMatch(/^\d+\.\d+\.\d+$/);
-    expect(packageJson.engines?.node).toMatch(/>=\d+\.\d+\.\d+/);
+    assertMatch(packageJson.name, /^@pppp606\/[a-z-]+$/);
+    assertMatch(packageJson.version, /^\d+\.\d+\.\d+$/);
+    assertMatch(packageJson.engines?.node, />=\d+\.\d+\.\d+/);
   });
 
   test('should have security-optimized file configuration', () => {
     // Ensure only necessary files are included in the package
-    expect(packageJson.files).toBeDefined();
-    expect(packageJson.files).not.toContain('src'); // Source files should not be published
-    expect(packageJson.files).not.toContain('__tests__'); // Test files should not be published
-    expect(packageJson.files).not.toContain('.github'); // GitHub workflows should not be published
-    expect(packageJson.sideEffects).toBe(false); // Should be tree-shakeable
+    assert.notEqual(packageJson.files, undefined);
+    assertNotContains(packageJson.files, 'src'); // Source files should not be published
+    assertNotContains(packageJson.files, '__tests__'); // Test files should not be published
+    assertNotContains(packageJson.files, '.github'); // GitHub workflows should not be published
+    assert.equal(packageJson.sideEffects, false); // Should be tree-shakeable
   });
 
   test('should have comprehensive metadata for supply chain security', () => {
     // Validate metadata that helps with supply chain security assessment
-    expect(packageJson.description).toBeTruthy();
-    expect(packageJson.description.length).toBeGreaterThan(10);
-    expect(packageJson.keywords.length).toBeGreaterThan(5);
-    expect(packageJson.author.name).toBeTruthy();
-    expect(packageJson.author.email).toBeTruthy();
-    expect(packageJson.repository.type).toBe('git');
+    assert.ok(packageJson.description);
+    assert.ok(packageJson.description.length > 10);
+    assert.ok(packageJson.keywords.length > 5);
+    assert.ok(packageJson.author.name);
+    assert.ok(packageJson.author.email);
+    assert.equal(packageJson.repository.type, 'git');
   });
 });

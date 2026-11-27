@@ -4,6 +4,9 @@
  * These tests use ink-testing-library to capture actual terminal output
  * and verify the rendered characters, ANSI color codes, and layout.
  */
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains, assertMatch } from '../helpers/assertions.js';
 import React from 'react';
 import { render } from 'ink-testing-library';
 import { Sparkline } from '../../src/components/Sparkline.js';
@@ -17,7 +20,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBe('▁▂▃▄▅▆▇█');
+      assert.equal(output, '▁▂▃▄▅▆▇█');
     });
 
     it('renders constant data as same height blocks', () => {
@@ -27,9 +30,9 @@ describe('E2E: Sparkline', () => {
       const output = lastFrame();
 
       // All same values should render as same height blocks
-      expect(output).toMatch(/^[▁▂▃▄▅▆▇█]{4}$/);
+      assertMatch(output, /^[▁▂▃▄▅▆▇█]{4}$/);
       // All characters should be identical
-      expect(new Set(output?.split('')).size).toBe(1);
+      assert.equal(new Set(output?.split('')).size, 1);
     });
 
     it('renders descending data correctly', () => {
@@ -38,7 +41,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBe('█▅▃▁');
+      assert.equal(output, '█▅▃▁');
     });
 
     it('handles single data point', () => {
@@ -48,7 +51,7 @@ describe('E2E: Sparkline', () => {
       const output = lastFrame();
 
       // Single data point should render as a block character
-      expect(output).toMatch(/^[▁▂▃▄▅▆▇█]$/);
+      assertMatch(output, /^[▁▂▃▄▅▆▇█]$/);
     });
   });
 
@@ -60,7 +63,7 @@ describe('E2E: Sparkline', () => {
       const output = lastFrame();
 
       // Should contain braille characters
-      expect(output).toMatch(/[⠀⠄⠆⠇⠏⠟⠿⣿]/);
+      assertMatch(output, /[⠀⠄⠆⠇⠏⠟⠿⣿]/);
     });
 
     it('renders ascending data in braille', () => {
@@ -69,7 +72,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(output).toBe('⠀⠄⠆⠇⠏⠟⠿⣿');
+      assert.equal(output, '⠀⠄⠆⠇⠏⠟⠿⣿');
     });
   });
 
@@ -85,8 +88,8 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(hasAnsi(output || '')).toBe(true);
-      expect(stripAnsi(output || '')).toBe('▁▄█');
+      assert.equal(hasAnsi(output || ''), true);
+      assert.equal(stripAnsi(output || ''), '▁▄█');
     });
 
     it('applies gradient colors with multiple thresholds', () => {
@@ -100,7 +103,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(hasAnsi(output || '')).toBe(true);
+      assert.equal(hasAnsi(output || ''), true);
     });
 
     it('supports blue color scheme', () => {
@@ -114,7 +117,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(hasAnsi(output || '')).toBe(true);
+      assert.equal(hasAnsi(output || ''), true);
     });
 
     it('supports green color scheme', () => {
@@ -128,7 +131,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(hasAnsi(output || '')).toBe(true);
+      assert.equal(hasAnsi(output || ''), true);
     });
 
     it('does not apply color when below threshold', () => {
@@ -142,7 +145,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(hasAnsi(output || '')).toBe(false);
+      assert.equal(hasAnsi(output || ''), false);
     });
   });
 
@@ -153,7 +156,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(stripAnsi(output || '').length).toBe(5);
+      assert.equal(stripAnsi(output || '').length, 5);
     });
 
     it('handles data longer than width by resampling', () => {
@@ -162,7 +165,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(stripAnsi(output || '').length).toBe(4);
+      assert.equal(stripAnsi(output || '').length, 4);
     });
   });
 
@@ -173,7 +176,7 @@ describe('E2E: Sparkline', () => {
       );
       const output = lastFrame();
 
-      expect(output).toContain('Test Caption');
+      assertContains(output, 'Test Caption');
     });
   });
 
@@ -185,8 +188,8 @@ describe('E2E: Sparkline', () => {
       const output = lastFrame();
 
       // With fixed domain 0-100, values 25, 50, 75 should map to specific blocks
-      expect(output).toBeDefined();
-      expect(stripAnsi(output || '').length).toBe(3);
+      assert.notEqual(output, undefined);
+      assert.equal(stripAnsi(output || '').length, 3);
     });
   });
 });

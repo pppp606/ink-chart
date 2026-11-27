@@ -1,3 +1,6 @@
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains, assertMatch, assertNotMatch } from './helpers/assertions.js';
 import { execSync } from 'child_process';
 import fs from 'fs';
 import path from 'path';
@@ -12,22 +15,22 @@ describe('Security Scanning', () => {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
       // Test that audit script exists
-      expect(packageJson.scripts).toHaveProperty('audit');
-      expect(packageJson.scripts.audit).toContain('npm audit');
+      assert.ok('audit' in packageJson.scripts);
+      assertContains(packageJson.scripts.audit, 'npm audit');
 
       // Test that audit:fix script exists
-      expect(packageJson.scripts).toHaveProperty('audit:fix');
-      expect(packageJson.scripts['audit:fix']).toContain('npm audit fix');
+      assert.ok('audit:fix' in packageJson.scripts);
+      assertContains(packageJson.scripts['audit:fix'], 'npm audit fix');
     });
 
     it('should have audit configuration for severity thresholds', () => {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
       // Test that npm config has audit-level set to moderate or higher
-      expect(packageJson.scripts.audit).toMatch(/--audit-level (moderate|high|critical)/);
+      assertMatch(packageJson.scripts.audit, /--audit-level (moderate|high|critical)/);
     });
 
-    it('should run npm audit without high/critical vulnerabilities', async () => {
+    it('should run npm audit without high/critical vulnerabilities', { timeout: 45000 }, async () => {
       try {
         // Run npm audit and check for vulnerabilities
         const auditResult = execSync('npm audit --audit-level high --dry-run', {
@@ -36,15 +39,15 @@ describe('Security Scanning', () => {
         });
 
         // If audit passes, we're good
-        expect(auditResult).toBeDefined();
+        assert.notEqual(auditResult, undefined);
       } catch (error: any) {
         // If audit fails, check if it's due to vulnerabilities
         if (error.stdout && error.stdout.includes('vulnerabilities')) {
-          fail('High or critical vulnerabilities detected in dependencies');
+          assert.fail('High or critical vulnerabilities detected in dependencies');
         }
         // Other errors might be network issues, which we can ignore in tests
       }
-    }, 45000);
+    });
   });
 
   describe('CI pipeline security integration', () => {
@@ -52,27 +55,27 @@ describe('Security Scanning', () => {
       const ciWorkflow = fs.readFileSync(ciWorkflowPath, 'utf8');
 
       // Test that CI workflow includes npm audit step
-      expect(ciWorkflow).toMatch(/npm audit|Run security audit/i);
+      assertMatch(ciWorkflow, /npm audit|Run security audit/i);
 
       // Test that audit step runs before build
       const auditStepIndex = ciWorkflow.indexOf('audit');
       const buildStepIndex = ciWorkflow.indexOf('npm run build');
 
-      expect(auditStepIndex).toBeGreaterThan(-1);
-      expect(buildStepIndex).toBeGreaterThan(-1);
-      expect(auditStepIndex).toBeLessThan(buildStepIndex);
+      assert.ok(auditStepIndex > -1);
+      assert.ok(buildStepIndex > -1);
+      assert.ok(auditStepIndex < buildStepIndex);
     });
 
     it('should have proper security permissions in CI workflow', () => {
       const ciWorkflow = fs.readFileSync(ciWorkflowPath, 'utf8');
 
       // Test that permissions are explicitly set and minimal
-      expect(ciWorkflow).toMatch(/permissions:/);
-      expect(ciWorkflow).toMatch(/contents:\s*read/);
+      assertMatch(ciWorkflow, /permissions:/);
+      assertMatch(ciWorkflow, /contents:\s*read/);
 
       // Should not have unnecessary permissions
-      expect(ciWorkflow).not.toMatch(/contents:\s*write/);
-      expect(ciWorkflow).not.toMatch(/actions:\s*write/);
+      assertNotMatch(ciWorkflow, /contents:\s*write/);
+      assertNotMatch(ciWorkflow, /actions:\s*write/);
     });
   });
 
@@ -82,8 +85,8 @@ describe('Security Scanning', () => {
 
       // Test for security-related npm configuration
       if (packageJson.config) {
-        expect(packageJson.config).toHaveProperty('audit-level');
-        expect(['moderate', 'high', 'critical']).toContain(packageJson.config['audit-level']);
+        assert.ok('audit-level' in packageJson.config);
+        assertContains(['moderate', 'high', 'critical'], packageJson.config['audit-level']);
       }
     });
 
@@ -95,40 +98,40 @@ describe('Security Scanning', () => {
       const hasDependabot = fs.existsSync(dependabotPath);
       const hasRenovate = fs.existsSync(renovatePath);
 
-      expect(hasDependabot || hasRenovate).toBe(true);
+      assert.equal(hasDependabot || hasRenovate, true);
 
       if (hasDependabot) {
         const dependabotConfig = fs.readFileSync(dependabotPath, 'utf8');
-        expect(dependabotConfig).toMatch(/package-ecosystem:\s*["']?npm["']?/);
-        expect(dependabotConfig).toMatch(/schedule:/);
+        assertMatch(dependabotConfig, /package-ecosystem:\s*["']?npm["']?/);
+        assertMatch(dependabotConfig, /schedule:/);
       }
     });
   });
 
   describe('Security policy configuration', () => {
     it('should have SECURITY.md file with vulnerability reporting process', () => {
-      expect(fs.existsSync(securityPolicyPath)).toBe(true);
+      assert.equal(fs.existsSync(securityPolicyPath), true);
 
       const securityPolicy = fs.readFileSync(securityPolicyPath, 'utf8');
 
       // Test that security policy contains required sections
-      expect(securityPolicy).toMatch(/## Reporting a Vulnerability/i);
-      expect(securityPolicy).toMatch(/## Supported Versions/i);
-      expect(securityPolicy).toMatch(/## Response Time/i);
+      assertMatch(securityPolicy, /## Reporting a Vulnerability/i);
+      assertMatch(securityPolicy, /## Supported Versions/i);
+      assertMatch(securityPolicy, /## Response Time/i);
 
       // Test that contact information is provided
-      expect(securityPolicy).toMatch(/email|contact|report/i);
+      assertMatch(securityPolicy, /email|contact|report/i);
     });
 
     it('should have security-focused npm configuration', () => {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
       // Test for security-related configurations
-      expect(packageJson.scripts).toHaveProperty('audit');
-      expect(packageJson.scripts).toHaveProperty('lint:secrets');
+      assert.ok('audit' in packageJson.scripts);
+      assert.ok('lint:secrets' in packageJson.scripts);
 
       // Test that secretlint is configured
-      expect(packageJson.devDependencies).toHaveProperty('secretlint');
+      assert.ok('secretlint' in packageJson.devDependencies);
     });
 
     it('should validate security workflow permissions', () => {
@@ -140,11 +143,11 @@ describe('Security Scanning', () => {
         const workflow = fs.readFileSync(workflowPath, 'utf8');
 
         // Test that all workflows have explicit permissions
-        expect(workflow).toMatch(/permissions:/);
+        assertMatch(workflow, /permissions:/);
 
         // Test that workflows don't have excessive permissions
-        expect(workflow).not.toMatch(/permissions:\s*write-all/);
-        expect(workflow).not.toMatch(/contents:\s*write/);
+        assertNotMatch(workflow, /permissions:\s*write-all/);
+        assertNotMatch(workflow, /contents:\s*write/);
       });
     });
   });
@@ -156,7 +159,7 @@ describe('Security Scanning', () => {
       // Test that audit command in CI has appropriate severity level
       const auditMatch = ciWorkflow.match(/npm audit[^\\n]*/);
       if (auditMatch) {
-        expect(auditMatch[0]).toMatch(/--audit-level (high|critical)/);
+        assertMatch(auditMatch[0], /--audit-level (high|critical)/);
       }
     });
 
@@ -165,7 +168,7 @@ describe('Security Scanning', () => {
 
       // Test that we have security notification setup
       if (packageJson.scripts['security:notify']) {
-        expect(packageJson.scripts['security:notify']).toBeDefined();
+        assert.notEqual(packageJson.scripts['security:notify'], undefined);
       }
     });
   });
@@ -176,34 +179,34 @@ describe('Security Scanning', () => {
       const mockAuditCommand = 'npm audit --audit-level high --json';
 
       // Test that our audit command structure is correct
-      expect(mockAuditCommand).toContain('--audit-level');
-      expect(mockAuditCommand).toContain('high');
+      assertContains(mockAuditCommand, '--audit-level');
+      assertContains(mockAuditCommand, 'high');
     });
 
     it('should validate audit fix workflow', () => {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
       // Test that audit fix is available but not automatic
-      expect(packageJson.scripts).toHaveProperty('audit:fix');
-      expect(packageJson.scripts['audit:fix']).toContain('--dry-run');
+      assert.ok('audit:fix' in packageJson.scripts);
+      assertContains(packageJson.scripts['audit:fix'], '--dry-run');
     });
   });
 
   describe('Security tooling integration', () => {
     it('should have secretlint integration', () => {
       const secretlintPath = path.join(process.cwd(), '.secretlintrc.json');
-      expect(fs.existsSync(secretlintPath)).toBe(true);
+      assert.equal(fs.existsSync(secretlintPath), true);
 
       const secretlintConfig = JSON.parse(fs.readFileSync(secretlintPath, 'utf8'));
-      expect(secretlintConfig.rules).toBeDefined();
-      expect(secretlintConfig.severity).toBe('error');
+      assert.notEqual(secretlintConfig.rules, undefined);
+      assert.equal(secretlintConfig.severity, 'error');
     });
 
     it('should run secretlint as part of security checks', () => {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
-      expect(packageJson.scripts).toHaveProperty('lint:secrets');
-      expect(packageJson.scripts['lint:secrets']).toContain('secretlint');
+      assert.ok('lint:secrets' in packageJson.scripts);
+      assertContains(packageJson.scripts['lint:secrets'], 'secretlint');
     });
   });
 });

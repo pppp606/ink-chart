@@ -2,11 +2,11 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "rootDir": ".",
-    "outDir": "./build/node-test",
+    "outDir": "./build/test",
     "declaration": false,
     "declarationMap": false,
     "sourceMap": true
   },
-  "include": ["src/**/*", "test-node/**/*"],
-  "exclude": ["node_modules", "src/**/__tests__/**"]
+  "include": ["src/**/*", "__tests__/**/*"],
+  "exclude": ["node_modules", "__tests__/secretlint/**"]
 }

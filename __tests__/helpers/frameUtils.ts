@@ -61,7 +61,7 @@ export class FrameUtils {
       // Extract text before the first bar character
       const match = line.match(/^([^█]*)/);
       if (match) {
-        labels.push(match[1].trim());
+        labels.push((match[1] ?? '').trim());
       }
     }
     
@@ -79,7 +79,7 @@ export class FrameUtils {
       // Extract text after the last bar character
       const match = line.match(/█+\s*(.*)$/);
       if (match) {
-        values.push(match[1].trim());
+        values.push((match[1] ?? '').trim());
       }
     }
     

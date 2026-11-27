@@ -9,31 +9,36 @@
  * by using short-lived, automatically rotating tokens.
  */
 
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import assert from 'node:assert/strict';
+import { assertContains } from './helpers/assertions.js';
 describe('OIDC Configuration Validation', () => {
   describe('NPM OIDC Configuration Validation', () => {
-    it('should validate package.json configuration for OIDC publishing', async () => {
+    it('should validate package.json configuration for OIDC publishing', () => {
       // Read package.json to validate configuration
-      const packageJson = await import('../package.json');
+      const packageJson = JSON.parse(readFileSync(resolve(process.cwd(), 'package.json'), 'utf8'));
 
       // Validate package is properly scoped for npm OIDC
-      expect(packageJson.default.name).toBe('@pppp606/ink-chart');
-      expect(packageJson.default.repository).toBeDefined();
-      expect(packageJson.default.repository.url).toBe('https://github.com/pppp606/ink-chart.git');
+      assert.equal(packageJson.name, '@pppp606/ink-chart');
+      assert.notEqual(packageJson.repository, undefined);
+      assert.equal(packageJson.repository.url, 'https://github.com/pppp606/ink-chart.git');
 
       // Ensure package.json has required fields for provenance
-      expect(packageJson.default.author).toBeDefined();
-      expect(packageJson.default.license).toBeDefined();
+      assert.notEqual(packageJson.author, undefined);
+      assert.notEqual(packageJson.license, undefined);
     });
 
     it('should validate npm registry configuration for OIDC', () => {
       // Test npm registry configuration
       const registryUrl = 'https://registry.npmjs.org';
 
-      expect(registryUrl).toBe('https://registry.npmjs.org');
+      assert.equal(registryUrl, 'https://registry.npmjs.org');
 
       // Validate package scope configuration
       const packageScope = '@pppp606';
-      expect(packageScope).toBe('@pppp606');
+      assert.equal(packageScope, '@pppp606');
     });
 
     it('should validate provenance publishing requirements', () => {
@@ -41,9 +46,9 @@ describe('OIDC Configuration Validation', () => {
       // This test validates the publishing command structure
       const publishCommand = 'npm publish --access public --provenance --registry=https://registry.npmjs.org';
 
-      expect(publishCommand).toContain('--provenance');
-      expect(publishCommand).toContain('--access public');
-      expect(publishCommand).toContain('--registry=https://registry.npmjs.org');
+      assertContains(publishCommand, '--provenance');
+      assertContains(publishCommand, '--access public');
+      assertContains(publishCommand, '--registry=https://registry.npmjs.org');
     });
   });
 
@@ -62,11 +67,11 @@ describe('OIDC Configuration Validation', () => {
       };
 
       // Validate expected claim structure
-      expect(mockOidcTokenClaims.iss).toBe('https://token.actions.githubusercontent.com');
-      expect(mockOidcTokenClaims.aud).toBe('npm');
-      expect(mockOidcTokenClaims.repository).toBe('pppp606/ink-chart');
-      expect(mockOidcTokenClaims.repository_owner).toBe('pppp606');
-      expect(mockOidcTokenClaims.sub).toContain('repo:pppp606/ink-chart');
+      assert.equal(mockOidcTokenClaims.iss, 'https://token.actions.githubusercontent.com');
+      assert.equal(mockOidcTokenClaims.aud, 'npm');
+      assert.equal(mockOidcTokenClaims.repository, 'pppp606/ink-chart');
+      assert.equal(mockOidcTokenClaims.repository_owner, 'pppp606');
+      assertContains(mockOidcTokenClaims.sub, 'repo:pppp606/ink-chart');
     });
 
     it('should validate workflow permissions for OIDC', () => {
@@ -76,8 +81,8 @@ describe('OIDC Configuration Validation', () => {
         'contents': 'read'
       };
 
-      expect(requiredPermissions['id-token']).toBe('write');
-      expect(requiredPermissions['contents']).toBe('read');
+      assert.equal(requiredPermissions['id-token'], 'write');
+      assert.equal(requiredPermissions['contents'], 'read');
     });
   });
 
@@ -87,7 +92,6 @@ describe('OIDC Configuration Validation', () => {
     const originalEnv = process.env;
 
     beforeEach(() => {
-      jest.resetModules();
       process.env = { ...originalEnv };
     });
 
@@ -103,7 +107,7 @@ describe('OIDC Configuration Validation', () => {
         process.env.NPM_TOKEN = 'npm_mock_token';
 
         const detectedMethod = detectAuthenticationMethod();
-        expect(detectedMethod).toBe('oidc');
+        assert.equal(detectedMethod, 'oidc');
       });
 
       it('should fallback to NPM_TOKEN when OIDC is not available', () => {
@@ -113,7 +117,7 @@ describe('OIDC Configuration Validation', () => {
         process.env.NPM_TOKEN = 'npm_mock_token';
 
         const detectedMethod = detectAuthenticationMethod();
-        expect(detectedMethod).toBe('npm-token');
+        assert.equal(detectedMethod, 'npm-token');
       });
 
       it('should return null when no authentication method is available', () => {
@@ -123,7 +127,7 @@ describe('OIDC Configuration Validation', () => {
         delete process.env.NPM_TOKEN;
 
         const detectedMethod = detectAuthenticationMethod();
-        expect(detectedMethod).toBeNull();
+        assert.equal(detectedMethod, null);
       });
     });
 
@@ -133,7 +137,7 @@ describe('OIDC Configuration Validation', () => {
         process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIs...';
 
         const isValid = validateOidcEnvironment();
-        expect(isValid).toBe(true);
+        assert.equal(isValid, true);
       });
 
       it('should reject invalid OIDC URL format', () => {
@@ -141,7 +145,7 @@ describe('OIDC Configuration Validation', () => {
         process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN = 'valid-token';
 
         const isValid = validateOidcEnvironment();
-        expect(isValid).toBe(false);
+        assert.equal(isValid, false);
       });
 
       it('should reject empty OIDC token', () => {
@@ -149,7 +153,7 @@ describe('OIDC Configuration Validation', () => {
         process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN = '';
 
         const isValid = validateOidcEnvironment();
-        expect(isValid).toBe(false);
+        assert.equal(isValid, false);
       });
     });
 
@@ -158,37 +162,37 @@ describe('OIDC Configuration Validation', () => {
         process.env.NPM_TOKEN = 'npm_FAKE_TOKEN_FOR_TESTING_ONLY';
 
         const isValid = validateNpmToken();
-        expect(isValid).toBe(true);
+        assert.equal(isValid, true);
       });
 
       it('should reject invalid NPM token format', () => {
         process.env.NPM_TOKEN = 'invalid-token';
 
         const isValid = validateNpmToken();
-        expect(isValid).toBe(false);
+        assert.equal(isValid, false);
       });
 
       it('should handle missing NPM token', () => {
         delete process.env.NPM_TOKEN;
 
         const isValid = validateNpmToken();
-        expect(isValid).toBe(false);
+        assert.equal(isValid, false);
       });
     });
 
     describe('Publishing Command Generation', () => {
       it('should generate OIDC publish command with provenance', () => {
         const command = generatePublishCommand('oidc');
-        expect(command).toBe('npm publish --access public --provenance --registry=https://registry.npmjs.org');
+        assert.equal(command, 'npm publish --access public --provenance --registry=https://registry.npmjs.org');
       });
 
       it('should generate NPM token publish command without provenance', () => {
         const command = generatePublishCommand('npm-token');
-        expect(command).toBe('npm publish --access public --registry=https://registry.npmjs.org');
+        assert.equal(command, 'npm publish --access public --registry=https://registry.npmjs.org');
       });
 
       it('should throw error for unknown authentication method', () => {
-        expect(() => generatePublishCommand('unknown' as any)).toThrow('Unknown authentication method: unknown');
+        assert.throws(() => generatePublishCommand('unknown' as any), /Unknown authentication method: unknown/);
       });
     });
 
@@ -198,14 +202,14 @@ describe('OIDC Configuration Validation', () => {
         delete process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN;
         delete process.env.NPM_TOKEN;
 
-        expect(() => validateAuthentication()).toThrow('No authentication method available for npm publishing');
+        assert.throws(() => validateAuthentication(), /No authentication method available for npm publishing/);
       });
 
       it('should provide detailed error for OIDC configuration issues', () => {
         process.env.ACTIONS_ID_TOKEN_REQUEST_URL = 'invalid-url';
         process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN = 'token';
 
-        expect(() => validateAuthentication()).toThrow('OIDC authentication is not properly configured');
+        assert.throws(() => validateAuthentication(), /OIDC authentication is not properly configured/);
       });
     });
   });

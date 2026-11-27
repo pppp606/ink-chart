@@ -1,24 +1,11 @@
-import React from 'react';
-
-// Mock Ink components
-jest.mock('ink', () => ({
-  Text: ({ children, color }: any) => React.createElement('span', { 'data-color': color }, children),
-  Box: ({ children }: any) => React.createElement('div', {}, children),
-}));
-
-// Mock useAutoWidth hook
-jest.mock('../src/core/useAutoWidth.js', () => ({
-  useAutoWidth: () => ({ width: 80, isAutoWidth: true }),
-}));
-
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { renderToFrame } from './helpers/renderToFrame.js';
 import { StackedBarChart, StackedBarSegment } from '../src/components/StackedBarChart.js';
 
 describe('StackedBarChart Component', () => {
-  // Execute the component function directly to trigger internal logic
-  const executeComponent = (props: any) => {
-    const StackedBarChartFunc = (StackedBarChart as any).type || StackedBarChart;
-    return StackedBarChartFunc(props);
-  };
+  // Render the component through Ink and return the frame (null when nothing is rendered)
+  const executeComponent = (props: any) => renderToFrame(StackedBarChart, props);
 
   it('should execute with basic data', () => {
     const data: StackedBarSegment[] = [
@@ -26,17 +13,17 @@ describe('StackedBarChart Component', () => {
       { label: 'B', value: 70 }
     ];
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should return null for empty data', () => {
     const result = executeComponent({ data: [] });
-    expect(result).toBeNull();
+    assert.equal(result, null);
   });
 
   it('should return null for null data', () => {
     const result = executeComponent({ data: null });
-    expect(result).toBeNull();
+    assert.equal(result, null);
   });
 
   it('should return null for zero total value', () => {
@@ -45,7 +32,7 @@ describe('StackedBarChart Component', () => {
       { label: 'B', value: 0 }
     ];
     const result = executeComponent({ data });
-    expect(result).toBeNull();
+    assert.equal(result, null);
   });
 
   it('should handle negative values by treating them as zero', () => {
@@ -54,7 +41,7 @@ describe('StackedBarChart Component', () => {
       { label: 'B', value: 50 }
     ];
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute width calculations', () => {
@@ -67,9 +54,9 @@ describe('StackedBarChart Component', () => {
     const fullResult = executeComponent({ data, width: 'full' });
     const fixedResult = executeComponent({ data, width: 50 });
 
-    expect(autoResult).not.toBeNull();
-    expect(fullResult).not.toBeNull();
-    expect(fixedResult).not.toBeNull();
+    assert.notEqual(autoResult, null);
+    assert.notEqual(fullResult, null);
+    assert.notEqual(fixedResult, null);
   });
 
   it('should execute with showLabels options', () => {
@@ -80,8 +67,8 @@ describe('StackedBarChart Component', () => {
     const withLabels = executeComponent({ data, showLabels: true });
     const withoutLabels = executeComponent({ data, showLabels: false });
 
-    expect(withLabels).not.toBeNull();
-    expect(withoutLabels).not.toBeNull();
+    assert.notEqual(withLabels, null);
+    assert.notEqual(withoutLabels, null);
   });
 
   it('should execute with showValues options', () => {
@@ -92,8 +79,8 @@ describe('StackedBarChart Component', () => {
     const withValues = executeComponent({ data, showValues: true });
     const withoutValues = executeComponent({ data, showValues: false });
 
-    expect(withValues).not.toBeNull();
-    expect(withoutValues).not.toBeNull();
+    assert.notEqual(withValues, null);
+    assert.notEqual(withoutValues, null);
   });
 
   it('should execute with custom format function', () => {
@@ -105,7 +92,7 @@ describe('StackedBarChart Component', () => {
     const customFormat = (v: number) => `${v.toFixed(0)}%`;
     const result = executeComponent({ data, format: customFormat });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with color options', () => {
@@ -116,7 +103,7 @@ describe('StackedBarChart Component', () => {
     ];
 
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with custom characters', () => {
@@ -126,7 +113,7 @@ describe('StackedBarChart Component', () => {
     ];
 
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with multiple segments', () => {
@@ -138,7 +125,7 @@ describe('StackedBarChart Component', () => {
     ];
 
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with unequal segment values', () => {
@@ -149,7 +136,7 @@ describe('StackedBarChart Component', () => {
     ];
 
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with single segment', () => {
@@ -158,7 +145,7 @@ describe('StackedBarChart Component', () => {
     ];
 
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with very small width', () => {
@@ -168,7 +155,7 @@ describe('StackedBarChart Component', () => {
     ];
 
     const result = executeComponent({ data, width: 10 });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with large width', () => {
@@ -178,7 +165,7 @@ describe('StackedBarChart Component', () => {
     ];
 
     const result = executeComponent({ data, width: 200 });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with all options combined', () => {
@@ -196,7 +183,7 @@ describe('StackedBarChart Component', () => {
       format: (v: number) => `${v.toFixed(1)}%`
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   // Absolute mode tests
@@ -212,7 +199,7 @@ describe('StackedBarChart Component', () => {
       max: 200
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with absolute mode and auto max', () => {
@@ -227,7 +214,7 @@ describe('StackedBarChart Component', () => {
       max: 'auto'
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with absolute mode and custom format', () => {
@@ -244,7 +231,7 @@ describe('StackedBarChart Component', () => {
         mode === 'percentage' ? `${v.toFixed(1)}%` : `${v}`
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with percentage mode explicitly', () => {
@@ -258,7 +245,7 @@ describe('StackedBarChart Component', () => {
       mode: 'percentage'
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with absolute mode showing labels and values', () => {
@@ -277,7 +264,7 @@ describe('StackedBarChart Component', () => {
       width: 50
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with absolute mode without labels', () => {
@@ -293,7 +280,7 @@ describe('StackedBarChart Component', () => {
       max: 200
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with absolute mode without values', () => {
@@ -309,7 +296,7 @@ describe('StackedBarChart Component', () => {
       max: 200
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should execute with absolute mode and colors', () => {
@@ -325,6 +312,6 @@ describe('StackedBarChart Component', () => {
       max: 300
     });
 
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 });

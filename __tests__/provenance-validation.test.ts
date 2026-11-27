@@ -13,6 +13,9 @@
  * - REFACTOR: Optimize and enhance
  */
 
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains } from './helpers/assertions.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -21,7 +24,6 @@ describe('Provenance Attestation Validation', () => {
   const workflowPath = path.resolve(process.cwd(), '.github', 'workflows', 'publish-npm.yml');
 
   beforeEach(() => {
-    jest.resetModules();
     process.env = { ...originalEnv };
   });
 
@@ -37,7 +39,7 @@ describe('Provenance Attestation Validation', () => {
         hasNpmToken: true
       });
 
-      expect(canGenerateProvenance).toBe(false);
+      assert.equal(canGenerateProvenance, false);
     });
 
     it('should validate that provenance works with OIDC authentication', () => {
@@ -47,7 +49,7 @@ describe('Provenance Attestation Validation', () => {
         hasNpmToken: false
       });
 
-      expect(canGenerateProvenance).toBe(true);
+      assert.equal(canGenerateProvenance, true);
     });
 
     it('should validate provenance command generation with OIDC', () => {
@@ -60,9 +62,9 @@ describe('Provenance Attestation Validation', () => {
 
       const command = generateProvenancePublishCommand();
 
-      expect(command).toContain('--provenance');
-      expect(command).toContain('npm publish');
-      expect(command).toContain('--access public');
+      assertContains(command, '--provenance');
+      assertContains(command, 'npm publish');
+      assertContains(command, '--access public');
     });
 
     it('should reject provenance generation without required GitHub context', () => {
@@ -71,7 +73,7 @@ describe('Provenance Attestation Validation', () => {
       process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN = 'token';
       delete process.env.GITHUB_REPOSITORY;
 
-      expect(() => generateProvenancePublishCommand()).toThrow('Missing GitHub context for provenance');
+      assert.throws(() => generateProvenancePublishCommand(), /Missing GitHub context for provenance/);
     });
   });
 
@@ -79,46 +81,46 @@ describe('Provenance Attestation Validation', () => {
     it('should validate expected provenance attestation structure', () => {
       const mockAttestation = createMockProvenanceAttestation();
 
-      expect(mockAttestation).toHaveProperty('statement');
-      expect(mockAttestation.statement).toHaveProperty('_type', 'https://in-toto.io/Statement/v0.1');
-      expect(mockAttestation.statement).toHaveProperty('subject');
-      expect(mockAttestation.statement).toHaveProperty('predicateType');
-      expect(mockAttestation.statement).toHaveProperty('predicate');
+      assert.ok('statement' in mockAttestation);
+      assert.equal(mockAttestation.statement._type, 'https://in-toto.io/Statement/v0.1');
+      assert.ok('subject' in mockAttestation.statement);
+      assert.ok('predicateType' in mockAttestation.statement);
+      assert.ok('predicate' in mockAttestation.statement);
     });
 
     it('should validate provenance subject information', () => {
       const mockAttestation = createMockProvenanceAttestation();
       const subject = mockAttestation.statement.subject[0];
 
-      expect(subject).toHaveProperty('name');
-      expect(subject.name).toContain('@pppp606/ink-chart');
-      expect(subject).toHaveProperty('digest');
-      expect(subject.digest).toHaveProperty('sha512');
+      assert.ok('name' in subject);
+      assertContains(subject.name, '@pppp606/ink-chart');
+      assert.ok('digest' in subject);
+      assert.ok('sha512' in subject.digest);
     });
 
     it('should validate provenance predicate type', () => {
       const mockAttestation = createMockProvenanceAttestation();
 
-      expect(mockAttestation.statement.predicateType).toBe('https://slsa.dev/provenance/v0.2');
+      assert.equal(mockAttestation.statement.predicateType, 'https://slsa.dev/provenance/v0.2');
     });
 
     it('should validate provenance builder information', () => {
       const mockAttestation = createMockProvenanceAttestation();
       const builder = mockAttestation.statement.predicate.builder;
 
-      expect(builder).toHaveProperty('id');
-      expect(builder.id).toContain('github.com/actions/runner');
+      assert.ok('id' in builder);
+      assertContains(builder.id, 'github.com/actions/runner');
     });
 
     it('should validate provenance invocation details', () => {
       const mockAttestation = createMockProvenanceAttestation();
       const invocation = mockAttestation.statement.predicate.invocation;
 
-      expect(invocation).toHaveProperty('configSource');
-      expect(invocation.configSource).toHaveProperty('uri');
-      expect(invocation.configSource.uri).toContain('pppp606/ink-chart');
-      expect(invocation.configSource).toHaveProperty('digest');
-      expect(invocation.configSource).toHaveProperty('entryPoint');
+      assert.ok('configSource' in invocation);
+      assert.ok('uri' in invocation.configSource);
+      assertContains(invocation.configSource.uri, 'pppp606/ink-chart');
+      assert.ok('digest' in invocation.configSource);
+      assert.ok('entryPoint' in invocation.configSource);
     });
   });
 
@@ -127,9 +129,9 @@ describe('Provenance Attestation Validation', () => {
       const workflowContent = fs.readFileSync(workflowPath, 'utf8');
 
       // OIDC publish step must include --provenance
-      expect(workflowContent).toContain('npm publish');
-      expect(workflowContent).toContain('--provenance');
-      expect(workflowContent).toContain('id-token: write');
+      assertContains(workflowContent, 'npm publish');
+      assertContains(workflowContent, '--provenance');
+      assertContains(workflowContent, 'id-token: write');
     });
   });
 
@@ -138,14 +140,14 @@ describe('Provenance Attestation Validation', () => {
       const mockSignature = createMockProvenanceSignature();
 
       const isValidSignature = validateProvenanceSignature(mockSignature);
-      expect(isValidSignature).toBe(true);
+      assert.equal(isValidSignature, true);
     });
 
     it('should validate provenance certificate chain', () => {
       const mockCertificateChain = createMockCertificateChain();
 
       const isValidChain = validateCertificateChain(mockCertificateChain);
-      expect(isValidChain).toBe(true);
+      assert.equal(isValidChain, true);
     });
 
     it('should validate provenance repository matching', () => {
@@ -153,7 +155,7 @@ describe('Provenance Attestation Validation', () => {
       const expectedRepository = 'pppp606/ink-chart';
 
       const repositoryMatches = validateRepositoryInProvenance(mockAttestation, expectedRepository);
-      expect(repositoryMatches).toBe(true);
+      assert.equal(repositoryMatches, true);
     });
 
     it('should reject provenance with mismatched repository', () => {
@@ -162,7 +164,7 @@ describe('Provenance Attestation Validation', () => {
       mockAttestation.statement.predicate.invocation.configSource.uri = 'git+https://github.com/attacker/malicious-repo@refs/tags/v1.0.0';
 
       const repositoryMatches = validateRepositoryInProvenance(mockAttestation, 'pppp606/ink-chart');
-      expect(repositoryMatches).toBe(false);
+      assert.equal(repositoryMatches, false);
     });
   });
 
@@ -176,9 +178,9 @@ describe('Provenance Attestation Validation', () => {
 
       const badgeRequirements = validateProvenanceBadgeRequirements(packageInfo);
 
-      expect(badgeRequirements.packagePublished).toBe(true);
-      expect(badgeRequirements.provenanceAttested).toBe(true);
-      expect(badgeRequirements.badgeEligible).toBe(true);
+      assert.equal(badgeRequirements.packagePublished, true);
+      assert.equal(badgeRequirements.provenanceAttested, true);
+      assert.equal(badgeRequirements.badgeEligible, true);
     });
 
     it('should validate provenance information display format', () => {
@@ -189,20 +191,20 @@ describe('Provenance Attestation Validation', () => {
         commitSha: 'abcdef1234567890'
       });
 
-      expect(provenanceInfo).toHaveProperty('repository');
-      expect(provenanceInfo).toHaveProperty('workflow');
-      expect(provenanceInfo).toHaveProperty('trigger');
-      expect(provenanceInfo).toHaveProperty('commit');
-      expect(provenanceInfo.repository).toBe('pppp606/ink-chart');
+      assert.ok('repository' in provenanceInfo);
+      assert.ok('workflow' in provenanceInfo);
+      assert.ok('trigger' in provenanceInfo);
+      assert.ok('commit' in provenanceInfo);
+      assert.equal(provenanceInfo.repository, 'pppp606/ink-chart');
     });
 
     it('should validate npm package page provenance section', () => {
       const mockNpmPageData = createMockNpmPackagePageData();
 
       const hasProvenanceSection = validateNpmProvenanceSection(mockNpmPageData);
-      expect(hasProvenanceSection.present).toBe(true);
-      expect(hasProvenanceSection.verified).toBe(true);
-      expect(hasProvenanceSection.sourceRepo).toBe('pppp606/ink-chart');
+      assert.equal(hasProvenanceSection.present, true);
+      assert.equal(hasProvenanceSection.verified, true);
+      assert.equal(hasProvenanceSection.sourceRepo, 'pppp606/ink-chart');
     });
   });
 
@@ -214,17 +216,17 @@ describe('Provenance Attestation Validation', () => {
 
       const error = simulateProvenanceGenerationFailure();
 
-      expect(error).toHaveProperty('code', 'PROVENANCE_GENERATION_FAILED');
-      expect(error).toHaveProperty('message');
-      expect(error.message).toContain('provenance');
+      assert.equal(error.code, 'PROVENANCE_GENERATION_FAILED');
+      assert.ok('message' in error);
+      assertContains(error.message, 'provenance');
     });
 
     it('should provide clear error messages for provenance issues', () => {
       const provenanceError = getProvenanceErrorMessage('OIDC_TOKEN_INVALID');
 
-      expect(provenanceError).toContain('OIDC token');
-      expect(provenanceError).toContain('Provenance');
-      expect(provenanceError).toContain('authentication');
+      assertContains(provenanceError, 'OIDC token');
+      assertContains(provenanceError, 'Provenance');
+      assertContains(provenanceError, 'authentication');
     });
 
     it('should handle missing provenance attestation gracefully', () => {
@@ -236,9 +238,9 @@ describe('Provenance Attestation Validation', () => {
 
       const validation = validatePackageProvenance(packageWithoutProvenance);
 
-      expect(validation.provenancePresent).toBe(false);
-      expect(validation.recommendation).toContain('OIDC');
-      expect(validation.securityLevel).toBe('basic');
+      assert.equal(validation.provenancePresent, false);
+      assertContains(validation.recommendation, 'OIDC');
+      assert.equal(validation.securityLevel, 'basic');
     });
   });
 });

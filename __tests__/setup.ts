@@ -1,1 +1,0 @@
-// Jest setup file for ink-chart tests

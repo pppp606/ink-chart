@@ -42,7 +42,7 @@
 /eslint.config.js @pppp606
 /.prettierrc @pppp606
 /tsconfig.json @pppp606
-/jest.config.js @pppp606
+/tsconfig.tests.json @pppp606
 
 # License and legal
 # Legal and licensing files require careful review

@@ -1,34 +1,21 @@
-import React from 'react';
-
-// Mock Ink components
-jest.mock('ink', () => ({
-  Text: ({ children, color }: any) => React.createElement('span', { 'data-color': color }, children),
-  Box: ({ children }: any) => React.createElement('div', {}, children),
-}));
-
-// Mock useAutoWidth hook
-jest.mock('../src/core/useAutoWidth.js', () => ({
-  useAutoWidth: () => ({ width: 80, isAutoWidth: true }),
-}));
-
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { renderToFrame } from './helpers/renderToFrame.js';
 import { BarChart, BarChartData } from '../src/components/BarChart.js';
 
 describe('BarChart Component', () => {
-  // Execute the component function directly to trigger internal logic
-  const executeComponent = (props: any) => {
-    const BarChartFunc = (BarChart as any).type || BarChart;
-    return BarChartFunc(props);
-  };
+  // Render the component through Ink and return the frame (null when nothing is rendered)
+  const executeComponent = (props: any) => renderToFrame(BarChart, props);
 
   it('should execute with basic data', () => {
     const data: BarChartData[] = [{ label: 'Test', value: 10 }];
     const result = executeComponent({ data });
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 
   it('should return null for empty data', () => {
     const result = executeComponent({ data: [] });
-    expect(result).toBeNull();
+    assert.equal(result, null);
   });
 
   it('should execute sorting functions', () => {
@@ -42,9 +29,9 @@ describe('BarChart Component', () => {
     const ascResult = executeComponent({ data, sort: 'asc' });
     const noneResult = executeComponent({ data, sort: 'none' });
     
-    expect(descResult).not.toBeNull();
-    expect(ascResult).not.toBeNull();
-    expect(noneResult).not.toBeNull();
+    assert.notEqual(descResult, null);
+    assert.notEqual(ascResult, null);
+    assert.notEqual(noneResult, null);
   });
 
   it('should execute width calculations', () => {
@@ -54,9 +41,9 @@ describe('BarChart Component', () => {
     const fullResult = executeComponent({ data, width: 'full' });
     const fixedResult = executeComponent({ data, width: 50 });
     
-    expect(autoResult).not.toBeNull();
-    expect(fullResult).not.toBeNull();
-    expect(fixedResult).not.toBeNull();
+    assert.notEqual(autoResult, null);
+    assert.notEqual(fullResult, null);
+    assert.notEqual(fixedResult, null);
   });
 
   it('should execute value display options', () => {
@@ -65,8 +52,8 @@ describe('BarChart Component', () => {
     const rightResult = executeComponent({ data, showValue: 'right' });
     const noneResult = executeComponent({ data, showValue: 'none' });
     
-    expect(rightResult).not.toBeNull();
-    expect(noneResult).not.toBeNull();
+    assert.notEqual(rightResult, null);
+    assert.notEqual(noneResult, null);
   });
 
   it('should execute max value calculations', () => {
@@ -78,8 +65,8 @@ describe('BarChart Component', () => {
     const autoResult = executeComponent({ data, max: 'auto' });
     const fixedResult = executeComponent({ data, max: 100 });
     
-    expect(autoResult).not.toBeNull();
-    expect(fixedResult).not.toBeNull();
+    assert.notEqual(autoResult, null);
+    assert.notEqual(fixedResult, null);
   });
 
   it('should execute bar character options', () => {
@@ -88,7 +75,7 @@ describe('BarChart Component', () => {
     const chars = ['▆', '█', '▓', '▒', '░'];
     chars.forEach(barChar => {
       const result = executeComponent({ data, barChar });
-      expect(result).not.toBeNull();
+      assert.notEqual(result, null);
     });
   });
 
@@ -101,8 +88,8 @@ describe('BarChart Component', () => {
     const colorResult = executeComponent({ data, color: '#00ff00' });
     const noColorResult = executeComponent({ data });
     
-    expect(colorResult).not.toBeNull();
-    expect(noColorResult).not.toBeNull();
+    assert.notEqual(colorResult, null);
+    assert.notEqual(noColorResult, null);
   });
 
   it('should execute format function', () => {
@@ -114,13 +101,13 @@ describe('BarChart Component', () => {
       format: (v: number) => `$${v}K` 
     });
     
-    expect(formatResult).not.toBeNull();
+    assert.notEqual(formatResult, null);
   });
 
   it('should handle zero maxValue edge case', () => {
     const data: BarChartData[] = [{ label: 'Zero', value: 0 }];
     const result = executeComponent({ data });
-    expect(result).toBeNull();
+    assert.equal(result, null);
   });
 
   it('should execute complex combinations', () => {
@@ -141,6 +128,6 @@ describe('BarChart Component', () => {
       color: '#333333'
     });
     
-    expect(result).not.toBeNull();
+    assert.notEqual(result, null);
   });
 });
