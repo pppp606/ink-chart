@@ -1,13 +1,15 @@
 version: 2
 updates:
-  # Enable version updates for npm
+  # npm: security updates only.
+  # A limit of 0 disables routine version-update PRs. Dependabot alerts and
+  # security-update PRs are not affected by this limit and keep arriving.
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "09:00"
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 0
     reviewers:
       - "pppp606"
     assignees:
@@ -16,7 +18,6 @@ updates:
       prefix: "chore"
       prefix-development: "chore"
       include: "scope"
-    # Security updates only
     target-branch: "main"
     labels:
       - "dependencies"
