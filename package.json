@@ -38,7 +38,8 @@
     "audit:fix": "npm audit fix --dry-run",
     "validate:sha-pinning": "node scripts/validate-sha-pinning.js",
     "validate:permissions": "node scripts/validate-permissions.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "test:node": "tsc -p tsconfig.node-test.json && node --test build/node-test/test-node/*.test.js"
   },
   "keywords": [
     "ink",
