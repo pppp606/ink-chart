@@ -139,12 +139,12 @@ describe('Sparkline Component', () => {
       
       assert.notEqual(result, null);
       assert.equal(typeof result, 'string');
-      // With mocked useAutoWidth returning 80, full width should be 76 (80 - 4)
+      // renderToFrame makes useAutoWidth report 80, so full width should be 76 (80 - 4)
     });
 
     it('should calculate full width with margin', () => {
       const data = [1, 2, 3];
-      // useAutoWidth is mocked to return width: 80
+      // renderToFrame makes useAutoWidth report width: 80
       const result = renderToFrame(Sparkline, { data, width: 'full' });
       
       assert.notEqual(result, null);
