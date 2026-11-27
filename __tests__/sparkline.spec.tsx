@@ -1,166 +1,153 @@
-import React from 'react';
-
-// Mock Ink components for testing
-jest.mock('ink', () => ({
-  Text: ({ children }: { children: React.ReactNode }) => children,
-  Box: ({ children }: { children: React.ReactNode }) => children,
-}));
-
-// Mock useAutoWidth hook
-jest.mock('../src/core/useAutoWidth.js', () => ({
-  useAutoWidth: () => ({
-    width: 80,
-    isAutoWidth: true,
-  }),
-}));
-
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { renderToFrame } from './helpers/renderToFrame.js';
 import { Sparkline } from '../src/components/Sparkline.js';
 
 describe('Sparkline Component', () => {
   describe('Basic component structure', () => {
     it('should be defined as a function', () => {
-      expect(typeof Sparkline).toBe('function');
+      assert.equal(typeof Sparkline, 'function');
     });
 
     it('should return a React element or null', () => {
       const data = [1, 2, 3, 4, 5];
-      const result = Sparkline({ data });
-      expect(result).toBeDefined(); // Should return a React element
-      expect(result?.type).toBeDefined();
+      const result = renderToFrame(Sparkline, { data });
+      assert.notEqual(result, undefined); // Should return a React element
+      assert.equal(typeof result, 'string');
     });
 
     it('should accept required data prop', () => {
       const data = [1, 2, 3, 4, 5];
-      expect(() => Sparkline({ data })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data }));
     });
 
     it('should handle empty data array', () => {
-      expect(() => Sparkline({ data: [] })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data: [] }));
     });
   });
 
   describe('Props interface validation', () => {
     it('should accept width prop as number', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, width: 40 })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, width: 40 }));
     });
 
     it('should accept width prop as auto', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, width: 'auto' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, width: 'auto' }));
     });
 
     it('should accept width prop as full', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, width: 'full' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, width: 'full' }));
     });
 
     it('should accept mode prop as block', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, mode: 'block' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, mode: 'block' }));
     });
 
     it('should accept mode prop as braille', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, mode: 'braille' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, mode: 'braille' }));
     });
 
     it('should accept yDomain prop as auto', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, yDomain: 'auto' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, yDomain: 'auto' }));
     });
 
     it('should accept yDomain prop as tuple', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, yDomain: [0, 100] })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, yDomain: [0, 100] }));
     });
 
     it('should accept threshold prop', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, threshold: 2.5 })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, threshold: 2.5 }));
     });
 
     it('should accept caption prop', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, caption: 'Test Caption' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, caption: 'Test Caption' }));
     });
 
     it('should accept colorScheme prop as red', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, colorScheme: 'red' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, colorScheme: 'red' }));
     });
 
     it('should accept colorScheme prop as blue', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, colorScheme: 'blue' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, colorScheme: 'blue' }));
     });
 
     it('should accept colorScheme prop as green', () => {
       const data = [1, 2, 3];
-      expect(() => Sparkline({ data, colorScheme: 'green' })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, colorScheme: 'green' }));
     });
 
     it('should accept multiple thresholds as array', () => {
       const data = [1, 2, 3, 4, 5];
-      expect(() => Sparkline({ data, threshold: [1, 2, 3, 4] })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data, threshold: [1, 2, 3, 4] }));
     });
 
     it('should accept combination of threshold and colorScheme', () => {
       const data = [1, 2, 3, 4, 5];
-      expect(() => Sparkline({ 
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { 
         data, 
         threshold: [1, 2, 3], 
         colorScheme: 'blue' 
-      })).not.toThrow();
+      }));
     });
   });
 
   describe('Data validation and edge cases', () => {
     it('should handle data with NaN values', () => {
       const data = [1, NaN, 3, 4, 5];
-      const result = Sparkline({ data });
-      expect(result).not.toBeNull();
+      const result = renderToFrame(Sparkline, { data });
+      assert.notEqual(result, null);
     });
 
     it('should handle data with Infinity values', () => {
       const data = [1, Infinity, 3, -Infinity, 5];
-      const result = Sparkline({ data });
-      expect(result).not.toBeNull();
+      const result = renderToFrame(Sparkline, { data });
+      assert.notEqual(result, null);
     });
 
     it('should return null for all invalid data', () => {
       const data = [NaN, Infinity, -Infinity];
       // Component should handle this gracefully
-      expect(() => Sparkline({ data })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data }));
     });
 
     it('should handle negative values', () => {
       const data = [-5, -2, 0, 2, 5];
-      expect(() => Sparkline({ data })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data }));
     });
 
     it('should handle very large numbers', () => {
       const data = [1e10, 2e10, 3e10];
-      expect(() => Sparkline({ data })).not.toThrow();
+      assert.doesNotThrow(() => renderToFrame(Sparkline, { data }));
     });
   });
 
   describe('Width prop behavior', () => {
     it('should handle full width option', () => {
       const data = [1, 2, 3, 4, 5];
-      const result = Sparkline({ data, width: 'full' });
+      const result = renderToFrame(Sparkline, { data, width: 'full' });
       
-      expect(result).not.toBeNull();
-      expect(result?.type).toBeDefined();
-      // With mocked useAutoWidth returning 80, full width should be 76 (80 - 4)
+      assert.notEqual(result, null);
+      assert.equal(typeof result, 'string');
+      // renderToFrame makes useAutoWidth report 80, so full width should be 76 (80 - 4)
     });
 
     it('should calculate full width with margin', () => {
       const data = [1, 2, 3];
-      // useAutoWidth is mocked to return width: 80
-      const result = Sparkline({ data, width: 'full' });
+      // renderToFrame makes useAutoWidth report width: 80
+      const result = renderToFrame(Sparkline, { data, width: 'full' });
       
-      expect(result).not.toBeNull();
+      assert.notEqual(result, null);
       // The component should use Math.max(10, autoWidth.width - 4)
       // So with autoWidth.width = 80, effective width should be 76
     });
@@ -171,69 +158,64 @@ describe('Sparkline Component', () => {
   describe('Expected behavior (failing tests)', () => {
     it('should render basic sparkline with block symbols', () => {
       const data = [1, 2, 3, 4, 5];
-      const result = Sparkline({ data, width: 10, mode: 'block' });
+      const result = renderToFrame(Sparkline, { data, width: 10, mode: 'block' });
       
       // This should fail because component currently returns null
-      expect(result).not.toBeNull();
-      expect(result?.type).toBeDefined();
+      assert.notEqual(result, null);
+      assert.equal(typeof result, 'string');
     });
 
     it('should handle width configuration', () => {
       const data = [1, 2, 3, 4, 5];
-      const result = Sparkline({ data, width: 25 });
+      const result = renderToFrame(Sparkline, { data, width: 25 });
       
       // This should fail because component needs to respect width
-      expect(result).not.toBeNull();
+      assert.notEqual(result, null);
     });
 
     it('should handle different modes', () => {
       const data = [1, 2, 3, 4, 5];
-      const blockResult = Sparkline({ data, mode: 'block' });
-      const brailleResult = Sparkline({ data, mode: 'braille' });
+      const blockResult = renderToFrame(Sparkline, { data, mode: 'block' });
+      const brailleResult = renderToFrame(Sparkline, { data, mode: 'braille' });
       
       // These should fail because modes need to be implemented
-      expect(blockResult).not.toBeNull();
-      expect(brailleResult).not.toBeNull();
-      expect(blockResult).not.toEqual(brailleResult);
+      assert.notEqual(blockResult, null);
+      assert.notEqual(brailleResult, null);
+      assert.notDeepEqual(blockResult, brailleResult);
     });
 
     it('should handle yDomain configuration', () => {
       const data = [20, 30, 40];
-      const autoResult = Sparkline({ data, yDomain: 'auto' });
-      const fixedResult = Sparkline({ data, yDomain: [0, 100] });
+      const autoResult = renderToFrame(Sparkline, { data, yDomain: 'auto' });
+      const fixedResult = renderToFrame(Sparkline, { data, yDomain: [0, 100] });
       
-      expect(autoResult).not.toBeNull();
-      expect(fixedResult).not.toBeNull();
+      assert.notEqual(autoResult, null);
+      assert.notEqual(fixedResult, null);
       
-      // Compare the props.children content instead of object references
-      const autoContent = (autoResult as any)?.props?.children;
-      const fixedContent = (fixedResult as any)?.props?.children;
-      
-      expect(autoContent).toBeDefined();
-      expect(fixedContent).toBeDefined();
-      expect(autoContent).not.toEqual(fixedContent);
+      // The rendered frames should differ
+      assert.notDeepEqual(autoResult, fixedResult);
     });
 
     it('should handle threshold highlighting', () => {
       const data = [1, 5, 10];
-      const withThreshold = Sparkline({ data, threshold: 7 });
-      const withoutThreshold = Sparkline({ data });
+      const withThreshold = renderToFrame(Sparkline, { data, threshold: 7 });
+      const withoutThreshold = renderToFrame(Sparkline, { data });
       
       // These should fail because threshold logic needs implementation
-      expect(withThreshold).not.toBeNull();
-      expect(withoutThreshold).not.toBeNull();
-      expect(withThreshold).not.toEqual(withoutThreshold);
+      assert.notEqual(withThreshold, null);
+      assert.notEqual(withoutThreshold, null);
+      assert.notDeepEqual(withThreshold, withoutThreshold);
     });
 
     it('should handle caption display', () => {
       const data = [1, 2, 3];
-      const withCaption = Sparkline({ data, caption: 'Test' });
-      const withoutCaption = Sparkline({ data });
+      const withCaption = renderToFrame(Sparkline, { data, caption: 'Test' });
+      const withoutCaption = renderToFrame(Sparkline, { data });
       
       // These should fail because caption logic needs implementation
-      expect(withCaption).not.toBeNull();
-      expect(withoutCaption).not.toBeNull();
-      expect(withCaption).not.toEqual(withoutCaption);
+      assert.notEqual(withCaption, null);
+      assert.notEqual(withoutCaption, null);
+      assert.notDeepEqual(withCaption, withoutCaption);
     });
   });
 });

@@ -22,9 +22,7 @@ export default [
       globals: {
         ...globals.node,
         ...globals.es2020,
-        ...globals.jest,
         NodeJS: 'readonly',
-        fail: 'readonly',
       },
     },
     plugins: {

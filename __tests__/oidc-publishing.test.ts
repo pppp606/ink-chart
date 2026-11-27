@@ -8,6 +8,9 @@
  * authentication and provides proper fallback mechanisms.
  */
 
+import { afterEach, beforeEach, describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { assertContains } from './helpers/assertions.js';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -17,7 +20,6 @@ describe('OIDC Publishing Workflow Validation', () => {
   const workflowPath = path.resolve(process.cwd(), '.github', 'workflows', 'publish-npm.yml');
 
   beforeEach(() => {
-    jest.resetModules();
     process.env = { ...originalEnv };
 
     // Clear OIDC/GitHub environment variables to ensure clean test state
@@ -44,7 +46,7 @@ describe('OIDC Publishing Workflow Validation', () => {
       process.env.CI = 'true';
 
       const isOidcReady = validateOidcPublishingEnvironment();
-      expect(isOidcReady).toBe(true);
+      assert.equal(isOidcReady, true);
     });
 
     it('should fail validation with incomplete OIDC environment', () => {
@@ -56,22 +58,22 @@ describe('OIDC Publishing Workflow Validation', () => {
       process.env.CI = 'true';
 
       const isOidcReady = validateOidcPublishingEnvironment();
-      expect(isOidcReady).toBe(false);
+      assert.equal(isOidcReady, false);
     });
 
     it('should validate tag-based publishing trigger', () => {
       process.env.GITHUB_REF = 'refs/tags/v1.2.3';
 
       const isTaggedRelease = isTagBasedRelease();
-      expect(isTaggedRelease).toBe(true);
-      expect(extractVersionFromRef()).toBe('v1.2.3');
+      assert.equal(isTaggedRelease, true);
+      assert.equal(extractVersionFromRef(), 'v1.2.3');
     });
 
     it('should reject non-tag references', () => {
       process.env.GITHUB_REF = 'refs/heads/main';
 
       const isTaggedRelease = isTagBasedRelease();
-      expect(isTaggedRelease).toBe(false);
+      assert.equal(isTaggedRelease, false);
     });
   });
 
@@ -81,16 +83,16 @@ describe('OIDC Publishing Workflow Validation', () => {
       const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
       // Validate required fields for OIDC publishing
-      expect(packageJson.name).toBe('@pppp606/ink-chart');
-      expect(packageJson.repository).toBeDefined();
-      expect(packageJson.repository.url).toContain('github.com/pppp606/ink-chart');
-      expect(packageJson.author).toBeDefined();
-      expect(packageJson.license).toBeDefined();
+      assert.equal(packageJson.name, '@pppp606/ink-chart');
+      assert.notEqual(packageJson.repository, undefined);
+      assertContains(packageJson.repository.url, 'github.com/pppp606/ink-chart');
+      assert.notEqual(packageJson.author, undefined);
+      assert.notEqual(packageJson.license, undefined);
 
       // Validate npm-specific configurations
-      expect(packageJson.files).toContain('dist');
-      expect(packageJson.main).toBe('dist/index.js');
-      expect(packageJson.types).toBe('dist/index.d.ts');
+      assertContains(packageJson.files, 'dist');
+      assert.equal(packageJson.main, 'dist/index.js');
+      assert.equal(packageJson.types, 'dist/index.d.ts');
     });
 
     it('should validate build outputs exist for publishing', () => {
@@ -103,9 +105,9 @@ describe('OIDC Publishing Workflow Validation', () => {
       // This should pass if dist files exist, otherwise provide clear error
       if (fs.existsSync(distPath)) {
         const buildOutputsExist = validateBuildOutputs(distPath, expectedFiles);
-        expect(buildOutputsExist).toBe(true);
+        assert.equal(buildOutputsExist, true);
       } else {
-        expect(() => validateBuildOutputs(distPath, expectedFiles)).toThrow('Build outputs not found');
+        assert.throws(() => validateBuildOutputs(distPath, expectedFiles), /Build outputs not found/);
       }
     });
   });
@@ -116,12 +118,12 @@ describe('OIDC Publishing Workflow Validation', () => {
       const workflowContent = fs.readFileSync(workflowPath, 'utf8');
 
       // Validate OIDC permissions
-      expect(workflowContent).toContain('id-token: write');
-      expect(workflowContent).toContain('contents: read');
+      assertContains(workflowContent, 'id-token: write');
+      assertContains(workflowContent, 'contents: read');
 
       // Validate OIDC publishing command
-      expect(workflowContent).toContain('--provenance');
-      expect(workflowContent).toContain('npm publish');
+      assertContains(workflowContent, '--provenance');
+      assertContains(workflowContent, 'npm publish');
     });
 
     it('should simulate authentication method detection from workflow', () => {
@@ -131,7 +133,7 @@ describe('OIDC Publishing Workflow Validation', () => {
       delete process.env.NPM_TOKEN;
 
       const result = simulateBashAuthDetection();
-      expect(result).toBe('oidc');
+      assert.equal(result, 'oidc');
     });
 
     it('should simulate NPM token fallback from workflow', () => {
@@ -141,7 +143,7 @@ describe('OIDC Publishing Workflow Validation', () => {
       process.env.NPM_TOKEN = 'npm_mock_token';
 
       const result = simulateBashAuthDetection();
-      expect(result).toBe('npm-token');
+      assert.equal(result, 'npm-token');
     });
   });
 
@@ -153,7 +155,7 @@ describe('OIDC Publishing Workflow Validation', () => {
         provenance: true
       });
 
-      expect(command).toBe('npm publish --access public --provenance --registry=https://registry.npmjs.org');
+      assert.equal(command, 'npm publish --access public --provenance --registry=https://registry.npmjs.org');
     });
 
     it('should validate npm registry connectivity', async () => {
@@ -162,23 +164,23 @@ describe('OIDC Publishing Workflow Validation', () => {
       const registryCheck = await validateRegistryConnectivity('https://registry.npmjs.org');
 
       // This should pass in most environments with internet access
-      expect(registryCheck).toBe(true);
+      assert.equal(registryCheck, true);
     });
 
     it('should validate package publication readiness', () => {
       const readinessCheck = validatePublicationReadiness();
 
       // This encompasses all pre-publication validations
-      expect(readinessCheck.packageJson).toBe(true);
+      assert.equal(readinessCheck.packageJson, true);
 
       // In CI, build outputs may not exist yet (build runs after tests)
       // In local dev after building, build outputs should exist
       // Use originalEnv because beforeEach clears process.env.CI
       if (!originalEnv.CI) {
-        expect(readinessCheck.buildOutputs).toBeTruthy();
+        assert.ok(readinessCheck.buildOutputs);
       }
 
-      expect(readinessCheck.npmRegistry).toBeTruthy();
+      assert.ok(readinessCheck.npmRegistry);
     });
   });
 
@@ -188,24 +190,24 @@ describe('OIDC Publishing Workflow Validation', () => {
       process.env.ACTIONS_ID_TOKEN_REQUEST_URL = 'https://invalid-url.com';
       process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN = 'invalid-token';
 
-      expect(() => validateOidcTokenRequest()).toThrow('OIDC token request failed');
+      assert.throws(() => validateOidcTokenRequest(), /OIDC token request failed/);
     });
 
     it('should provide clear error messages for missing permissions', () => {
       // Test error message when id-token permission is missing
       const missingPermissionError = getMissingPermissionErrorMessage('id-token');
 
-      expect(missingPermissionError).toContain('id-token: write');
-      expect(missingPermissionError).toContain('permissions');
+      assertContains(missingPermissionError, 'id-token: write');
+      assertContains(missingPermissionError, 'permissions');
     });
 
     it('should handle network failures during publishing', () => {
       // Simulate network failure scenario
       const networkError = simulateNetworkFailure();
 
-      expect(networkError.code).toBe('NETWORK_ERROR');
-      expect(networkError.message).toContain('registry unreachable');
-      expect(networkError.retryable).toBe(true);
+      assert.equal(networkError.code, 'NETWORK_ERROR');
+      assertContains(networkError.message, 'registry unreachable');
+      assert.equal(networkError.retryable, true);
     });
   });
 
@@ -222,10 +224,10 @@ describe('OIDC Publishing Workflow Validation', () => {
 
       const securityValidation = validateOidcSecurityClaims(mockOidcClaims);
 
-      expect(securityValidation.issuerValid).toBe(true);
-      expect(securityValidation.audienceValid).toBe(true);
-      expect(securityValidation.repositoryValid).toBe(true);
-      expect(securityValidation.refValid).toBe(true);
+      assert.equal(securityValidation.issuerValid, true);
+      assert.equal(securityValidation.audienceValid, true);
+      assert.equal(securityValidation.repositoryValid, true);
+      assert.equal(securityValidation.refValid, true);
     });
 
     it('should reject invalid OIDC token claims', () => {
@@ -239,8 +241,8 @@ describe('OIDC Publishing Workflow Validation', () => {
 
       const securityValidation = validateOidcSecurityClaims(invalidOidcClaims);
 
-      expect(securityValidation.issuerValid).toBe(false);
-      expect(securityValidation.repositoryValid).toBe(false);
+      assert.equal(securityValidation.issuerValid, false);
+      assert.equal(securityValidation.repositoryValid, false);
     });
   });
 });

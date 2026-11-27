@@ -1,33 +1,21 @@
-import React from 'react';
-
-// Mock Ink components for testing
-jest.mock('ink', () => ({
-  Text: ({ children }: { children: React.ReactNode }) => children,
-  Box: ({ children }: { children: React.ReactNode }) => children,
-}));
-
-// Mock useAutoWidth hook
-jest.mock('../src/core/useAutoWidth.js', () => ({
-  useAutoWidth: () => ({
-    width: 80,
-    isAutoWidth: true,
-  }),
-}));
+import { describe, it } from 'node:test';
+import assert from 'node:assert/strict';
+import { renderToFrame } from './helpers/renderToFrame.js';
 
 import {
   StackedBarChart,
   type StackedBarChartProps,
 } from '../src/components/StackedBarChart.js';
 
-// Helper to render StackedBarChart (works with React.memo wrapped components)
+// Helper to render StackedBarChart through Ink (null when nothing is rendered)
 function renderStackedBarChart(props: StackedBarChartProps) {
-  return React.createElement(StackedBarChart, props);
+  return renderToFrame(StackedBarChart, props);
 }
 
 describe('StackedBarChart Component', () => {
   describe('basic component structure', () => {
     it('should be defined', () => {
-      expect(StackedBarChart).toBeDefined();
+      assert.notEqual(StackedBarChart, undefined);
     });
 
     it('should return a React element for valid data', () => {
@@ -36,12 +24,12 @@ describe('StackedBarChart Component', () => {
         { label: 'B', value: 50 },
       ];
       const result = renderStackedBarChart({ data, width: 20 });
-      expect(result).toBeDefined();
+      assert.notEqual(result, undefined);
     });
 
     it('should not throw with required data prop', () => {
       const data = [{ label: 'A', value: 100 }];
-      expect(() => renderStackedBarChart({ data })).not.toThrow();
+      assert.doesNotThrow(() => renderStackedBarChart({ data }));
     });
   });
 
@@ -49,41 +37,38 @@ describe('StackedBarChart Component', () => {
     it('should return null for empty data array', () => {
       const result = renderStackedBarChart({ data: [] });
       // React.createElement returns an element, but the component renders null
-      expect(result).toBeDefined();
+      assert.notEqual(result, undefined);
     });
 
     it('should handle all zero values', () => {
-      expect(() =>
+      assert.doesNotThrow(() =>
         renderStackedBarChart({
           data: [
             { label: 'A', value: 0 },
             { label: 'B', value: 0 },
           ],
-        })
-      ).not.toThrow();
+        }));
     });
 
     it('should handle all negative values', () => {
-      expect(() =>
+      assert.doesNotThrow(() =>
         renderStackedBarChart({
           data: [
             { label: 'A', value: -10 },
             { label: 'B', value: -20 },
           ],
-        })
-      ).not.toThrow();
+        }));
     });
 
     it('should handle mixed positive and negative values', () => {
-      expect(() =>
+      assert.doesNotThrow(() =>
         renderStackedBarChart({
           data: [
             { label: 'A', value: 50 },
             { label: 'B', value: -10 }, // negative values are treated as 0
           ],
           width: 20,
-        })
-      ).not.toThrow();
+        }));
     });
   });
 
@@ -93,7 +78,7 @@ describe('StackedBarChart Component', () => {
         { label: 'A', value: 25 },
         { label: 'B', value: 75 },
       ];
-      expect(() => renderStackedBarChart({ data, width: 20 })).not.toThrow();
+      assert.doesNotThrow(() => renderStackedBarChart({ data, width: 20 }));
     });
 
     it('should accept mode prop as percentage', () => {
@@ -101,9 +86,8 @@ describe('StackedBarChart Component', () => {
         { label: 'A', value: 50 },
         { label: 'B', value: 50 },
       ];
-      expect(() =>
-        renderStackedBarChart({ data, mode: 'percentage', width: 20 })
-      ).not.toThrow();
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, mode: 'percentage', width: 20 }));
     });
   });
 
@@ -113,9 +97,8 @@ describe('StackedBarChart Component', () => {
         { label: 'A', value: 100 },
         { label: 'B', value: 200 },
       ];
-      expect(() =>
-        renderStackedBarChart({ data, mode: 'absolute', width: 20 })
-      ).not.toThrow();
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, mode: 'absolute', width: 20 }));
     });
 
     it('should accept max prop in absolute mode', () => {
@@ -123,9 +106,8 @@ describe('StackedBarChart Component', () => {
         { label: 'A', value: 50 },
         { label: 'B', value: 50 },
       ];
-      expect(() =>
-        renderStackedBarChart({ data, mode: 'absolute', max: 200, width: 20 })
-      ).not.toThrow();
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, mode: 'absolute', max: 200, width: 20 }));
     });
 
     it('should accept max as auto', () => {
@@ -133,31 +115,26 @@ describe('StackedBarChart Component', () => {
         { label: 'A', value: 50 },
         { label: 'B', value: 50 },
       ];
-      expect(() =>
-        renderStackedBarChart({ data, mode: 'absolute', max: 'auto', width: 20 })
-      ).not.toThrow();
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, mode: 'absolute', max: 'auto', width: 20 }));
     });
   });
 
   describe('display options', () => {
     it('should accept showLabels prop', () => {
       const data = [{ label: 'A', value: 100 }];
-      expect(() =>
-        renderStackedBarChart({ data, showLabels: false, width: 20 })
-      ).not.toThrow();
-      expect(() =>
-        renderStackedBarChart({ data, showLabels: true, width: 20 })
-      ).not.toThrow();
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, showLabels: false, width: 20 }));
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, showLabels: true, width: 20 }));
     });
 
     it('should accept showValues prop', () => {
       const data = [{ label: 'A', value: 100 }];
-      expect(() =>
-        renderStackedBarChart({ data, showValues: false, width: 20 })
-      ).not.toThrow();
-      expect(() =>
-        renderStackedBarChart({ data, showValues: true, width: 20 })
-      ).not.toThrow();
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, showValues: false, width: 20 }));
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, showValues: true, width: 20 }));
     });
   });
 
@@ -165,26 +142,25 @@ describe('StackedBarChart Component', () => {
     it('should accept custom format function', () => {
       const data = [{ label: 'A', value: 50 }];
       const format = (value: number) => `[${value}]`;
-      expect(() =>
-        renderStackedBarChart({ data, format, width: 20 })
-      ).not.toThrow();
+      assert.doesNotThrow(() =>
+        renderStackedBarChart({ data, format, width: 20 }));
     });
   });
 
   describe('width options', () => {
     it('should accept width as number', () => {
       const data = [{ label: 'A', value: 100 }];
-      expect(() => renderStackedBarChart({ data, width: 40 })).not.toThrow();
+      assert.doesNotThrow(() => renderStackedBarChart({ data, width: 40 }));
     });
 
     it('should accept width as auto', () => {
       const data = [{ label: 'A', value: 100 }];
-      expect(() => renderStackedBarChart({ data, width: 'auto' })).not.toThrow();
+      assert.doesNotThrow(() => renderStackedBarChart({ data, width: 'auto' }));
     });
 
     it('should accept width as full', () => {
       const data = [{ label: 'A', value: 100 }];
-      expect(() => renderStackedBarChart({ data, width: 'full' })).not.toThrow();
+      assert.doesNotThrow(() => renderStackedBarChart({ data, width: 'full' }));
     });
   });
 
@@ -194,7 +170,7 @@ describe('StackedBarChart Component', () => {
         { label: 'A', value: 50, char: '▓' as const },
         { label: 'B', value: 50, char: '░' as const },
       ];
-      expect(() => renderStackedBarChart({ data, width: 20 })).not.toThrow();
+      assert.doesNotThrow(() => renderStackedBarChart({ data, width: 20 }));
     });
   });
 
@@ -204,7 +180,7 @@ describe('StackedBarChart Component', () => {
         { label: 'A', value: 50, color: '#ff0000' },
         { label: 'B', value: 50, color: 'green' },
       ];
-      expect(() => renderStackedBarChart({ data, width: 20 })).not.toThrow();
+      assert.doesNotThrow(() => renderStackedBarChart({ data, width: 20 }));
     });
   });
 
@@ -222,9 +198,9 @@ describe('StackedBarChart Component', () => {
       // With barWidth=10 and 20 segments each getting minimum length of 1,
       // currentPos would be 20, exceeding barWidth of 10.
       // Without the PR #33 fix, this would cause a crash due to negative length.
-      expect(() => {
+      assert.doesNotThrow(() => {
         renderStackedBarChart({ data: manySmallSegments, width: 10 });
-      }).not.toThrow();
+      });
     });
 
     it('should handle segments where rounding causes total to exceed width', () => {
@@ -242,23 +218,22 @@ describe('StackedBarChart Component', () => {
         { label: 'H', value: 1 },
       ];
 
-      expect(() => {
+      assert.doesNotThrow(() => {
         renderStackedBarChart({
           data,
           width: 5,
           showLabels: false,
           showValues: false,
         });
-      }).not.toThrow();
+      });
     });
 
     it('should render correctly with single segment', () => {
-      expect(() =>
+      assert.doesNotThrow(() =>
         renderStackedBarChart({
           data: [{ label: 'Only', value: 100 }],
           width: 20,
-        })
-      ).not.toThrow();
+        }));
     });
 
     it('should handle very narrow width with multiple segments', () => {
@@ -268,9 +243,9 @@ describe('StackedBarChart Component', () => {
         { label: 'B', value: 50 },
       ];
 
-      expect(() => {
+      assert.doesNotThrow(() => {
         renderStackedBarChart({ data, width: 1 });
-      }).not.toThrow();
+      });
     });
 
     it('should handle extreme number of segments', () => {
@@ -280,27 +255,26 @@ describe('StackedBarChart Component', () => {
         value: 1,
       }));
 
-      expect(() => {
+      assert.doesNotThrow(() => {
         renderStackedBarChart({ data: manySegments, width: 10 });
-      }).not.toThrow();
+      });
     });
   });
 
   describe('multi-segment rendering', () => {
     it('should handle two segments', () => {
-      expect(() =>
+      assert.doesNotThrow(() =>
         renderStackedBarChart({
           data: [
             { label: 'A', value: 50 },
             { label: 'B', value: 50 },
           ],
           width: 20,
-        })
-      ).not.toThrow();
+        }));
     });
 
     it('should handle three segments', () => {
-      expect(() =>
+      assert.doesNotThrow(() =>
         renderStackedBarChart({
           data: [
             { label: 'A', value: 30 },
@@ -308,20 +282,18 @@ describe('StackedBarChart Component', () => {
             { label: 'C', value: 40 },
           ],
           width: 20,
-        })
-      ).not.toThrow();
+        }));
     });
 
     it('should handle segments with very different sizes', () => {
-      expect(() =>
+      assert.doesNotThrow(() =>
         renderStackedBarChart({
           data: [
             { label: 'Tiny', value: 1 },
             { label: 'Huge', value: 999 },
           ],
           width: 20,
-        })
-      ).not.toThrow();
+        }));
     });
   });
 });
